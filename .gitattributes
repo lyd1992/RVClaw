@@ -8,3 +8,5 @@
 *.yml text eol=lf
 *.toml text eol=lf
 *.jsonl text eol=lf
+Dockerfile text eol=lf
+*.Dockerfile text eol=lf

@@ -10,6 +10,7 @@ env/
 build/
 dist/
 *.egg-info/
+.ccache/
 
 # Runtime artifacts
 runs/*
@@ -17,6 +18,9 @@ runs/*
 third_party/
 deps/
 deploy/sg2044/*.generated.sh
+*.tar
+*.tar.gz
+*.tar.xz
 *.sqlite3
 *.db
 *.jsonl.tmp

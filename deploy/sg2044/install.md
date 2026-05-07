@@ -9,6 +9,34 @@ source deploy/sg2044/env.sh
 python3 -m rvclaw run --planner mock
 ```
 
+## MNN Docker Build
+
+Build the GCC 15.1 toolchain image once on SG2044:
+
+```bash
+bash docker/sg2044/gcc15.1/build_image.sh
+bash docker/sg2044/gcc15.1/verify_image.sh
+```
+
+Build MNN inside that image while keeping source and build artifacts on the host:
+
+```bash
+python3 -m rvclaw container doctor
+python3 -m rvclaw container mnn plan
+bash deploy/sg2044/mnn_container_build.sh
+```
+
+Outputs:
+
+```text
+third_party/MNN/
+build/mnn-sg2044-gcc15/
+runs/env/<run_id>/container_manifest.json
+runs/env/<run_id>/mnn_build.log
+```
+
+See `docs/mnn_container_build.md` for the full workflow.
+
 ## Optional Backend Installs
 
 RVClaw can generate or run source-install plans for optional backends:

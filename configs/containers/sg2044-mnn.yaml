@@ -1,0 +1,18 @@
+name: sg2044-mnn
+runtime: docker
+base_image: rvclaw/sg2044-gcc15.1:openeuler-riscv64
+workspace_mount: /workspace/RVClaw
+deps_mount: /workspace/RVClaw/third_party
+build_mount: /workspace/RVClaw/build
+ccache_mount: /workspace/.ccache
+backend:
+  name: mnn
+  repo: https://github.com/alibaba/MNN.git
+  ref: master
+  build_dir: build/mnn-sg2044-gcc15
+  cmake_flags:
+    - MNN_BUILD_SHARED_LIBS=ON
+    - MNN_BUILD_TOOLS=ON
+    - MNN_BUILD_BENCHMARK=ON
+    - MNN_BUILD_TEST=OFF
+    - MNN_BUILD_CONVERTER=OFF

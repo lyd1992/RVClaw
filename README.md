@@ -129,6 +129,46 @@ bash deploy/sg2044/run_demo.sh
 
 - `deploy/sg2044/install.md`
 - `docs/operations.md`
+- `docs/mnn_container_build.md`
+
+## MNN Docker 构建流程
+
+第一阶段以 MNN 为例打通容器化构建。需要先在 SG2044 上构建一次 GCC 15.1 工具链镜像：
+
+```bash
+bash docker/sg2044/gcc15.1/build_image.sh
+bash docker/sg2044/gcc15.1/verify_image.sh
+```
+
+该镜像只内置 openEuler、GCC/G++ 15.1、CMake、Ninja、Python、git、make、ccache 等构建环境；MNN 源码和 build 产物不写进镜像，而是挂载到宿主机目录：
+
+```text
+third_party/MNN/
+build/mnn-sg2044-gcc15/
+runs/env/<run_id>/
+```
+
+查看 MNN 容器构建计划：
+
+```bash
+export PYTHONPATH="$PWD/src"
+python3 -m rvclaw container doctor
+python3 -m rvclaw container mnn plan
+```
+
+生成或执行 MNN 容器构建脚本：
+
+```bash
+python3 -m rvclaw container mnn script --output deploy/sg2044/mnn_container_build.generated.sh
+bash deploy/sg2044/mnn_container_build.sh
+```
+
+构建完成后检查：
+
+```bash
+find build/mnn-sg2044-gcc15 -name "libMNN.so" -o -name "*benchmark*" -o -name "*MNN*"
+cat runs/env/*/container_manifest.json
+```
 
 ## 后端框架安装管理
 

@@ -5,6 +5,16 @@ import json
 from pathlib import Path
 
 from rvclaw.api import run_demo
+from rvclaw.container.manager import (
+    DEFAULT_BUILD_DIR,
+    DEFAULT_GCC15_IMAGE,
+    DEFAULT_MNN_REF,
+    build_mnn_script,
+    collect_container_doctor,
+    format_container_doctor,
+    format_mnn_plan,
+    run_mnn_container_build,
+)
 from rvclaw.install.manager import (
     DEFAULT_DEPS_DIR,
     build_install_script,
@@ -54,6 +64,27 @@ def build_parser() -> argparse.ArgumentParser:
     _add_install_args(run_install_parser)
     run_install_parser.add_argument("--yes", action="store_true", help="confirm execution of network/build commands")
 
+    container_parser = subparsers.add_parser("container", help="manage Docker-based SG2044 build workflows")
+    container_subparsers = container_parser.add_subparsers(dest="container_command")
+
+    container_doctor = container_subparsers.add_parser("doctor", help="inspect Docker and RVClaw images")
+    container_doctor.add_argument("--image", default=DEFAULT_GCC15_IMAGE, help="GCC 15.1 toolchain image")
+    container_doctor.add_argument("--json", action="store_true", help="print machine-readable diagnostics")
+
+    mnn_parser = container_subparsers.add_parser("mnn", help="manage MNN container build workflow")
+    mnn_subparsers = mnn_parser.add_subparsers(dest="mnn_command")
+
+    mnn_plan = mnn_subparsers.add_parser("plan", help="print the MNN container build plan")
+    _add_mnn_container_args(mnn_plan)
+
+    mnn_script = mnn_subparsers.add_parser("script", help="write an MNN container build script")
+    _add_mnn_container_args(mnn_script)
+    mnn_script.add_argument("--output", default="deploy/sg2044/mnn_container_build.sh", help="script output path")
+
+    mnn_run = mnn_subparsers.add_parser("run", help="execute the MNN container build workflow")
+    _add_mnn_container_args(mnn_run)
+    mnn_run.add_argument("--yes", action="store_true", help="confirm Docker execution")
+
     return parser
 
 
@@ -93,6 +124,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "install":
         return _handle_install(args, parser)
 
+    if args.command == "container":
+        return _handle_container(args, parser)
+
     parser.print_help()
     return 1
 
@@ -112,6 +146,12 @@ def _add_install_args(parser: argparse.ArgumentParser) -> None:
         metavar="BACKEND=REF",
         help="pin a backend git ref, for example llama_cpp=b1234 or mnn=3.5.0",
     )
+
+
+def _add_mnn_container_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--image", default=DEFAULT_GCC15_IMAGE, help="GCC 15.1 toolchain image")
+    parser.add_argument("--mnn-ref", default=DEFAULT_MNN_REF, help="MNN git ref to build")
+    parser.add_argument("--build-dir", default=DEFAULT_BUILD_DIR, help="MNN CMake build directory")
 
 
 def _handle_install(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
@@ -151,6 +191,46 @@ def _handle_install(args: argparse.Namespace, parser: argparse.ArgumentParser) -
             print("Refusing to execute install commands without --yes. Use 'rvclaw install plan' first.")
             return 2
         return run_backend_install(backends, deps_dir=deps_dir, refs=refs)
+
+    parser.print_help()
+    return 1
+
+
+def _handle_container(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
+    command = getattr(args, "container_command", None)
+    if command is None:
+        print("Missing container subcommand. Use: rvclaw container doctor|mnn")
+        return 1
+
+    if command == "doctor":
+        report = collect_container_doctor(image=args.image)
+        if args.json:
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+        else:
+            print(format_container_doctor(report))
+        return 0
+
+    if command == "mnn":
+        mnn_command = getattr(args, "mnn_command", None)
+        if mnn_command is None:
+            print("Missing MNN subcommand. Use: rvclaw container mnn plan|script|run")
+            return 1
+
+        if mnn_command == "plan":
+            print(format_mnn_plan(image=args.image, mnn_ref=args.mnn_ref, build_dir=args.build_dir))
+            return 0
+
+        if mnn_command == "script":
+            script = build_mnn_script(image=args.image, mnn_ref=args.mnn_ref, build_dir=args.build_dir)
+            output = write_script(args.output, script)
+            print(output)
+            return 0
+
+        if mnn_command == "run":
+            if not args.yes:
+                print("Refusing to execute Docker workflow without --yes. Use 'rvclaw container mnn plan' first.")
+                return 2
+            return run_mnn_container_build(image=args.image, mnn_ref=args.mnn_ref, build_dir=args.build_dir)
 
     parser.print_help()
     return 1
