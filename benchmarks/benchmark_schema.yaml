@@ -1,0 +1,20 @@
+version: "0.1.0"
+required_fields:
+  - run_id
+  - platform.soc
+  - platform.core
+  - platform.rvv_vlen
+  - platform.os
+  - runtime.engine
+  - runtime.commit
+  - runtime.build_flags
+  - model.name
+  - model.dtype
+  - model.quant
+  - model.kv_dtype
+  - metrics.tokens_s
+  - metrics.ttft_ms
+  - metrics.p95_ms
+  - metrics.p99_ms
+  - metrics.memory_mb
+  - metrics.task_success

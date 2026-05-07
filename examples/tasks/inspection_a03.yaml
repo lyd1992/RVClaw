@@ -1,0 +1,8 @@
+goal: "检查 A-03 区域设备状态并生成报告"
+source: "example"
+expected_artifacts:
+  - "task.yaml"
+  - "metrics.json"
+  - "trace.jsonl"
+  - "report.md"
+  - "raw.log"

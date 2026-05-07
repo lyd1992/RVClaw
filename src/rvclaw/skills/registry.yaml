@@ -1,0 +1,99 @@
+{
+  "version": "0.1.0",
+  "skills": [
+    {
+      "name": "memory_query",
+      "description": "Query local SQLite/JSONL memory for device profiles and inspection history.",
+      "safety_level": "read",
+      "timeout_s": 5,
+      "requires_confirmation": false,
+      "parameters": {
+        "required": ["query"],
+        "properties": {
+          "query": {"type": "string"},
+          "limit": {"type": "integer", "minimum": 1, "maximum": 10}
+        }
+      }
+    },
+    {
+      "name": "move_to",
+      "description": "Move mock device to a named inspection zone.",
+      "safety_level": "controlled_motion",
+      "timeout_s": 10,
+      "requires_confirmation": false,
+      "parameters": {
+        "required": ["target"],
+        "properties": {
+          "target": {"type": "string", "enum": ["A-03", "BASE"]}
+        }
+      }
+    },
+    {
+      "name": "capture_image",
+      "description": "Capture a mock inspection image artifact.",
+      "safety_level": "read_sensor",
+      "timeout_s": 10,
+      "requires_confirmation": false,
+      "parameters": {
+        "required": ["target"],
+        "properties": {
+          "target": {"type": "string", "enum": ["A-03", "BASE"]},
+          "mode": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "detect_status",
+      "description": "Detect device state from the latest mock image.",
+      "safety_level": "local_inference",
+      "timeout_s": 10,
+      "requires_confirmation": false,
+      "parameters": {
+        "required": ["target"],
+        "properties": {
+          "target": {"type": "string", "enum": ["A-03", "BASE"]},
+          "image_ref": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "speak",
+      "description": "Speak a short status message through the mock device.",
+      "safety_level": "output",
+      "timeout_s": 5,
+      "requires_confirmation": false,
+      "parameters": {
+        "required": ["text"],
+        "properties": {
+          "text": {"type": "string", "max_length": 200}
+        }
+      }
+    },
+    {
+      "name": "upload_report",
+      "description": "Upload the generated inspection report to a mock endpoint.",
+      "safety_level": "network_mock",
+      "timeout_s": 5,
+      "requires_confirmation": false,
+      "parameters": {
+        "required": ["title"],
+        "properties": {
+          "title": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "stop",
+      "description": "Emergency stop for the mock device.",
+      "safety_level": "emergency",
+      "timeout_s": 3,
+      "requires_confirmation": false,
+      "parameters": {
+        "required": [],
+        "properties": {
+          "reason": {"type": "string"}
+        }
+      }
+    }
+  ]
+}

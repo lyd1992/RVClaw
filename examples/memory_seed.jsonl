@@ -1,0 +1,2 @@
+{"kind":"device_profile","content":{"zone":"A-03","device":"edge-inference-node-a03","expected_status":"normal"},"tags":["seed","device","A-03"]}
+{"kind":"inspection_history","content":{"zone":"A-03","last_result":"normal","last_report":"No abnormal vibration or overheating found."},"tags":["seed","inspection","A-03"]}

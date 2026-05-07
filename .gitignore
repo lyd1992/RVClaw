@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+build/
+dist/
+*.egg-info/
+
+# Runtime artifacts
+runs/*
+!runs/.gitkeep
+*.sqlite3
+*.db
+*.jsonl.tmp
+
+# Local tools
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
