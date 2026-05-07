@@ -1,38 +1,87 @@
 # RVClaw
 
-RVClaw 是 Demo Claw v0.1 的最小可运行框架，定位为面向具身智能设备的 RISC-V 端侧 Agent Runtime。当前仓库先把任务闭环、接口边界、mock device、SQLite 记忆、白名单 skill、安全校验、trace/metrics/report 产物跑通，再逐步接入 llama.cpp、MNN、vLLM、Knowhere/Milvus 等优化后端。
+RVClaw 是 Demo Claw v0.1 的最小可运行框架，面向 RISC-V Linux 环境，优先在 SG2044 / openEuler 等 RISC-V Linux 系统上完成安装、部署、运行、测试和验收。
 
-一句话口径：
+当前阶段的目标不是追求单点 kernel 性能，而是先把具身智能 Agent 的任务闭环跑通：
+
+```text
+自然语言任务
+  -> PlannerBackend
+  -> Agent Core
+  -> Safety Guard
+  -> Skill Router
+  -> Memory + Mock Device
+  -> trace / metrics / report 运行产物
+```
+
+一句话定位：
 
 > RVClaw 不是机器人整机，也不是大模型训练项目，而是 RISC-V 具身智能设备上可交付、可复现、可运维的软件底座。
 
-## 当前目标
+## 目标运行环境
 
-- 主验收平台：SG2044 / RVV VLEN=128。
-- Demo v0.1：设备巡检助手，默认任务为“检查 A-03 区域设备状态并生成报告”。
-- 默认闭环：Task Intake -> PlannerBackend -> Agent Core -> Safety Guard -> Skill Router -> Mock Device/Memory -> Observability。
-- 运行产物：`task.yaml`、`trace.jsonl`、`metrics.json`、`report.md`、`raw.log`。
-- 后端策略：v0.1 不强依赖 vLLM/MNN/Knowhere；它们在接口稳定后作为插件接入。
+第一阶段主验收环境：
 
-## 快速开始
+| 项目 | 当前口径 |
+|---|---|
+| SoC | SG2044 |
+| ISA | RV64GCV / RVV 1.0 |
+| RVV VLEN | 128 |
+| OS | openEuler RISC-V 或兼容 RISC-V Linux |
+| Python | Python 3.10+ |
+| 外部依赖 | mock Demo Claw 主链路零第三方依赖 |
 
-```powershell
+`K3 / VLEN=256` 只作为后续兼容验证目标，不作为 v0.1 首要验收平台。
+
+## 在 openEuler / RISC-V Linux 上安装
+
+```bash
+sudo dnf install -y git python3
+git clone https://github.com/lyd1992/RVClaw.git
 cd RVClaw
-$env:PYTHONPATH = "src"
-python -m rvclaw run --planner mock
+python3 --version
 ```
 
-也可以提交自定义任务：
+不安装包，直接运行：
 
-```powershell
-$env:PYTHONPATH = "src"
-python -m rvclaw run "检查 A-03 区域设备状态并生成报告" --planner mock
+```bash
+export PYTHONPATH="$PWD/src"
+python3 -m rvclaw run --planner mock
 ```
 
-运行完成后会生成类似目录：
+可选：以 editable 模式安装：
+
+```bash
+sudo dnf install -y python3-pip
+python3 -m pip install -e .
+rvclaw run --planner mock
+```
+
+## 运行 Demo Claw
+
+默认巡检任务：
+
+```bash
+export PYTHONPATH="$PWD/src"
+python3 -m rvclaw run --planner mock
+```
+
+自定义任务：
+
+```bash
+python3 -m rvclaw run "检查 A-03 区域设备状态并生成报告" --planner mock
+```
+
+输出 JSON 摘要：
+
+```bash
+python3 -m rvclaw run "检查 A-03 区域设备状态并生成报告" --planner mock --json
+```
+
+每次运行都会在 `runs/` 下生成一个运行目录：
 
 ```text
-runs/run-20260507T023000Z/
+runs/run-YYYYMMDDTHHMMSSZ/
   task.yaml
   metrics.json
   trace.jsonl
@@ -41,62 +90,120 @@ runs/run-20260507T023000Z/
   artifacts/
 ```
 
-如已安装 Claude CLI，可使用：
+这些文件是 Demo Claw v0.1 的基本验收产物。
 
-```powershell
-$env:PYTHONPATH = "src"
-python -m rvclaw run "检查 A-03 区域设备状态并生成报告" --planner claude
+## 在 RISC-V Linux 上测试
+
+```bash
+export PYTHONPATH="$PWD/src"
+python3 -m unittest discover -s tests
+python3 -m compileall -q src tests benchmarks
 ```
 
-`--planner auto` 会优先探测 Claude CLI，不存在时回退到 mock planner。
+运行端到端 benchmark：
 
-## 代码结构
+```bash
+python3 benchmarks/run_agent_e2e.py --repeat 3 --planner mock
+```
+
+benchmark 结果会写入：
+
+```text
+runs/benchmark_agent_e2e.csv
+```
+
+指标字段参考：
+
+```text
+benchmarks/benchmark_schema.yaml
+```
+
+## SG2044 辅助脚本
+
+```bash
+source deploy/sg2044/env.sh
+bash deploy/sg2044/run_demo.sh
+```
+
+部署说明：
+
+- `deploy/sg2044/install.md`
+- `docs/operations.md`
+
+## 目前已经实现的功能
+
+| 模块 | 当前状态 | 主要文件 |
+|---|---|---|
+| CLI 任务入口 | 已实现，支持自然语言任务提交 | `src/rvclaw/cli.py` |
+| Python API | 已实现，提供 `run_demo()` | `src/rvclaw/api.py` |
+| `task.yaml` 生成 | 已实现，每次 run 生成结构化任务文件 | `src/rvclaw/observability.py` |
+| Mock PlannerBackend | 已实现，能生成固定巡检 tool_calls | `src/rvclaw/agent/planner.py` |
+| Claude CLI PlannerBackend | 已实现适配器，需要本机存在 `claude` 命令 | `src/rvclaw/agent/planner.py` |
+| Auto Planner | 已实现，优先探测 Claude CLI，不存在时回退 mock planner | `src/rvclaw/agent/planner.py` |
+| Agent Core | 已实现基础执行循环、状态收敛和错误中止 | `src/rvclaw/agent/core.py` |
+| Skill Registry | 已实现白名单 registry | `src/rvclaw/skills/registry.yaml` |
+| Safety Guard | 已实现白名单、必填参数、类型、枚举、范围、timeout 默认值校验 | `src/rvclaw/agent/safety_guard.py` |
+| Tool Router | 已实现 skill 调用分发和结果记录 | `src/rvclaw/agent/tool_router.py` |
+| Mock Skills | 已实现 `memory_query`、`move_to`、`capture_image`、`detect_status`、`speak`、`upload_report`、`stop` | `src/rvclaw/skills/builtin.py` |
+| SQLite 事件记忆 | 已实现，内置 A-03 设备画像和历史巡检 seed | `src/rvclaw/memory/sqlite_event_store.py` |
+| Flat Vector baseline | 已实现轻量词法检索 baseline | `src/rvclaw/memory/flat_vector_store.py` |
+| Mock Device | 已实现移动、拍照、状态检测、播报、上报、停止 mock 行为 | `src/rvclaw/adapters/mock_device.py` |
+| 运行产物 | 已实现 `task.yaml`、`metrics.json`、`trace.jsonl`、`report.md`、`raw.log` | `src/rvclaw/observability.py` |
+| E2E Benchmark | 已实现 mock 端到端 benchmark CSV 输出 | `benchmarks/run_agent_e2e.py` |
+| 基础单元测试 | 已实现 demo run 产物检查 | `tests/test_demo_run.py` |
+| SG2044 部署脚本 | 已实现环境变量和 demo 启动脚本 | `deploy/sg2044/` |
+
+## 尚未实现或仅预留接口的功能
+
+| 模块 | 当前状态 |
+|---|---|
+| FastAPI / Web API | 尚未实现；当前先提供 CLI 和 Python API |
+| ROS 2 Adapter | 仅占位 |
+| OpenClaw Adapter | 仅占位 |
+| llama.cpp / GGUF 后端 | 仅占位 |
+| MNN 后端 | 仅占位 |
+| vLLM 后端 | 仅占位 |
+| ONNX Runtime 后端 | 仅占位 |
+| Knowhere / Milvus MemoryBackend | 尚未实现 |
+| 真实相机 / IMU / 底盘控制 | 尚未实现，当前为 Mock Device |
+| 人工确认 UI | Safety Guard 预留边界，尚未实现交互式确认界面 |
+
+## 仓库结构
 
 ```text
 src/rvclaw/
-  agent/              # Agent Core、Planner、Safety Guard、Tool Router
+  agent/              # Planner、Agent Core、Safety Guard、Tool Router
   adapters/           # Mock Device，后续 ROS2/OpenClaw
-  memory/             # SQLite event store 与 flat vector baseline
-  runtime/            # RuntimeBackend 接口与后端占位
+  memory/             # SQLite event store 与 flat retrieval baseline
+  runtime/            # RuntimeBackend API 与后端占位
   skills/             # Skill Registry 与内置 mock skills
-  api.py              # run_demo 编程接口
-  cli.py              # CLI
-benchmarks/           # Demo e2e 与后端 benchmark 入口
-deploy/sg2044/        # SG2044 部署说明和启动脚本
-docs/                 # 架构、SRS/SDS、路线图、运维说明
-examples/             # 示例任务和记忆种子
+  api.py              # run_demo() 编程接口
+  cli.py              # 命令行入口
+benchmarks/           # 端到端 benchmark 入口
+deploy/sg2044/        # SG2044 / openEuler 辅助脚本
+docs/                 # 架构、SRS/SDS、运维、路线图
+examples/             # 示例任务和 memory seed
 tests/                # 基础回归测试
 ```
 
-## 测试
+## Demo Claw v0.1 验收清单
 
-```powershell
-cd RVClaw
-$env:PYTHONPATH = "src"
-python -m unittest discover -s tests
+在 SG2044 / openEuler 上，一次有效 demo run 应证明：
+
+- CLI 能接收自然语言巡检任务。
+- Planner 能生成受控 skill-call 序列。
+- Skill Registry 和 Safety Guard 会校验每个 skill 调用。
+- Mock Device 和 SQLite memory 能完成一次巡检闭环。
+- 运行目录包含 `task.yaml`、`metrics.json`、`trace.jsonl`、`report.md`、`raw.log`。
+- `python3 -m unittest discover -s tests` 通过。
+- `benchmarks/run_agent_e2e.py` 能生成 benchmark CSV。
+
+## 后续路线
+
+近期路线：
+
+```text
+Demo Claw -> Robot Agent -> Embodied Claw -> Fleet Claw
 ```
 
-## Benchmark
-
-```powershell
-cd RVClaw
-$env:PYTHONPATH = "src"
-python benchmarks/run_agent_e2e.py --repeat 3 --planner mock
-```
-
-结果会写入 `runs/benchmark_agent_e2e.csv`，字段遵循 `benchmarks/benchmark_schema.yaml`。
-
-## 路线图
-
-近期路线是：
-
-1. Demo Claw：SG2044 上可运行、可复现、可验收的 mock/baseline 样机。
-2. Robot Agent：单机任务型智能体，接入真实设备 adapter 与本地模型 baseline。
-3. Embodied Claw：单机长期值守智能体，增加事件循环、长期记忆、异常处理。
-4. Fleet Claw：多机协同、OTA、日志回放、远程诊断与运维。
-
-更多细节见 [docs/architecture.md](docs/architecture.md)、[docs/srs_sds.md](docs/srs_sds.md) 和 [docs/roadmap.md](docs/roadmap.md)。
-
-## 状态
-
-当前为 v0.1 skeleton。接口优先于单点性能，mock/baseline 优先于优化后端。所有性能数字必须记录平台、模型、后端、commit/build flags 和测试环境。
+MNN、vLLM、llama.cpp、Knowhere、Milvus 等后端应在 v0.1 主链路稳定后，通过统一接口作为可插拔优化后端接入。
