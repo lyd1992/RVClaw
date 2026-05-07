@@ -14,6 +14,9 @@ dist/
 # Runtime artifacts
 runs/*
 !runs/.gitkeep
+third_party/
+deps/
+deploy/sg2044/*.generated.sh
 *.sqlite3
 *.db
 *.jsonl.tmp

@@ -130,6 +130,61 @@ bash deploy/sg2044/run_demo.sh
 - `deploy/sg2044/install.md`
 - `docs/operations.md`
 
+## 后端框架安装管理
+
+RVClaw 可以统一管理 llama.cpp、MNN、vLLM 等可选后端的源码安装。v0.1 的 mock 主链路仍然保持零第三方依赖；这些后端通过 `rvclaw install` 作为可插拔能力接入。
+
+检查 SG2044 / openEuler 环境：
+
+```bash
+export PYTHONPATH="$PWD/src"
+python3 -m rvclaw doctor
+```
+
+列出支持的后端：
+
+```bash
+python3 -m rvclaw install list
+```
+
+查看安装计划，不执行：
+
+```bash
+python3 -m rvclaw install plan llama_cpp mnn
+python3 -m rvclaw install plan vllm
+```
+
+生成可审计 shell 脚本：
+
+```bash
+python3 -m rvclaw install script llama_cpp mnn --output deploy/sg2044/install_backends.generated.sh
+bash deploy/sg2044/install_backends.generated.sh
+```
+
+直接执行安装：
+
+```bash
+python3 -m rvclaw install run llama_cpp --yes
+python3 -m rvclaw install run mnn --yes
+```
+
+SG2044 辅助入口：
+
+```bash
+bash deploy/sg2044/install_backends.sh llama_cpp
+bash deploy/sg2044/install_backends.sh mnn
+```
+
+当前安装边界：
+
+| 后端 | 当前定位 | 安装动作 |
+|---|---|---|
+| llama.cpp | P0 本地 LLM/GGUF baseline | clone 源码，CMake Release 构建，验证 `llama-cli` |
+| MNN | P1 端侧视觉/小模型插件 | clone 源码，CMake Release 构建 CPU/tools/benchmark |
+| vLLM | P1/P2 服务化 LLM 实验后端 | clone 源码，Python development install；不承诺 RISC-V 高性能 backend |
+
+详细说明见 `docs/backend_installation.md`。
+
 ## 目前已经实现的功能
 
 | 模块 | 当前状态 | 主要文件 |
@@ -152,6 +207,8 @@ bash deploy/sg2044/run_demo.sh
 | E2E Benchmark | 已实现 mock 端到端 benchmark CSV 输出 | `benchmarks/run_agent_e2e.py` |
 | 基础单元测试 | 已实现 demo run 产物检查 | `tests/test_demo_run.py` |
 | SG2044 部署脚本 | 已实现环境变量和 demo 启动脚本 | `deploy/sg2044/` |
+| 后端安装管理 | 已实现 `doctor`、`install list/plan/script/run` | `src/rvclaw/install/` |
+| 后端安装文档 | 已实现 llama.cpp、MNN、vLLM 安装边界说明 | `docs/backend_installation.md` |
 
 ## 尚未实现或仅预留接口的功能
 
@@ -160,9 +217,9 @@ bash deploy/sg2044/run_demo.sh
 | FastAPI / Web API | 尚未实现；当前先提供 CLI 和 Python API |
 | ROS 2 Adapter | 仅占位 |
 | OpenClaw Adapter | 仅占位 |
-| llama.cpp / GGUF 后端 | 仅占位 |
-| MNN 后端 | 仅占位 |
-| vLLM 后端 | 仅占位 |
+| llama.cpp / GGUF RuntimeBackend | 推理适配器仍为占位；源码安装管理已实现 |
+| MNN RuntimeBackend | 推理适配器仍为占位；源码安装管理已实现 |
+| vLLM RuntimeBackend | 服务适配器仍为占位；源码/Python development 安装管理已实现 |
 | ONNX Runtime 后端 | 仅占位 |
 | Knowhere / Milvus MemoryBackend | 尚未实现 |
 | 真实相机 / IMU / 底盘控制 | 尚未实现，当前为 Mock Device |
