@@ -132,3 +132,7 @@ bash deploy/k3/run_demo.sh | tee /tmp/rvclaw_llama_run.json
 jq -r '.tool_calls[].name' /tmp/rvclaw_llama_run.json
 python3 benchmarks/run_agent_e2e.py --repeat 3 --planner llama_cpp --runs-dir /data/rvclaw/runs
 ```
+
+Do not type checklist labels such as `mock CLI / mock benchmark` as shell
+commands; use the concrete `python3 -m rvclaw ...` and `python3 benchmarks/...`
+commands above.

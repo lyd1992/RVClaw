@@ -111,6 +111,37 @@ class LlamaCppPlannerTest(unittest.TestCase):
 
         self.assertEqual([call.name for call in calls], ["memory_query", "move_to"])
 
+    def test_llama_cpp_planner_accepts_choice_content_response(self) -> None:
+        response = {
+            "choices": [
+                {
+                    "content": json.dumps(
+                        {
+                            "tool_calls": [
+                                {"name": "speak", "arguments": {"text": "hello"}},
+                            ]
+                        }
+                    )
+                }
+            ]
+        }
+        task = Task(task_id="run-test", goal="播报 hello", created_at="2026-05-21T00:00:00Z")
+        planner = LlamaCppPlannerBackend(base_url="http://127.0.0.1:9090/v1", model="Qwen3-0.6B", timeout_s=3)
+
+        with patch("rvclaw.agent.planner.urlopen", return_value=_FakeResponse(response)):
+            calls = planner.plan(task, memory_context=[])
+
+        self.assertEqual([call.name for call in calls], ["speak"])
+
+    def test_llama_cpp_planner_error_includes_response_shape(self) -> None:
+        response = {"choices": [{"message": {"role": "assistant", "content": ""}, "finish_reason": "stop"}]}
+        task = Task(task_id="run-test", goal="播报 hello", created_at="2026-05-21T00:00:00Z")
+        planner = LlamaCppPlannerBackend(base_url="http://127.0.0.1:9090/v1", model="Qwen3-0.6B", timeout_s=3)
+
+        with patch("rvclaw.agent.planner.urlopen", return_value=_FakeResponse(response)):
+            with self.assertRaisesRegex(RuntimeError, "choice_keys=.*message_keys=.*finish_reason=stop"):
+                planner.plan(task, memory_context=[])
+
     def test_llama_cpp_planner_repairs_incomplete_inspection_plan(self) -> None:
         response = {
             "choices": [

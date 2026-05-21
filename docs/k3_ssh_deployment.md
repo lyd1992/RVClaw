@@ -325,6 +325,8 @@ python3 benchmarks/run_agent_e2e.py --repeat 3 --planner llama_cpp --runs-dir /d
 tail -n 5 /data/rvclaw/runs/benchmark_agent_e2e.csv
 ```
 
+不要把文档里的说明文字当 shell 命令输入；例如 `mock CLI / mock benchmark` 只是说明项，不是命令。
+
 预期：
 
 ```text
@@ -334,7 +336,37 @@ CSV 中包含 planner_model、planner_model_path、planner_base_url、llama_thre
 llama_cpp 三次 run 的 status 为 completed
 ```
 
-### 13.8 验收结论口径
+### 13.8 抓取 llama-server 原始响应
+
+如果 `bash deploy/k3/run_demo.sh` 报 `llama.cpp planner response missing message content`，先抓一次原始响应：
+
+```bash
+curl "$RVCLAW_LLAMA_BASE_URL/chat/completions" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"model\": \"$RVCLAW_LLAMA_MODEL\",
+    \"messages\": [
+      {\"role\":\"system\",\"content\":\"Return strict JSON only.\"},
+      {\"role\":\"user\",\"content\":\"返回 {\\\"tool_calls\\\":[{\\\"name\\\":\\\"speak\\\",\\\"arguments\\\":{\\\"text\\\":\\\"hello\\\"}}]}\"}
+    ],
+    \"temperature\": 0,
+    \"max_tokens\": 128,
+    \"stream\": false
+  }" | tee /tmp/rvclaw_llama_raw_response.json | jq
+```
+
+常见兼容结构：
+
+```text
+choices[0].message.content
+choices[0].message.reasoning_content
+choices[0].content
+choices[0].text
+```
+
+当前适配器会依次尝试这些字段。若仍失败，把 `/tmp/rvclaw_llama_raw_response.json` 保存下来，用于更新适配器。
+
+### 13.9 验收结论口径
 
 全部通过后，可以记录为：
 

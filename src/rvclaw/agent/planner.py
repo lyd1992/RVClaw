@@ -194,10 +194,18 @@ def _extract_openai_message_content(payload: dict) -> str:
     if openai_tool_calls:
         return json.dumps({"tool_calls": [_openai_tool_call_to_dict(call) for call in openai_tool_calls]}, ensure_ascii=False)
 
-    content = message.get("content") or first.get("text")
+    content = message.get("content") or message.get("reasoning_content") or first.get("content") or first.get("text")
     if not isinstance(content, str) or not content.strip():
-        raise RuntimeError("llama.cpp planner response missing message content")
+        raise RuntimeError(f"llama.cpp planner response missing message content: {_response_shape(first, message)}")
     return content
+
+
+def _response_shape(choice: dict, message: dict) -> str:
+    return (
+        f"choice_keys={sorted(choice.keys())}; "
+        f"message_keys={sorted(message.keys())}; "
+        f"finish_reason={choice.get('finish_reason')!s}"
+    )
 
 
 def _openai_tool_call_to_dict(call: dict) -> dict:
