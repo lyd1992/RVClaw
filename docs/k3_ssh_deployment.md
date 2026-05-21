@@ -140,6 +140,19 @@ python3 -m rvclaw run "检查 A-03 区域设备状态并生成报告" \
   --json
 ```
 
+预期输出应包含 6 个工具调用，而不是只有 `speak`：
+
+```text
+memory_query
+move_to
+capture_image
+detect_status
+speak
+upload_report
+```
+
+如果模型只返回了单个 `speak`，当前代码会把巡检任务修复为 deterministic 6 步计划，避免 demo 表面 completed 但没有真实执行巡检闭环。
+
 ## 11. 常用覆盖项
 
 这些环境变量只影响 K3 运行，不需要写死进 RVClaw 代码：
@@ -171,3 +184,170 @@ python3 benchmarks/run_agent_e2e.py --repeat 3 --planner llama_cpp --runs-dir /d
 ```
 
 `llama_cpp` benchmark 需要 `llama-server` 已经在另一个 SSH/tmux 会话中运行。
+
+## 13. 完整验证步骤与预期结果
+
+### 13.1 更新到最新代码
+
+```bash
+cd /opt/rvclaw/RVClaw
+git pull --ff-only
+git log -1 --oneline
+```
+
+预期：
+
+```text
+最新提交包含 K3 llama.cpp planner hardening / deployment 相关说明
+```
+
+### 13.2 确认环境变量
+
+```bash
+source deploy/k3/env.sh
+echo "$RVCLAW_PLATFORM_SOC"
+echo "$RVCLAW_LLAMA_BASE_URL"
+echo "$RVCLAW_LLAMA_MODEL_PATH"
+ls -lh "$RVCLAW_LLAMA_MODEL_PATH"
+```
+
+预期：
+
+```text
+K3-Pico-ITX-32GB
+http://127.0.0.1:9090/v1
+/data/rvclaw/models/planner-smoke.gguf
+模型文件存在，大小约 364M
+```
+
+### 13.3 启动并验证 llama-server
+
+一个 SSH/tmux 窗口：
+
+```bash
+cd /opt/rvclaw/RVClaw
+source deploy/k3/env.sh
+bash deploy/k3/run_llama_server.sh
+```
+
+另一个 SSH 窗口：
+
+```bash
+curl http://127.0.0.1:9090/v1/models | jq '.data[0].id'
+```
+
+预期：
+
+```text
+"planner-smoke.gguf"
+```
+
+### 13.4 跑 mock 基线
+
+```bash
+python3 -m rvclaw run "检查 A-03 区域设备状态并生成报告" \
+  --planner mock \
+  --runs-dir /data/rvclaw/runs \
+  --json | tee /tmp/rvclaw_mock_run.json
+```
+
+预期：
+
+```bash
+jq -r '.status' /tmp/rvclaw_mock_run.json
+jq -r '.tool_calls[].name' /tmp/rvclaw_mock_run.json
+```
+
+输出：
+
+```text
+completed
+memory_query
+move_to
+capture_image
+detect_status
+speak
+upload_report
+```
+
+### 13.5 跑 llama.cpp Planner
+
+```bash
+bash deploy/k3/run_demo.sh | tee /tmp/rvclaw_llama_run.json
+```
+
+预期：
+
+```bash
+jq -r '.status' /tmp/rvclaw_llama_run.json
+jq -r '.tool_calls[].name' /tmp/rvclaw_llama_run.json
+```
+
+输出：
+
+```text
+completed
+memory_query
+move_to
+capture_image
+detect_status
+speak
+upload_report
+```
+
+### 13.6 检查运行产物
+
+```bash
+RUN_DIR="$(jq -r '.run_dir' /tmp/rvclaw_llama_run.json)"
+ls "$RUN_DIR"
+cat "$RUN_DIR/task.yaml"
+jq . "$RUN_DIR/metrics.json"
+tail -n 5 "$RUN_DIR/trace.jsonl"
+cat "$RUN_DIR/report.md"
+```
+
+预期：
+
+```text
+目录包含 artifacts、metrics.json、raw.log、report.md、task.yaml、trace.jsonl
+task.yaml 中 platform.soc 为 K3-Pico-ITX-32GB
+metrics.json 中 status 为 completed，task_success 为 true，tool_call_count 为 6
+trace.jsonl 中能看到 planner.completed、skill_call.started、skill_call.completed、run.finished
+report.md 中列出 6 个 Tool Calls
+```
+
+### 13.7 跑测试和 benchmark
+
+```bash
+python3 -m unittest discover -s tests
+python3 benchmarks/run_agent_e2e.py --repeat 3 --planner mock --runs-dir /data/rvclaw/runs
+python3 benchmarks/run_agent_e2e.py --repeat 3 --planner llama_cpp --runs-dir /data/rvclaw/runs
+tail -n 5 /data/rvclaw/runs/benchmark_agent_e2e.csv
+```
+
+预期：
+
+```text
+11 个以上测试通过
+benchmark_agent_e2e.csv 生成
+CSV 中包含 planner_model、planner_model_path、planner_base_url、llama_threads、platform_soc
+llama_cpp 三次 run 的 status 为 completed
+```
+
+### 13.8 验收结论口径
+
+全部通过后，可以记录为：
+
+```text
+K3 Pico-ITX 32GB 上 RVClaw Demo Claw v0.1 初步闭环通过：
+本地 spacemit-llama.cpp/Qwen3-0.6B Planner 接入成功，
+Agent Core/Safety Guard/Mock Device/SQLite memory/RVBench 产物链路可复现。
+```
+
+不要写成：
+
+```text
+K3 上完整机器人控制或 ROS2/OpenClaw 实机闭环已完成
+```
+
+当前验证仍是 Mock Device + 本地 LLM Planner 的软件闭环。

@@ -146,6 +146,14 @@ SSH 部署步骤见：
 - `docs/k3_ssh_deployment.md`
 - `deploy/k3/install.md`
 
+默认巡检任务在 K3 上的 `llama_cpp` planner 预期输出 6 个 tool calls：
+
+```text
+memory_query -> move_to -> capture_image -> detect_status -> speak -> upload_report
+```
+
+小模型若只返回单个 `speak`，适配器会把巡检任务修复为上述 deterministic workflow，保证 v0.1 demo 验收看到完整闭环。
+
 ## MNN Docker 构建流程
 
 第一阶段以 MNN 为例打通容器化构建。需要先在 SG2044 上构建一次 GCC 15.1 工具链镜像：

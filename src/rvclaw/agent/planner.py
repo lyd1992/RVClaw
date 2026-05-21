@@ -11,6 +11,8 @@ from urllib.request import Request, urlopen
 from rvclaw.models import Task, ToolCall
 from rvclaw.utils import detect_zone
 
+INSPECTION_WORKFLOW = ("memory_query", "move_to", "capture_image", "detect_status", "speak", "upload_report")
+
 
 class PlannerBackend(Protocol):
     name: str
@@ -105,7 +107,8 @@ class LlamaCppPlannerBackend:
         content = _extract_openai_message_content(payload)
         parsed = _extract_json(content)
         calls = _extract_tool_calls(parsed)
-        return [_tool_call_from_planner_payload(call) for call in calls]
+        tool_calls = [_tool_call_from_planner_payload(call) for call in calls]
+        return _repair_incomplete_inspection_plan(task, tool_calls)
 
     def _build_request(self, task: Task, memory_context: list[dict]) -> Request:
         payload = {
@@ -150,7 +153,8 @@ class LlamaCppPlannerBackend:
             "Return strict JSON only, with no markdown and no explanation. "
             f"Allowed skills: {allowed}. "
             "Schema: {\"tool_calls\":[{\"name\":\"skill\",\"arguments\":{...}}]}. "
-            "For inspection tasks, prefer memory_query, move_to, capture_image, detect_status, speak, upload_report. "
+            "For any inspection, device-status, or report task, you must output exactly these skills in order: "
+            "memory_query, move_to, capture_image, detect_status, speak, upload_report. "
             "Use only allowed skill names and keep arguments inside the registry whitelist."
         )
 
@@ -217,6 +221,21 @@ def _tool_call_from_planner_payload(call: dict) -> ToolCall:
     if "function" in call:
         call = _openai_tool_call_to_dict(call)
     return ToolCall.from_dict(call)
+
+
+def _repair_incomplete_inspection_plan(task: Task, calls: list[ToolCall]) -> list[ToolCall]:
+    if not _is_inspection_task(task.goal):
+        return calls
+    names = [call.name for call in calls]
+    if all(name in names for name in INSPECTION_WORKFLOW):
+        return calls
+    return MockPlannerBackend().plan(task, memory_context=[])
+
+
+def _is_inspection_task(goal: str) -> bool:
+    normalized = goal.lower()
+    markers = ("检查", "巡检", "设备状态", "生成报告", "inspection", "inspect", "status", "report")
+    return any(marker in normalized for marker in markers)
 
 
 def _extract_json(text: str):

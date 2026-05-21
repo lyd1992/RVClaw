@@ -77,7 +77,10 @@ class LlamaCppPlannerTest(unittest.TestCase):
         with patch("rvclaw.agent.planner.urlopen", return_value=_FakeResponse(response)) as urlopen:
             calls = planner.plan(task, memory_context=[{"device_id": "A-03", "status": "normal"}])
 
-        self.assertEqual([call.name for call in calls], ["memory_query", "move_to", "capture_image", "detect_status"])
+        self.assertEqual(
+            [call.name for call in calls],
+            ["memory_query", "move_to", "capture_image", "detect_status", "speak", "upload_report"],
+        )
         self.assertEqual(calls[0].arguments["limit"], 5)
         request = urlopen.call_args.args[0]
         self.assertEqual(request.full_url, "http://127.0.0.1:9090/v1/chat/completions")
@@ -100,13 +103,70 @@ class LlamaCppPlannerTest(unittest.TestCase):
                 }
             ]
         }
-        task = Task(task_id="run-test", goal="检查 A-03 区域设备状态", created_at="2026-05-21T00:00:00Z")
+        task = Task(task_id="run-test", goal="移动到 A-03", created_at="2026-05-21T00:00:00Z")
         planner = LlamaCppPlannerBackend(base_url="http://127.0.0.1:9090/v1", model="Qwen3-0.6B", timeout_s=3)
 
         with patch("rvclaw.agent.planner.urlopen", return_value=_FakeResponse(response)):
             calls = planner.plan(task, memory_context=[])
 
         self.assertEqual([call.name for call in calls], ["memory_query", "move_to"])
+
+    def test_llama_cpp_planner_repairs_incomplete_inspection_plan(self) -> None:
+        response = {
+            "choices": [
+                {
+                    "message": {
+                        "content": json.dumps(
+                            {
+                                "tool_calls": [
+                                    {
+                                        "name": "speak",
+                                        "arguments": {"text": "A-03区域设备状态检查已完成，检测结果：无异常发现。"},
+                                    }
+                                ]
+                            }
+                        )
+                    }
+                }
+            ]
+        }
+        task = Task(task_id="run-test", goal="检查 A-03 区域设备状态并生成报告", created_at="2026-05-21T00:00:00Z")
+        planner = LlamaCppPlannerBackend(base_url="http://127.0.0.1:9090/v1", model="Qwen3-0.6B", timeout_s=3)
+
+        with patch("rvclaw.agent.planner.urlopen", return_value=_FakeResponse(response)):
+            calls = planner.plan(task, memory_context=[])
+
+        self.assertEqual(
+            [call.name for call in calls],
+            ["memory_query", "move_to", "capture_image", "detect_status", "speak", "upload_report"],
+        )
+
+    def test_llama_cpp_planner_does_not_repair_non_inspection_plan(self) -> None:
+        response = {
+            "choices": [
+                {
+                    "message": {
+                        "content": json.dumps(
+                            {
+                                "tool_calls": [
+                                    {
+                                        "name": "speak",
+                                        "arguments": {"text": "hello"},
+                                    }
+                                ]
+                            }
+                        )
+                    }
+                }
+            ]
+        }
+        task = Task(task_id="run-test", goal="播报 hello", created_at="2026-05-21T00:00:00Z")
+        planner = LlamaCppPlannerBackend(base_url="http://127.0.0.1:9090/v1", model="Qwen3-0.6B", timeout_s=3)
+
+        with patch("rvclaw.agent.planner.urlopen", return_value=_FakeResponse(response)):
+            calls = planner.plan(task, memory_context=[])
+
+        self.assertEqual([call.name for call in calls], ["speak"])
 
 
 if __name__ == "__main__":

@@ -77,6 +77,21 @@ Then run the local llama.cpp planner:
 bash deploy/k3/run_demo.sh
 ```
 
+Expected `tool_calls` for the default inspection task:
+
+```text
+memory_query
+move_to
+capture_image
+detect_status
+speak
+upload_report
+```
+
+If the small local model returns an incomplete plan such as only `speak`,
+the llama.cpp planner adapter repairs inspection tasks to this deterministic
+six-step workflow.
+
 The run should write:
 
 ```text
@@ -99,3 +114,21 @@ export RVCLAW_PLANNER=llama_cpp
 ```
 
 Use `RVCLAW_PLANNER=mock` when the local model server is not running.
+
+## 8. Full Verification
+
+The SSH runbook has the complete verification flow and expected outputs:
+
+```text
+docs/k3_ssh_deployment.md
+```
+
+Minimum K3 acceptance commands:
+
+```bash
+source deploy/k3/env.sh
+python3 -m unittest discover -s tests
+bash deploy/k3/run_demo.sh | tee /tmp/rvclaw_llama_run.json
+jq -r '.tool_calls[].name' /tmp/rvclaw_llama_run.json
+python3 benchmarks/run_agent_e2e.py --repeat 3 --planner llama_cpp --runs-dir /data/rvclaw/runs
+```

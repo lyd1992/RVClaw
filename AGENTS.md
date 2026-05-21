@@ -10,6 +10,7 @@ RVClaw 是 Demo Claw v0.1 的代码仓。进入本仓库时，请优先遵循以
 6. 性能数字必须记录来源和环境，不要混用本地报告、PR 描述和 PPT 展示口径。
 7. K3 机器侧 SSH 部署、模型路径、`spacemit-llama.cpp` 包和环境变量配置必须放在 `deploy/k3/` 或 `docs/k3_ssh_deployment.md`，不要写死进核心 Python 代码。
 8. RVClaw 代码以 GitHub 上游仓库为准；K3 运行产物、模型文件和官方二进制包放在 `/data/rvclaw`，不要提交进仓库。
+9. `llama_cpp` planner 的默认巡检任务必须产出完整 6 步闭环：`memory_query -> move_to -> capture_image -> detect_status -> speak -> upload_report`。如果小模型返回不完整巡检计划，适配器应修复为 deterministic workflow。
 
 默认本地检查：
 
