@@ -152,6 +152,7 @@ upload_report
 ```
 
 如果模型只返回了单个 `speak`，当前代码会把巡检任务修复为 deterministic 6 步计划，避免 demo 表面 completed 但没有真实执行巡检闭环。
+如果模型返回了半截 JSON、缺逗号、错误参数名等不稳定输出，默认巡检任务同样会回退到 deterministic 6 步计划；非巡检任务仍会报错，方便继续定位真实模型输出问题。
 
 ## 11. 常用覆盖项
 
@@ -338,7 +339,7 @@ llama_cpp 三次 run 的 status 为 completed
 
 ### 13.8 抓取 llama-server 原始响应
 
-如果 `bash deploy/k3/run_demo.sh` 报 `llama.cpp planner response missing message content`，先抓一次原始响应：
+如果 `bash deploy/k3/run_demo.sh` 报 `llama.cpp planner response missing message content` 或非巡检任务的 `malformed JSON content`，先抓一次原始响应：
 
 ```bash
 curl "$RVCLAW_LLAMA_BASE_URL/chat/completions" \

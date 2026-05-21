@@ -142,6 +142,39 @@ class LlamaCppPlannerTest(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "choice_keys=.*message_keys=.*finish_reason=stop"):
                 planner.plan(task, memory_context=[])
 
+    def test_llama_cpp_planner_repairs_malformed_json_for_inspection_task(self) -> None:
+        response = {
+            "choices": [
+                {
+                    "message": {
+                        "content": (
+                            '{"tool_calls":[{"name":"memory_query","arguments":'
+                            '{"query":"检查 A-03 区域设备状态并生成报告"'
+                        )
+                    }
+                }
+            ]
+        }
+        task = Task(task_id="run-test", goal="检查 A-03 区域设备状态并生成报告", created_at="2026-05-21T00:00:00Z")
+        planner = LlamaCppPlannerBackend(base_url="http://127.0.0.1:9090/v1", model="Qwen3-0.6B", timeout_s=3)
+
+        with patch("rvclaw.agent.planner.urlopen", return_value=_FakeResponse(response)):
+            calls = planner.plan(task, memory_context=[])
+
+        self.assertEqual(
+            [call.name for call in calls],
+            ["memory_query", "move_to", "capture_image", "detect_status", "speak", "upload_report"],
+        )
+
+    def test_llama_cpp_planner_raises_malformed_json_for_non_inspection_task(self) -> None:
+        response = {"choices": [{"message": {"content": '{"tool_calls":['}}]}
+        task = Task(task_id="run-test", goal="播报 hello", created_at="2026-05-21T00:00:00Z")
+        planner = LlamaCppPlannerBackend(base_url="http://127.0.0.1:9090/v1", model="Qwen3-0.6B", timeout_s=3)
+
+        with patch("rvclaw.agent.planner.urlopen", return_value=_FakeResponse(response)):
+            with self.assertRaisesRegex(RuntimeError, "malformed JSON"):
+                planner.plan(task, memory_context=[])
+
     def test_llama_cpp_planner_repairs_incomplete_inspection_plan(self) -> None:
         response = {
             "choices": [

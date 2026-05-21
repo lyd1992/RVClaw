@@ -91,6 +91,8 @@ upload_report
 If the small local model returns an incomplete plan such as only `speak`,
 the llama.cpp planner adapter repairs inspection tasks to this deterministic
 six-step workflow.
+If it returns malformed JSON for the default inspection task, the adapter also
+falls back to the same workflow so K3 smoke validation can continue.
 
 The run should write:
 

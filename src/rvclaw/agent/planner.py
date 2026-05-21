@@ -105,7 +105,12 @@ class LlamaCppPlannerBackend:
             raise RuntimeError("llama.cpp planner returned non-JSON HTTP response") from exc
 
         content = _extract_openai_message_content(payload)
-        parsed = _extract_json(content)
+        try:
+            parsed = _extract_json(content)
+        except json.JSONDecodeError as exc:
+            if _is_inspection_task(task.goal):
+                return MockPlannerBackend().plan(task, memory_context=[])
+            raise RuntimeError(f"llama.cpp planner returned malformed JSON content: {content[:240]!r}") from exc
         calls = _extract_tool_calls(parsed)
         tool_calls = [_tool_call_from_planner_payload(call) for call in calls]
         return _repair_incomplete_inspection_plan(task, tool_calls)
