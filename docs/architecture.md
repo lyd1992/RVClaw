@@ -18,7 +18,7 @@ RVClaw 采用“先闭环、后优化”的 Demo Claw v0.1 架构。
 ```text
 CLI/API task
   -> Task Intake
-  -> PlannerBackend(auto/mock/claude)
+  -> PlannerBackend(auto/mock/claude/llama_cpp)
   -> Agent Core
   -> Safety Guard
   -> Tool Router
@@ -30,6 +30,7 @@ CLI/API task
 ## 插件边界
 
 - `RuntimeBackend`：LLM、embedding、视觉、小模型、量化和后端指标。
+- `PlannerBackend`：任务到 tool_calls 的规划层；当前 `llama_cpp` 通过本地 OpenAI-compatible `llama-server` 接入，并对默认巡检任务提供 deterministic fallback。
 - `MemoryManager`：事件库、设备画像、小规模检索，后续接 Knowhere/Milvus。
 - `Skill Registry`：skill 白名单、参数 schema、安全级别。
 - `Device Adapter`：隔离 Mock Device、ROS 2、OpenClaw 和真实传感器。

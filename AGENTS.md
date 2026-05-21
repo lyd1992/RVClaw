@@ -12,6 +12,7 @@ RVClaw 是 Demo Claw v0.1 的代码仓。进入本仓库时，请优先遵循以
 8. RVClaw 代码以 GitHub 上游仓库为准；K3 运行产物、模型文件和官方二进制包放在 `/data/rvclaw`，不要提交进仓库。
 9. `llama_cpp` planner 的默认巡检任务必须产出完整 6 步闭环：`memory_query -> move_to -> capture_image -> detect_status -> speak -> upload_report`。如果小模型返回不完整巡检计划，适配器应修复为 deterministic workflow。
 10. 不支持的任务、非法 skill 参数或非巡检 planner 解析失败，应以 `failed` run artifact 收敛，不要让 CLI 直接 traceback。
+11. 当前 K3 smoke checkpoint 记录在 `docs/development_status.md`，上游 tag 为 `v0.1.0-k3-llama-smoke`。
 
 默认本地检查：
 
@@ -33,4 +34,10 @@ bash deploy/k3/run_demo.sh
 
 ```bash
 python3 -m rvclaw run "检查 A-03 区域设备状态并生成报告" --planner llama_cpp --runs-dir /data/rvclaw/runs
+```
+
+当前状态说明：
+
+```text
+docs/development_status.md
 ```

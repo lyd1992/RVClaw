@@ -1,17 +1,35 @@
 # Roadmap
 
+## Current Checkpoint: K3 llama.cpp Smoke
+
+Status as of 2026-05-21:
+
+- K3 Pico-ITX 32GB + Bianbu/RISC-V Linux validated.
+- Local `spacemit-llama.cpp` server reachable through OpenAI-compatible API.
+- Qwen3-0.6B GGUF smoke model can drive the `llama_cpp` PlannerBackend.
+- Default A-03 inspection task completes with the 6-step mock workflow.
+- `返回 BASE` completes with `move_to(BASE)`.
+- Unsupported targets such as `B-01` fail safely with run artifacts instead of Python tracebacks.
+
+Checkpoint tag:
+
+```text
+v0.1.0-k3-llama-smoke
+```
+
 ## Week 1: Demo Claw Skeleton
 
-- 固化代码结构和接口边界。
-- 跑通 mock planner、mock device、SQLite memory、skill registry。
-- 生成标准 run artifacts。
-- 建立基础 e2e benchmark。
+- [x] 固化代码结构和接口边界。
+- [x] 跑通 mock planner、mock device、SQLite memory、skill registry。
+- [x] 生成标准 run artifacts。
+- [x] 建立基础 e2e benchmark。
 
-## Week 2: SG2044 Baseline
+## Week 2: K3 llama.cpp Baseline
 
-- 在 SG2044 上固定 Python、OS、compiler、RVV VLEN 记录口径。
-- 接入 llama.cpp/GGUF baseline。
-- 建立模型、量化、tokens/s、TTFT 的最小指标集。
+- [x] 在 K3 上固定 OS、Python、模型、运行目录记录口径。
+- [x] 接入 `spacemit-llama.cpp` / GGUF smoke baseline。
+- [x] 建立 mock/llama.cpp E2E benchmark CSV。
+- [ ] 补充 tokens/s、TTFT、内存峰值等更细指标进入 `metrics.json`。
 
 ## Week 3: Device and Vision Baseline
 

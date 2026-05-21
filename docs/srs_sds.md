@@ -6,7 +6,7 @@
 |---|---|---|
 | FR-001 | CLI 或 Web/API 提交自然语言任务 | `src/rvclaw/cli.py`、`src/rvclaw/api.py`；Web/API 预留 optional dependency |
 | FR-002 | 生成结构化 `task.yaml` | `RunRecorder.write_task()` |
-| FR-003 | Claude CLI PlannerBackend 输出 JSON tool_calls | `ClaudeCliPlannerBackend` |
+| FR-003 | Claude CLI / llama.cpp PlannerBackend 输出 JSON tool_calls | `ClaudeCliPlannerBackend`、`LlamaCppPlannerBackend` |
 | FR-004 | Skill Registry 白名单校验 | `skills/registry.yaml`、`SkillRegistry` |
 | FR-005 | Safety Guard 校验参数、权限、超时、确认和急停 | `SafetyGuard.validate()`；人工确认接口预留 |
 | FR-006 | Mock Skills | `skills/builtin.py` |
@@ -15,7 +15,7 @@
 | FR-009 | 每次运行生成 `run_id` 和运行目录 | `run_demo()`、`RunRecorder` |
 | FR-010 | 输出 metrics/trace/report/raw log | `RunRecorder` |
 | FR-011 | Benchmark Schema | `benchmarks/benchmark_schema.yaml` |
-| FR-012 | PlannerBackend 可替换 | `planner_from_name()` |
+| FR-012 | PlannerBackend 可替换 | `planner_from_name()`；支持 `auto`、`mock`、`claude_cli`、`llama_cpp` |
 | FR-013 | RuntimeBackend 可替换 | `runtime/runtime_api.py` 与后端占位 |
 | FR-014 | MemoryBackend 可替换 | `MemoryManager` 与 `SQLiteEventStore` 边界 |
 
