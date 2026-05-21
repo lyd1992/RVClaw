@@ -38,21 +38,29 @@ class AgentCore:
         self.recorder.trace("memory.context", {"matches": memory_context})
 
         status = "completed"
-        calls = self.planner.plan(task, memory_context)
-        self.recorder.trace("planner.completed", {"planner": self.planner.name, "tool_calls": [c.to_dict() for c in calls]})
-
         results = []
-        for call in calls:
-            result = self.router.execute(call)
-            results.append({"call": call.to_dict(), "result": result.to_dict()})
-            if not result.ok:
-                status = "failed"
-                break
-            if call.name == "stop":
-                status = "stopped"
-                break
+        planner_error = None
+        try:
+            calls = self.planner.plan(task, memory_context)
+            self.recorder.trace("planner.completed", {"planner": self.planner.name, "tool_calls": [c.to_dict() for c in calls]})
 
-        report = self._build_report(task, status, results)
+            for call in calls:
+                result = self.router.execute(call)
+                results.append({"call": call.to_dict(), "result": result.to_dict()})
+                if not result.ok:
+                    status = "failed"
+                    break
+                if call.name == "stop":
+                    status = "stopped"
+                    break
+        except Exception as exc:
+            status = "failed"
+            calls = []
+            planner_error = str(exc)
+            self.recorder.trace("planner.failed", {"planner": self.planner.name, "error": planner_error})
+            self.recorder.raw(f"Planner failed: {planner_error}")
+
+        report = self._build_report(task, status, results, planner_error=planner_error)
         self.recorder.write_report(report)
         self.memory.remember(
             "inspection_report",
@@ -74,6 +82,8 @@ class AgentCore:
                 "raw_log": str(self.recorder.raw_log_path),
             },
         }
+        if planner_error:
+            metrics["planner_error"] = planner_error
         self.recorder.write_metrics(metrics)
         self.recorder.trace("run.finished", metrics)
 
@@ -89,7 +99,7 @@ class AgentCore:
         )
 
     @staticmethod
-    def _build_report(task: Task, status: str, results: list[dict]) -> str:
+    def _build_report(task: Task, status: str, results: list[dict], planner_error: str | None = None) -> str:
         lines = [
             f"# RVClaw Inspection Report - {task.task_id}",
             "",
@@ -101,6 +111,15 @@ class AgentCore:
             "## Tool Calls",
             "",
         ]
+        if planner_error:
+            lines.extend(
+                [
+                    "## Planner Error",
+                    "",
+                    planner_error,
+                    "",
+                ]
+            )
         for index, item in enumerate(results, start=1):
             call = item["call"]
             result = item["result"]

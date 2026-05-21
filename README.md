@@ -154,6 +154,14 @@ memory_query -> move_to -> capture_image -> detect_status -> speak -> upload_rep
 
 小模型若只返回单个 `speak`，适配器会把巡检任务修复为上述 deterministic workflow，保证 v0.1 demo 验收看到完整闭环。
 
+当前 mock planner 还支持 `返回 BASE` 这类基础动作，预期输出：
+
+```text
+memory_query -> move_to(BASE) -> speak
+```
+
+超出白名单或模型输出异常的非巡检任务应以 `failed` 状态写出运行产物，而不是让 CLI 打印 Python traceback。
+
 ## MNN Docker 构建流程
 
 第一阶段以 MNN 为例打通容器化构建。需要先在 SG2044 上构建一次 GCC 15.1 工具链镜像：

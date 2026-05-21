@@ -174,7 +174,58 @@ export RVCLAW_PLANNER=mock
 bash deploy/k3/run_demo.sh
 ```
 
-## 12. 验收命令
+## 12. 当前支持动作与边界
+
+v0.1 当前支持的是白名单 skill 闭环，不是开放世界机器人控制。稳定支持的命令类型包括：
+
+```text
+检查 A-03 区域设备状态并生成报告
+巡检 A-03
+返回 BASE
+播报 hello
+停止
+```
+
+其中默认巡检会执行：
+
+```text
+memory_query -> move_to(A-03) -> capture_image(A-03) -> detect_status(A-03) -> speak -> upload_report
+```
+
+`返回 BASE` 的 mock planner 预期执行：
+
+```text
+memory_query -> move_to(BASE) -> speak
+```
+
+可以这样验证：
+
+```bash
+python3 -m rvclaw run "返回 BASE" --planner mock --runs-dir /data/rvclaw/runs --json | tee /tmp/rvclaw_base_run.json
+jq -r '.status' /tmp/rvclaw_base_run.json
+jq -r '.tool_calls[].name' /tmp/rvclaw_base_run.json
+jq -r '.tool_calls[] | select(.name=="move_to") | .arguments.target' /tmp/rvclaw_base_run.json
+```
+
+预期：
+
+```text
+completed
+memory_query
+move_to
+speak
+BASE
+```
+
+如果请求超出当前白名单或模型输出非 JSON，例如 `移动到 B-01 区域并拍照`，系统应该优雅失败并保留证据包，而不是打印 Python traceback。预期：
+
+```text
+status: failed
+metrics.json 中包含 planner_error 或 skill 参数校验错误
+run 目录仍包含 task.yaml、metrics.json、trace.jsonl、report.md、raw.log
+```
+
+## 13. 验收命令
 
 ```bash
 cd /opt/rvclaw/RVClaw
@@ -186,9 +237,9 @@ python3 benchmarks/run_agent_e2e.py --repeat 3 --planner llama_cpp --runs-dir /d
 
 `llama_cpp` benchmark 需要 `llama-server` 已经在另一个 SSH/tmux 会话中运行。
 
-## 13. 完整验证步骤与预期结果
+## 14. 完整验证步骤与预期结果
 
-### 13.1 更新到最新代码
+### 14.1 更新到最新代码
 
 ```bash
 cd /opt/rvclaw/RVClaw
@@ -202,7 +253,7 @@ git log -1 --oneline
 最新提交包含 K3 llama.cpp planner hardening / deployment 相关说明
 ```
 
-### 13.2 确认环境变量
+### 14.2 确认环境变量
 
 ```bash
 source deploy/k3/env.sh
@@ -221,7 +272,7 @@ http://127.0.0.1:9090/v1
 模型文件存在，大小约 364M
 ```
 
-### 13.3 启动并验证 llama-server
+### 14.3 启动并验证 llama-server
 
 一个 SSH/tmux 窗口：
 
@@ -243,7 +294,7 @@ curl http://127.0.0.1:9090/v1/models | jq '.data[0].id'
 "planner-smoke.gguf"
 ```
 
-### 13.4 跑 mock 基线
+### 14.4 跑 mock 基线
 
 ```bash
 python3 -m rvclaw run "检查 A-03 区域设备状态并生成报告" \
@@ -271,7 +322,7 @@ speak
 upload_report
 ```
 
-### 13.5 跑 llama.cpp Planner
+### 14.5 跑 llama.cpp Planner
 
 ```bash
 bash deploy/k3/run_demo.sh | tee /tmp/rvclaw_llama_run.json
@@ -296,7 +347,7 @@ speak
 upload_report
 ```
 
-### 13.6 检查运行产物
+### 14.6 检查运行产物
 
 ```bash
 RUN_DIR="$(jq -r '.run_dir' /tmp/rvclaw_llama_run.json)"
@@ -317,7 +368,7 @@ trace.jsonl 中能看到 planner.completed、skill_call.started、skill_call.com
 report.md 中列出 6 个 Tool Calls
 ```
 
-### 13.7 跑测试和 benchmark
+### 14.7 跑测试和 benchmark
 
 ```bash
 python3 -m unittest discover -s tests
@@ -337,7 +388,7 @@ CSV 中包含 planner_model、planner_model_path、planner_base_url、llama_thre
 llama_cpp 三次 run 的 status 为 completed
 ```
 
-### 13.8 抓取 llama-server 原始响应
+### 14.8 抓取 llama-server 原始响应
 
 如果 `bash deploy/k3/run_demo.sh` 报 `llama.cpp planner response missing message content` 或非巡检任务的 `malformed JSON content`，先抓一次原始响应：
 
@@ -367,7 +418,7 @@ choices[0].text
 
 当前适配器会依次尝试这些字段。若仍失败，把 `/tmp/rvclaw_llama_raw_response.json` 保存下来，用于更新适配器。
 
-### 13.9 验收结论口径
+### 14.9 验收结论口径
 
 全部通过后，可以记录为：
 

@@ -25,6 +25,12 @@ class MockPlannerBackend:
     name = "mock"
 
     def plan(self, task: Task, memory_context: list[dict]) -> list[ToolCall]:
+        if _is_return_to_base_task(task.goal):
+            return [
+                ToolCall("memory_query", {"query": task.goal, "limit": 5}),
+                ToolCall("move_to", {"target": "BASE"}),
+                ToolCall("speak", {"text": "Returned to BASE."}),
+            ]
         zone = detect_zone(task.goal)
         return [
             ToolCall("memory_query", {"query": task.goal, "limit": 5}),
@@ -249,6 +255,11 @@ def _is_inspection_task(goal: str) -> bool:
     normalized = goal.lower()
     markers = ("检查", "巡检", "设备状态", "生成报告", "inspection", "inspect", "status", "report")
     return any(marker in normalized for marker in markers)
+
+
+def _is_return_to_base_task(goal: str) -> bool:
+    normalized = goal.lower()
+    return "base" in normalized and any(marker in normalized for marker in ("返回", "回到", "返航", "return"))
 
 
 def _extract_json(text: str):
