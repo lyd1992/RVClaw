@@ -131,6 +131,21 @@ bash deploy/sg2044/run_demo.sh
 - `docs/operations.md`
 - `docs/mnn_container_build.md`
 
+## K3 Pico-ITX / llama.cpp 辅助脚本
+
+K3 作为边缘盒子演示环境时，代码仍以本仓库为准，机器侧配置独立放在 `deploy/k3/` 和文档中：
+
+```bash
+source deploy/k3/env.sh
+bash deploy/k3/run_llama_server.sh
+bash deploy/k3/run_demo.sh
+```
+
+SSH 部署步骤见：
+
+- `docs/k3_ssh_deployment.md`
+- `deploy/k3/install.md`
+
 ## MNN Docker 构建流程
 
 第一阶段以 MNN 为例打通容器化构建。需要先在 SG2044 上构建一次 GCC 15.1 工具链镜像：

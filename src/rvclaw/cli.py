@@ -37,7 +37,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     run_parser = subparsers.add_parser("run", help="run a Demo Claw inspection task")
     run_parser.add_argument("goal", nargs="?", default=DEFAULT_GOAL, help="natural-language task goal")
-    run_parser.add_argument("--planner", default="auto", choices=["auto", "mock", "claude"], help="planner backend")
+    run_parser.add_argument("--planner", default="auto", choices=["auto", "mock", "claude", "llama_cpp"], help="planner backend")
     run_parser.add_argument("--runs-dir", default="runs", help="directory for run artifacts")
     run_parser.add_argument("--memory-db", default=None, help="SQLite memory database path")
     run_parser.add_argument("--json", action="store_true", help="print machine-readable summary")

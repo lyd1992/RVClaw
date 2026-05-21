@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import platform
 import re
 from datetime import datetime, timezone
@@ -29,10 +30,15 @@ def detect_zone(goal: str, default: str = "A-03") -> str:
 
 
 def platform_profile() -> dict[str, Any]:
+    rvv_vlen = os.environ.get("RVCLAW_RVV_VLEN", "unknown")
+    if rvv_vlen.isdigit():
+        rvv_vlen_value: int | str = int(rvv_vlen)
+    else:
+        rvv_vlen_value = rvv_vlen
     return {
-        "soc": "SG2044",
-        "isa": "rv64gcv",
-        "rvv_vlen": 128,
+        "soc": os.environ.get("RVCLAW_PLATFORM_SOC", "unknown"),
+        "isa": os.environ.get("RVCLAW_PLATFORM_ISA", platform.machine() or "unknown"),
+        "rvv_vlen": rvv_vlen_value,
         "os": platform.platform(),
         "python": platform.python_version(),
     }
