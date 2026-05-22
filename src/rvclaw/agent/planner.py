@@ -12,6 +12,7 @@ from rvclaw.models import Task, ToolCall
 from rvclaw.utils import detect_zone
 
 INSPECTION_WORKFLOW = ("memory_query", "move_to", "capture_image", "detect_status", "speak", "upload_report")
+VISION_WORKFLOW = ("memory_query", "capture_image", "analyze_image", "speak", "upload_report")
 
 
 class PlannerBackend(Protocol):
@@ -32,6 +33,8 @@ class MockPlannerBackend:
                 ToolCall("move_to", {"target": "BASE"}),
                 ToolCall("speak", {"text": "Returned to BASE."}),
             ]
+        if _is_vision_analysis_task(task.goal):
+            return _vision_workflow_for_goal(task.goal)
         zone = detect_zone(task.goal)
         return [
             ToolCall("memory_query", {"query": task.goal, "limit": 5}),
@@ -73,6 +76,7 @@ class ClaudeCliPlannerBackend:
             "move_to",
             "capture_image",
             "detect_status",
+            "analyze_image",
             "speak",
             "upload_report",
             "stop",
@@ -117,6 +121,9 @@ class LlamaCppPlannerBackend:
         try:
             parsed = _extract_json(content)
         except json.JSONDecodeError as exc:
+            if _is_vision_analysis_task(task.goal):
+                self.last_mode = "fallback_malformed_json"
+                return _vision_workflow_for_goal(task.goal)
             if _is_inspection_task(task.goal):
                 self.last_mode = "fallback_malformed_json"
                 return MockPlannerBackend().plan(task, memory_context=[])
@@ -124,7 +131,7 @@ class LlamaCppPlannerBackend:
             raise RuntimeError(f"llama.cpp planner returned malformed JSON content: {content[:240]!r}") from exc
         calls = _extract_tool_calls(parsed)
         tool_calls = [_tool_call_from_planner_payload(call) for call in calls]
-        repaired = _repair_incomplete_inspection_plan(task, tool_calls)
+        repaired = _repair_incomplete_plan(task, tool_calls)
         if repaired != tool_calls:
             self.last_mode = "repaired_incomplete"
         return repaired
@@ -163,6 +170,7 @@ class LlamaCppPlannerBackend:
             "move_to",
             "capture_image",
             "detect_status",
+            "analyze_image",
             "speak",
             "upload_report",
             "stop",
@@ -172,6 +180,8 @@ class LlamaCppPlannerBackend:
             "Return strict JSON only, with no markdown and no explanation. "
             f"Allowed skills: {allowed}. "
             "Schema: {\"tool_calls\":[{\"name\":\"skill\",\"arguments\":{...}}]}. "
+            "For visual analysis tasks, use memory_query, capture_image, analyze_image, speak, upload_report. "
+            "analyze_image.task must be one of classification, object_detection, segmentation, face_detection. "
             "For any inspection, device-status, or report task, you must output exactly these skills in order: "
             "memory_query, move_to, capture_image, detect_status, speak, upload_report. "
             "Use only allowed skill names and keep arguments inside the registry whitelist."
@@ -252,13 +262,30 @@ def _tool_call_from_planner_payload(call: dict) -> ToolCall:
     return ToolCall.from_dict(call)
 
 
-def _repair_incomplete_inspection_plan(task: Task, calls: list[ToolCall]) -> list[ToolCall]:
+def _repair_incomplete_plan(task: Task, calls: list[ToolCall]) -> list[ToolCall]:
+    if _is_vision_analysis_task(task.goal):
+        names = [call.name for call in calls]
+        if all(name in names for name in VISION_WORKFLOW):
+            return calls
+        return _vision_workflow_for_goal(task.goal)
     if not _is_inspection_task(task.goal):
         return calls
     names = [call.name for call in calls]
     if all(name in names for name in INSPECTION_WORKFLOW):
         return calls
     return MockPlannerBackend().plan(task, memory_context=[])
+
+
+def _vision_workflow_for_goal(goal: str) -> list[ToolCall]:
+    task = _vision_task_from_goal(goal)
+    model = _vision_model_for_task(task)
+    return [
+        ToolCall("memory_query", {"query": goal, "limit": 5}),
+        ToolCall("capture_image", {"target": detect_zone(goal), "mode": "vision"}),
+        ToolCall("analyze_image", {"image_ref": "latest", "task": task, "model": model}),
+        ToolCall("speak", {"text": _vision_speech(task)}),
+        ToolCall("upload_report", {"title": f"RVClaw {task} vision report"}),
+    ]
 
 
 def _is_inspection_task(goal: str) -> bool:
@@ -277,6 +304,58 @@ def _is_inspection_task(goal: str) -> bool:
         "capture",
     )
     return any(marker in normalized for marker in markers)
+
+
+def _is_vision_analysis_task(goal: str) -> bool:
+    normalized = goal.lower()
+    markers = (
+        "分类",
+        "识别这张",
+        "这张图片",
+        "图片内容",
+        "画面中",
+        "有哪些物体",
+        "目标",
+        "分割",
+        "轮廓",
+        "人脸",
+        "人员",
+        "classify",
+        "image",
+        "object",
+        "segment",
+        "face",
+    )
+    return any(marker in normalized for marker in markers)
+
+
+def _vision_task_from_goal(goal: str) -> str:
+    normalized = goal.lower()
+    if any(marker in normalized for marker in ("分类", "识别是什么", "classify")):
+        return "classification"
+    if any(marker in normalized for marker in ("分割", "区域", "轮廓", "segment")):
+        return "segmentation"
+    if any(marker in normalized for marker in ("人脸", "人员", "face")):
+        return "face_detection"
+    return "object_detection"
+
+
+def _vision_model_for_task(task: str) -> str:
+    return {
+        "classification": "resnet",
+        "object_detection": "yolov8",
+        "segmentation": "yolov8_seg",
+        "face_detection": "yolov5_face",
+    }[task]
+
+
+def _vision_speech(task: str) -> str:
+    return {
+        "classification": "Image classification complete.",
+        "object_detection": "Object detection complete.",
+        "segmentation": "Image segmentation complete.",
+        "face_detection": "Face detection complete. No identity recognition was performed.",
+    }[task]
 
 
 def _is_return_to_base_task(goal: str) -> bool:

@@ -1,6 +1,6 @@
 # RVClaw
 
-RVClaw 是 Demo Claw v0.1 的最小可运行框架，面向 RISC-V Linux 环境。当前已在 K3 Pico-ITX 32GB 上完成 `spacemit-llama.cpp` + GGUF 模型的软件闭环 smoke 验证，并正在推进 v0.1.1 Web + CV 可视化 demo；SG2044/openEuler 保留为服务器型验证和后续优化平台。
+RVClaw 是 Demo Claw v0.1 的最小可运行框架，面向 RISC-V Linux 环境。当前已在 K3 Pico-ITX 32GB 上完成 `spacemit-llama.cpp` + GGUF 模型的软件闭环 smoke 验证，并正在推进 v0.1.2 Web + Multi-Vision DemoZoo demo；SG2044/openEuler 保留为服务器型验证和后续优化平台。
 
 当前阶段的目标不是追求单点 kernel 性能，而是先把具身智能 Agent 的任务闭环跑通：
 
@@ -289,6 +289,7 @@ bash deploy/sg2044/install_backends.sh mnn
 | Mock Skills | 已实现 `memory_query`、`move_to`、`capture_image`、`detect_status`、`speak`、`upload_report`、`stop` | `src/rvclaw/skills/builtin.py` |
 | Web 控制台/API | 已实现 `rvclaw serve`、run history、artifact viewer、benchmark reader | `src/rvclaw/web/` |
 | CV sample Device | 已实现样例图片 capture/annotated artifact，OpenCV 可用时绘制标注，不可用时 fallback | `src/rvclaw/adapters/cv_sample_device.py` |
+| Multi-Vision Bridge | 已实现 `analyze_image`，支持分类、检测、分割、人脸检测的 DemoZoo sidecar/fallback | `src/rvclaw/adapters/demozoo_device.py` |
 | Zone 配置 | 已实现 `A-03`、`B-01`、`BASE` 可配置白名单 | `configs/zones.yaml` |
 | SQLite 事件记忆 | 已实现，内置 A-03 设备画像和历史巡检 seed | `src/rvclaw/memory/sqlite_event_store.py` |
 | Flat Vector baseline | 已实现轻量词法检索 baseline | `src/rvclaw/memory/flat_vector_store.py` |
@@ -310,7 +311,7 @@ bash deploy/sg2044/install_backends.sh mnn
 | llama.cpp / GGUF RuntimeBackend | RuntimeBackend 仍为占位；PlannerBackend 已接入本地 `llama-server` |
 | MNN RuntimeBackend | 推理适配器仍为占位；源码安装管理已实现 |
 | vLLM RuntimeBackend | 服务适配器仍为占位；源码/Python development 安装管理已实现 |
-| ONNX Runtime 后端 | 仅占位 |
+| ONNX Runtime 后端 | 仅占位；当前先通过 DemoZoo sidecar 演示多视觉能力 |
 | Knowhere / Milvus MemoryBackend | 尚未实现 |
 | 真实相机 / IMU / 底盘控制 | 尚未实现；当前为 Mock Device + sample-image CV |
 | 人工确认 UI | Safety Guard 预留边界，尚未实现交互式确认界面 |

@@ -96,6 +96,7 @@ class AgentCore:
             },
         }
         metrics.update(self.run_metadata)
+        metrics.update(_vision_metrics_from_results(results))
         if planner_error:
             metrics["planner_error"] = planner_error
         self.recorder.write_metrics(metrics)
@@ -147,6 +148,12 @@ class AgentCore:
                 lines.append(f"   - Risk: {output['risk_level']}")
             if "remote_uri" in output:
                 lines.append(f"   - Upload: {output['remote_uri']}")
+            if "summary" in output:
+                lines.append(f"   - Vision: {output['summary']}")
+            if "objects" in output:
+                lines.append(f"   - Objects: {len(output.get('objects') or [])}")
+            if "faces" in output:
+                lines.append(f"   - Faces: {len(output.get('faces') or [])}")
         lines.extend(
             [
                 "",
@@ -157,3 +164,22 @@ class AgentCore:
             ]
         )
         return "\n".join(lines)
+
+
+def _vision_metrics_from_results(results: list[dict]) -> dict:
+    for item in reversed(results):
+        call = item.get("call", {})
+        output = (item.get("result", {}) or {}).get("output", {}) or {}
+        if call.get("name") == "analyze_image":
+            return {
+                "vision_task": output.get("task"),
+                "vision_backend": output.get("backend"),
+                "vision_model": output.get("model"),
+                "vision_summary": output.get("summary"),
+                "vision_latency_ms": output.get("latency_ms"),
+                "objects_count": len(output.get("objects") or []),
+                "labels_count": len(output.get("labels") or []),
+                "segments_count": len(output.get("segments") or []),
+                "faces_count": len(output.get("faces") or []),
+            }
+    return {}

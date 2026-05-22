@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from rvclaw.adapters.vision import local_vision_result, write_vision_result
 from rvclaw.utils import ensure_dir, utc_now_iso
 
 
@@ -46,6 +47,13 @@ class MockDevice:
             },
             "risk_level": "low",
         }
+
+    def analyze_image(self, image_ref: str | None = "latest", task: str = "object_detection", model: str | None = None) -> dict:
+        result = local_vision_result(task=task, model=model)
+        result["backend"] = "mock"
+        result["image_ref"] = image_ref
+        write_vision_result(self.artifact_dir, result)
+        return result
 
     def speak(self, text: str) -> dict:
         return {"text": text, "status": "spoken"}

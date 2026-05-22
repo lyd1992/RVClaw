@@ -16,7 +16,7 @@ def create_app(runs_dir: str | Path, planner: str = "llama_cpp", web_token: str 
         raise RuntimeError("FastAPI is not installed. Install RVClaw with: python3 -m pip install -e '.[api]'") from exc
 
     runs_root = Path(runs_dir)
-    app = FastAPI(title="RVClaw K3 Web Demo", version="0.1.1")
+    app = FastAPI(title="RVClaw K3 Web Demo", version="0.1.2")
 
     def check_token(x_rvclaw_token: str | None = Header(default=None)) -> None:
         if web_token and x_rvclaw_token != web_token:
@@ -97,6 +97,8 @@ def _index_html() -> str:
     textarea { min-height: 112px; resize: vertical; line-height: 1.5; }
     button { cursor: pointer; background: #17392f; border-color: #2f8d70; margin-top: 10px; font-weight: 650; }
     button:hover { background: #1e4b3f; }
+    .presets { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px 0; }
+    .presets button { margin:0; background:#11171a; border-color:var(--line); font-weight:500; text-align:left; }
     .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .metric { border:1px solid var(--line); border-radius:6px; padding:10px; background:#11171a; }
     .metric b { display:block; font-size:12px; color:var(--muted); margin-bottom:4px; }
@@ -108,6 +110,9 @@ def _index_html() -> str:
     .file-view { max-height: 340px; overflow:auto; background:#090b0c; border:1px solid var(--line); border-radius:6px; padding:12px; white-space:pre-wrap; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
     .files { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
     .files button { width:auto; margin:0; padding:7px 10px; background:#11171a; border-color:var(--line); font-weight:500; }
+    .results { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:8px; margin-top:12px; }
+    .result-card { border:1px solid var(--line); border-radius:6px; padding:10px; background:#0f1416; }
+    .result-card b { display:block; color:var(--accent); margin-bottom:4px; }
     @media (max-width: 980px) { main { grid-template-columns: 1fr; } .images { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -117,6 +122,12 @@ def _index_html() -> str:
     <section>
       <h2>任务输入</h2>
       <textarea id="goal">检查 A-03 区域设备状态并生成报告</textarea>
+      <div class="presets">
+        <button onclick="setGoal('分类这张图片并说明结果')">分类图片</button>
+        <button onclick="setGoal('检测图片中的目标并生成结论')">目标检测</button>
+        <button onclick="setGoal('分割画面中的主要区域')">语义分割</button>
+        <button onclick="setGoal('检测画面中是否有人脸')">人脸检测</button>
+      </div>
       <select id="planner"><option value="llama_cpp">llama_cpp</option><option value="mock">mock</option></select>
       <input id="token" placeholder="RVCLAW_WEB_TOKEN" type="password">
       <button onclick="runTask()">运行任务</button>
@@ -129,11 +140,16 @@ def _index_html() -> str:
         <div class="metric"><b>planner_mode</b><span id="plannerMode">-</span></div>
         <div class="metric"><b>tool calls</b><span id="toolCount">-</span></div>
         <div class="metric"><b>latency</b><span id="latency">-</span></div>
+        <div class="metric"><b>vision</b><span id="visionBackend">-</span></div>
+        <div class="metric"><b>model</b><span id="visionModel">-</span></div>
       </div>
       <h2>执行时间线</h2>
       <div id="timeline" class="timeline"></div>
       <h2>CV 画面</h2>
       <div class="images"><img id="capture" alt="capture"><img id="annotated" alt="annotated"></div>
+      <h2>识别结论</h2>
+      <div id="visionSummary" class="metric">等待视觉任务...</div>
+      <div id="visionResults" class="results"></div>
       <h2>证据文件</h2>
       <div id="files" class="files"></div>
       <div id="fileView" class="file-view">等待运行...</div>
@@ -151,6 +167,7 @@ def _index_html() -> str:
       return next;
     }
     async function api(path, options) { const r = await fetch(path, requestOptions(options)); if (!r.ok) throw new Error(await r.text()); return r; }
+    function setGoal(text){ goal.value = text; }
     async function refreshHealth(){ const h = await (await api('/api/health')).json(); health.textContent = h.runs_dir; }
     async function refreshRuns(){ const rows = await (await api('/api/runs')).json(); runs.innerHTML = rows.map(r => `<div class="event" onclick="loadRun('${r.run_id}')"><span>${r.run_id}</span><span class="${r.status==='completed'?'ok':'fail'}">${r.status}</span></div>`).join(''); }
     async function runTask(){
@@ -163,11 +180,20 @@ def _index_html() -> str:
       currentRun = runId; const detail = await (await api(`/api/runs/${runId}`)).json(); const m = detail.metrics || {};
       status.textContent = m.status || detail.summary.status; status.className = status.textContent === 'completed' ? 'ok' : 'fail';
       plannerMode.textContent = m.planner_mode || '-'; toolCount.textContent = m.tool_call_count ?? '-'; latency.textContent = m.latency_ms ? `${m.latency_ms} ms` : '-';
+      visionBackend.textContent = m.vision_backend || '-'; visionModel.textContent = m.vision_model || '-';
       timeline.innerHTML = detail.trace.filter(e => e.event.includes('skill_call') || e.event.includes('planner')).map(e => `<div class="event"><span>${e.event}</span><span>${(e.payload.call && e.payload.call.name) || e.payload.planner || ''}</span></div>`).join('');
       files.innerHTML = detail.files.map(f => `<button onclick="showFile('${f}')">${f}</button>`).join('');
       const annotatedFile = detail.files.find(f => f.endsWith('_annotated.png')); const captureFile = detail.files.find(f => f.endsWith('_capture.png'));
       capture.src = captureFile ? fileUrl(runId, captureFile) : ''; annotated.src = annotatedFile ? fileUrl(runId, annotatedFile) : '';
+      const visionEvent = detail.trace.findLast ? detail.trace.findLast(e => e.payload && e.payload.call && e.payload.call.name === 'analyze_image') : [...detail.trace].reverse().find(e => e.payload && e.payload.call && e.payload.call.name === 'analyze_image');
+      renderVision((visionEvent && visionEvent.payload.result && visionEvent.payload.result.output) || null);
       if (detail.files.includes('report.md')) showFile('report.md');
+    }
+    function renderVision(output){
+      if (!output) { visionSummary.textContent = '当前 run 没有 analyze_image 结果。'; visionResults.innerHTML = ''; return; }
+      visionSummary.textContent = output.summary || '视觉任务完成。';
+      const rows = [...(output.labels || []), ...(output.objects || []), ...(output.segments || []), ...(output.faces || [])];
+      visionResults.innerHTML = rows.map(item => `<div class="result-card"><b>${item.label || 'result'}</b><span>confidence: ${Number(item.confidence || 0).toFixed(2)}</span><br><span>${item.bbox ? 'bbox: ' + item.bbox.join(', ') : ''}</span></div>`).join('') || '<div class="result-card"><b>无目标</b><span>未返回可视对象。</span></div>';
     }
     function fileUrl(runId, name) { return `/api/runs/${encodeURIComponent(runId)}/files/${name.split('/').map(encodeURIComponent).join('/')}`; }
     async function showFile(name){

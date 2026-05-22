@@ -17,7 +17,15 @@ Checkpoint tag:
 v0.1.0-k3-llama-smoke
 ```
 
-## Next Checkpoint: v0.1.1 K3 Web + CV Demo
+## Current Checkpoint: v0.1.2 K3 Multi-Vision DemoZoo Bridge
+
+- [x] Add `analyze_image` as the unified vision skill.
+- [x] Support classification, object detection, segmentation, and face detection task mapping.
+- [x] Add DemoZoo HTTP sidecar bridge with `cv_sample` fallback.
+- [x] Upgrade Web UI with visual task presets and result cards.
+- [ ] Validate DemoZoo sidecar on the physical K3.
+
+## Previous Checkpoint: v0.1.1 K3 Web + CV Demo
 
 - [x] Add FastAPI-compatible Web/API surface for runs, history, artifacts, and benchmark CSV.
 - [x] Add configurable zones with `A-03`, `B-01`, and `BASE`.

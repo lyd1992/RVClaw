@@ -4,11 +4,11 @@ Updated: 2026-05-22
 
 Checkpoint tag: `v0.1.0-k3-llama-smoke`
 
-Current code checkpoint target: `v0.1.1-k3-web-cv-demo`
+Current code checkpoint target: `v0.1.2-k3-demozoo-vision-bridge`
 
 ## Summary
 
-RVClaw has reached the first K3 smoke checkpoint and now has a v0.1.1 Web + CV demo implementation ready for K3 validation. The v0.1.0 checkpoint proved the Demo Claw software loop on K3 Pico-ITX 32GB with local `spacemit-llama.cpp`; v0.1.1 adds a visual control surface, sample-image CV artifacts, configurable zones, and planner/device mode metadata.
+RVClaw has reached the first K3 smoke checkpoint and now has a v0.1.2 multi-vision Web demo implementation ready for K3 DemoZoo validation. The v0.1.0 checkpoint proved the Demo Claw software loop on K3 Pico-ITX 32GB with local `spacemit-llama.cpp`; v0.1.1 added the Web/CV surface; v0.1.2 adds `analyze_image` and a DemoZoo sidecar bridge for classification, object detection, segmentation, and face detection.
 
 This checkpoint proves the RVClaw runtime path is executable and auditable on the target RISC-V edge box:
 
@@ -19,7 +19,7 @@ browser or CLI natural-language task
   -> Agent Core
   -> Safety Guard
   -> Tool Router
-  -> Mock or CV sample Device + SQLite memory
+  -> Mock / CV sample / DemoZoo Device + SQLite memory
   -> trace.jsonl / metrics.json / report.md / raw.log
 ```
 
@@ -59,6 +59,8 @@ bash deploy/k3/run_llama_server.sh
 bash deploy/k3/run_web_demo.sh
 ```
 
+For v0.1.2 DemoZoo validation, also see `docs/k3_demozoo_bridge.md`.
+
 Known successful K3 runs:
 
 | Run ID | Goal | Planner | Expected result |
@@ -90,6 +92,8 @@ Known successful K3 runs:
 - CV sample device backend that writes real image artifacts:
   - `artifacts/a03_capture.png`
   - `artifacts/a03_annotated.png`
+- Multi-vision `analyze_image` skill with normalized `vision_result.json`.
+- DemoZoo sidecar bridge with `cv_sample` fallback for classification, object detection, segmentation, and face detection.
 - Web console and API:
   - `GET /api/health`
   - `POST /api/runs`
@@ -97,7 +101,7 @@ Known successful K3 runs:
   - `GET /api/runs/{run_id}`
   - `GET /api/runs/{run_id}/files`
   - `GET /api/benchmarks`
-- `planner_mode` and `device_backend` metrics for demo explainability.
+- `planner_mode`, `device_backend`, `vision_backend`, and `vision_task` metrics for demo explainability.
 - E2E benchmark CSV with K3/llama.cpp environment metadata.
 - Planner hardening for small-model instability:
   - repairs incomplete inspection plans to the deterministic 6-step workflow;
@@ -149,6 +153,7 @@ speak
 - MNN/ONNX/CV model-backed anomaly detection.
 - Milvus/Knowhere high-performance memory backend.
 - Interactive human confirmation UI.
+- Face identity recognition or face-library matching.
 
 ## Acceptance Criteria For This Checkpoint
 

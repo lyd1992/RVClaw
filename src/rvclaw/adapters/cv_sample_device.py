@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import os
 import shutil
+import time
 from pathlib import Path
 from typing import Any
 
 from rvclaw.adapters.mock_device import MockDevice
+from rvclaw.adapters.vision import default_model_for_task, local_vision_result, normalize_vision_task, render_vision_annotation, write_vision_result
 
 
 class CVSampleDevice(MockDevice):
@@ -52,6 +54,24 @@ class CVSampleDevice(MockDevice):
             "risk_level": "low",
             "backend": self.backend_name,
         }
+
+    def analyze_image(self, image_ref: str | None = "latest", task: str = "object_detection", model: str | None = None) -> dict[str, Any]:
+        source = _resolve_image_ref(image_ref, self._latest_capture)
+        task = normalize_vision_task(task)
+        model = model or default_model_for_task(task)
+        started_at = time.perf_counter()
+        result = local_vision_result(task=task, model=model)
+        annotated = self.artifact_dir / f"{_slug(task)}_annotated.png"
+        render_vision_annotation(source, annotated, result)
+        result.update(
+            {
+                "image_ref": str(source),
+                "annotated_image_ref": str(annotated),
+                "latency_ms": round((time.perf_counter() - started_at) * 1000, 3),
+            }
+        )
+        write_vision_result(self.artifact_dir, result)
+        return result
 
 
 def _resolve_image_ref(image_ref: str | None, latest_capture: Path | None) -> Path:

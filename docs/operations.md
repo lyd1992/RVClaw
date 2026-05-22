@@ -1,33 +1,37 @@
 # Operations Runbook
 
-## 本地运行
+This runbook is the short operational reference. For first-time K3 deployment,
+start with `docs/k3_start_here.md`; for the v0.1.2 multi-vision sidecar, use
+`docs/k3_demozoo_bridge.md`.
+
+## Local Development
 
 ```powershell
 $env:PYTHONPATH = "src"
-python -m rvclaw run --planner mock
+python -m unittest discover -s tests
+python -m compileall -q src tests benchmarks
+python -m rvclaw run "Check A-03 and generate report" --planner mock --json
 ```
 
-## K3 运行
-
-当前 K3 smoke checkpoint 使用：
+## K3 CLI Smoke
 
 ```bash
 cd /opt/rvclaw/RVClaw
+git pull --ff-only
 source deploy/k3/env.sh
-bash deploy/k3/run_llama_server.sh
+
+python3 -m unittest discover -s tests
+python3 -m compileall -q src tests benchmarks
+
+python3 -m rvclaw run "检查 A-03 区域设备状态并生成报告" \
+  --planner mock \
+  --runs-dir /data/rvclaw/runs \
+  --json
 ```
 
-另一个 SSH 终端运行：
-
-```bash
-source deploy/k3/env.sh
-bash deploy/k3/run_demo.sh
-```
-
-预期默认巡检输出：
+Expected baseline tool chain:
 
 ```text
-completed
 memory_query
 move_to
 capture_image
@@ -36,22 +40,32 @@ speak
 upload_report
 ```
 
-支持的基础动作：
+## K3 llama.cpp Planner
+
+Keep llama-server in a dedicated SSH/tmux window:
 
 ```bash
-python3 -m rvclaw run "返回 BASE" --planner mock --runs-dir /data/rvclaw/runs --json
+cd /opt/rvclaw/RVClaw
+source deploy/k3/env.sh
+bash deploy/k3/run_llama_server.sh
 ```
 
-超出白名单的任务应返回 `failed` 并保留 run artifacts。详见：
+Check the service from another SSH window:
 
-```text
-docs/k3_ssh_deployment.md
-docs/development_status.md
+```bash
+curl http://127.0.0.1:9090/v1/models | jq
 ```
 
-## K3 Web + CV 运行
+Run the CLI demo:
 
-K3 正式 Web 演示默认使用 Qwen3-30B-A3B GGUF。OpenCV 推荐安装：
+```bash
+source deploy/k3/env.sh
+bash deploy/k3/run_demo.sh
+```
+
+## K3 Web + CV
+
+Install OpenCV if possible:
 
 ```bash
 sudo apt update
@@ -62,56 +76,80 @@ print(cv2.__version__)
 PY
 ```
 
-如果 OpenCV 暂不可用，`cv_sample` 会回退到图片复制检测路径，demo 仍可运行。
-
-启动 llama-server：
+Start the Web console:
 
 ```bash
 cd /opt/rvclaw/RVClaw
 source deploy/k3/env.sh
-bash deploy/k3/run_llama_server.sh
-```
-
-另一个 SSH 终端启动 Web：
-
-```bash
-source deploy/k3/env.sh
 bash deploy/k3/run_web_demo.sh
 ```
 
-浏览器访问：
+Open the Web UI from Windows:
 
 ```text
-http://<K3-IP>:8088
+http://<K3-LAN-IP>:8088
+http://<K3-TAILSCALE-IP>:8088
 ```
 
-详见：
+## K3 DemoZoo Multi-Vision
+
+Start DemoZoo separately according to the SpacemiT/Bianbu instructions, then run
+RVClaw with the sidecar enabled:
+
+```bash
+cd /opt/rvclaw/RVClaw
+source deploy/k3/env.sh
+
+export RVCLAW_DEVICE_BACKEND=cv_sample
+export RVCLAW_VISION_BACKEND=demozoo
+export RVCLAW_DEMOZOO_BASE_URL=http://127.0.0.1:8000
+export RVCLAW_DEMOZOO_ENDPOINT_TEMPLATE='/predict/{model}'
+export RVCLAW_VISION_TIMEOUT_S=30
+
+bash deploy/k3/run_web_demo.sh
+```
+
+Use the four Web presets:
 
 ```text
-docs/k3_web_cv_demo.md
+分类这张图片并说明结果
+检测图片中的目标并生成结论
+分割画面中的主要区域
+检测画面中是否有人脸
 ```
 
-## SG2044 运行
+Expected evidence for each visual run:
 
-参考 `deploy/sg2044/install.md`。首次验收建议固定记录：
+```text
+artifacts/a03_capture.png
+artifacts/<task>_annotated.png
+artifacts/vision_result.json
+metrics.json
+trace.jsonl
+report.md
+raw.log
+```
 
-- SoC：SG2044
-- core：64 core
-- ISA：RVV 1.0
-- VLEN：128
-- OS：openEuler/EulixOS 或实际发行版
-- compiler：GCC/Clang 版本
-- runtime：engine、commit、build flags
-- model：model、dtype、quant、kv_dtype、kv_len
+## Safety Checks
 
-## Run Artifacts
+Unknown zones, unknown skills, unknown vision tasks, unknown vision models, and
+external image URLs should return `failed` while still preserving the run
+evidence package.
 
-每次运行必须保留：
+Example:
 
-- `task.yaml`
-- `metrics.json`
-- `trace.jsonl`
-- `report.md`
-- `raw.log`
+```bash
+python3 -m rvclaw run "移动到 Z-99 区域并拍照" \
+  --planner mock \
+  --runs-dir /data/rvclaw/runs \
+  --json
+```
 
-这些产物用于 demo replay、benchmark 汇总、问题定位和验收归档。
+## Benchmark
+
+```bash
+python3 benchmarks/run_agent_e2e.py --repeat 3 --planner llama_cpp --runs-dir /data/rvclaw/runs
+```
+
+The CSV is written under the selected runs directory. Record model name,
+quantization, thread count, K3 image version, and whether DemoZoo was enabled.

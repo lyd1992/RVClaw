@@ -57,6 +57,24 @@
       }
     },
     {
+      "name": "analyze_image",
+      "description": "Run a whitelisted local vision analysis task on the latest image artifact.",
+      "safety_level": "local_inference",
+      "timeout_s": 30,
+      "requires_confirmation": false,
+      "parameters": {
+        "required": ["task"],
+        "properties": {
+          "image_ref": {"type": "string", "enum": ["latest"]},
+          "task": {"type": "string", "enum": ["classification", "object_detection", "segmentation", "face_detection"]},
+          "model": {
+            "type": "string",
+            "enum": ["resnet", "mobilenet_v2", "efficientnet", "swin_tiny", "yolov5", "yolov8", "yolov11", "yolov8_seg", "fcn", "unet", "sam", "yolov5_face"]
+          }
+        }
+      }
+    },
+    {
       "name": "speak",
       "description": "Speak a short status message through the mock device.",
       "safety_level": "output",

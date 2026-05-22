@@ -1,19 +1,22 @@
 # RVClaw Architecture
 
-RVClaw 采用“先闭环、后优化”的 Demo Claw v0.1 架构。
+RVClaw follows a "close the loop first, optimize later" architecture. The
+current K3 path is a demo-grade edge Agent Runtime: RVClaw owns task intake,
+planning, safety, skills, evidence, and Web visualization; local model services
+such as llama.cpp or DemoZoo are sidecars behind stable interfaces.
 
-## 八层架构
+## Eight-Layer View
 
-1. RISC-V Hardware + OS：SG2044、K3、openEuler/EulixOS、GCC/Clang。
-2. RVV Kernel Layer：Attention、GEMM、Pack/Reorder、Dynamic Quant、SQ、Distance、MPMI、ROrder。
-3. AI Runtime：llama.cpp baseline，后续接入 MNN、vLLM、ONNX Runtime。
-4. RAG + Memory：SQLite/flat baseline，后续接入 Knowhere/Milvus/RVFlow。
-5. Device Adapter：Mock Device、ROS 2、OpenClaw、Camera、IMU、Mic、底盘、控制器。
-6. Agent Orchestrator：Planner、State Machine、Tool Router、Task Context。
-7. Safety + Observability：Skill 白名单、人工接管、日志、trace、replay、diagnostics。
-8. Robot / Fleet Apps：巡检、实验室运维、园区安防、仓储 AMR、低空节点等。
+1. RISC-V Hardware + OS: K3 Pico-ITX, SG2044, Bianbu/Ubuntu/openEuler.
+2. RVV Kernel Layer: attention, GEMM, quantization, distance, reorder.
+3. AI Runtime: llama.cpp baseline, later MNN, ONNX Runtime, vLLM.
+4. RAG + Memory: SQLite/JSONL/flat baseline, later Knowhere/Milvus.
+5. Device Adapter: mock, cv_sample, DemoZoo sidecar, future ROS2/OpenClaw.
+6. Agent Orchestrator: Planner, Agent Core, Tool Router, Task Context.
+7. Safety + Observability: Skill whitelist, guard, trace, replay, metrics.
+8. Robot / Fleet Apps: inspection, lab operations, AMR, security, diagnostics.
 
-## v0.1 执行链路
+## v0.1 Core Loop
 
 ```text
 CLI/API task
@@ -27,24 +30,52 @@ CLI/API task
   -> Observability(task/trace/metrics/report/raw log)
 ```
 
-## v0.1.1 Web + CV 执行链路
+## v0.1.1 K3 Web + CV Loop
 
 ```text
 Web console
   -> POST /api/runs
   -> run_demo()
-  -> llama.cpp Planner
+  -> llama.cpp Planner or deterministic repair
   -> configurable zone Safety Guard
   -> cv_sample capture/detect
   -> artifacts/a03_capture.png + artifacts/a03_annotated.png
-  -> Web artifact viewer
+  -> Web timeline + artifact viewer
 ```
 
-## 插件边界
+## v0.1.2 Multi-Vision Loop
 
-- `RuntimeBackend`：LLM、embedding、视觉、小模型、量化和后端指标。
-- `PlannerBackend`：任务到 tool_calls 的规划层；当前 `llama_cpp` 通过本地 OpenAI-compatible `llama-server` 接入，并对默认巡检任务提供 deterministic fallback。
-- `MemoryManager`：事件库、设备画像、小规模检索，后续接 Knowhere/Milvus。
-- `Skill Registry`：skill 白名单、参数 schema、安全级别。
-- `Device Adapter`：隔离 Mock Device、ROS 2、OpenClaw 和真实传感器。
-- `Observability`：统一 run artifacts，支撑 replay、benchmark 和验收。
+```text
+Web preset or natural-language vision task
+  -> Planner / deterministic vision workflow
+  -> analyze_image
+  -> DemoZoo HTTP sidecar
+  -> classification / object_detection / segmentation / face_detection
+  -> normalized vision_result.json
+  -> annotated image + result cards + metrics + report
+```
+
+If DemoZoo is unavailable, the same `analyze_image` skill falls back to
+`cv_sample` and records `vision_backend=mock_fallback` or `cv_sample` in the run
+evidence. Face support is detection-only in v0.1.2; RVClaw does not perform
+identity recognition, face matching, or face-library management.
+
+## Stable Interfaces
+
+- `PlannerBackend`: converts task context into JSON `tool_calls`. Current local
+  K3 path uses OpenAI-compatible `llama-server` plus deterministic repair.
+- `Skill Registry`: defines allowed skill names, schemas, enums, timeouts, and
+  safety levels.
+- `Device Adapter`: hides mock, CV sample, DemoZoo, and future ROS2/OpenClaw
+  implementations behind the same skill functions.
+- `Memory Manager`: handles SQLite/JSONL memory and is the future expansion
+  point for Knowhere/Milvus.
+- `Observability`: every run must leave `task.yaml`, `trace.jsonl`,
+  `metrics.json`, `report.md`, `raw.log`, and task-specific artifacts.
+
+## Main Verification Documents
+
+- First K3 setup and verification: `docs/k3_start_here.md`.
+- Web + CV smoke demo: `docs/k3_web_cv_demo.md`.
+- Optional v0.1.2 DemoZoo sidecar: `docs/k3_demozoo_bridge.md`.
+- Current checkpoint and known gaps: `docs/development_status.md`.

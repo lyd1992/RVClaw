@@ -1,4 +1,4 @@
-# Demo Claw v0.1.1 SRS/SDS Mapping
+# Demo Claw v0.1.2 SRS/SDS Mapping
 
 ## Functional Requirements
 
@@ -21,6 +21,7 @@
 | FR-015 | Web console can inspect run history, artifacts, and benchmark CSV | `src/rvclaw/web/` |
 | FR-016 | Record planner output mode | `planner_mode` in `metrics.json` and `trace.jsonl` |
 | FR-017 | Configurable zone whitelist | `configs/zones.yaml` |
+| FR-018 | Multi-vision image analysis | `analyze_image`, DemoZoo bridge, `vision_result.json` |
 
 ## Design Modules
 
@@ -32,6 +33,6 @@
 | Memory Manager | SQLite/flat memory query and write | `memory/` |
 | Skill Registry | Whitelist, parameter schema, safety level, zone constraints | `skills/registry.yaml`, `configs/zones.yaml` |
 | Safety Guard | Validate legality, safety, and executability | `agent/safety_guard.py` |
-| Device Adapter | Mock Device, CV sample Device, future ROS2/OpenClaw | `adapters/` |
+| Device Adapter | Mock Device, CV sample Device, DemoZoo sidecar, future ROS2/OpenClaw | `adapters/` |
 | Web Console | Submit tasks, view run history, evidence files, and image artifacts | `web/` |
 | Observability | trace, metrics, report, raw log | `observability.py` |

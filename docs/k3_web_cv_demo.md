@@ -1,6 +1,6 @@
 # K3 Web + CV Demo
 
-This document records the v0.1.1 K3 visual demo path. It keeps RVClaw code in
+This document records the v0.1.1/v0.1.2 K3 visual demo path. It keeps RVClaw code in
 the GitHub repository and keeps K3 runtime state under `/data/rvclaw`.
 
 If this is your first K3 setup, finish `docs/k3_start_here.md` first. This
@@ -15,13 +15,15 @@ browser natural-language task
   -> FastAPI Web console
   -> llama.cpp Planner
   -> Safety Guard
-  -> cv_sample / mock device skills
+  -> cv_sample / DemoZoo / mock device skills
   -> timeline + image artifacts + metrics + trace + report
 ```
 
 The default visual input is a sample image, so the demo works before a USB
 camera is available. A future camera backend can reuse the same
 `capture_image` / `detect_status` skill contract.
+
+For the v0.1.2 multi-vision DemoZoo bridge, see `docs/k3_demozoo_bridge.md`.
 
 ## Dependencies
 

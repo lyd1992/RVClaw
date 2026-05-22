@@ -23,6 +23,9 @@ def build_builtin_skills(device: MockDevice, memory: MemoryManager, run_id: str)
     def detect_status(target: str, image_ref: str | None = None) -> dict[str, Any]:
         return device.detect_status(target=target, image_ref=image_ref)
 
+    def analyze_image(image_ref: str = "latest", task: str = "object_detection", model: str | None = None) -> dict[str, Any]:
+        return device.analyze_image(image_ref=image_ref, task=task, model=model)
+
     def speak(text: str) -> dict[str, Any]:
         return device.speak(text=text)
 
@@ -37,6 +40,7 @@ def build_builtin_skills(device: MockDevice, memory: MemoryManager, run_id: str)
         "move_to": move_to,
         "capture_image": capture_image,
         "detect_status": detect_status,
+        "analyze_image": analyze_image,
         "speak": speak,
         "upload_report": upload_report,
         "stop": stop,

@@ -55,7 +55,7 @@ sudo apt install -y git curl wget rsync unzip tar tree htop tmux \
   sqlite3 jq v4l-utils ffmpeg python3-opencv
 ```
 
-OpenCV 用于 v0.1.1 的样例图识别和标注，建议安装：
+OpenCV 用于 v0.1.1/v0.1.2 的样例图识别和标注，建议安装：
 
 ```bash
 python3 - <<'PY'
@@ -221,6 +221,7 @@ python3 benchmarks/run_agent_e2e.py --repeat 3 --planner llama_cpp --runs-dir /d
 ## 10. 继续阅读
 
 - `docs/k3_web_cv_demo.md`：Web 页面、CV sample、演示脚本和验收项。
+- `docs/k3_demozoo_bridge.md`：v0.1.2 多视觉 DemoZoo sidecar 增强。
 - `deploy/k3/install.md`：完整安装命令和环境变量参考。
 - `docs/k3_ssh_deployment.md`：详细 SSH 操作、排障和历史 smoke 验收记录。
 - `docs/openclaw_adapter_contract.md`：v0.2 后续 OpenClaw/ROS2/飞书 sidecar 合同。
