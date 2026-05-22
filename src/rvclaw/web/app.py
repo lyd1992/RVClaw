@@ -127,25 +127,12 @@ def create_app(runs_dir: str | Path, planner: str = "llama_cpp", web_token: str 
     @app.get("/api/runs/{run_id}")
     def run_detail(run_id: str) -> dict[str, Any]:
         try:
-            return get_run_detail(runs_root, run_id)
+            detail = get_run_detail(runs_root, run_id)
+            return _merge_job_detail(detail, get_job(run_id), planner)
         except FileNotFoundError:
             job = get_job(run_id)
             if job:
-                return {
-                    "summary": {
-                        "run_id": run_id,
-                        "status": job.get("status", "running"),
-                        "planner": job.get("planner", planner),
-                        "planner_mode": "running",
-                        "task_success": False,
-                        "tool_call_count": 0,
-                        "latency_ms": None,
-                        "run_dir": str(runs_root / run_id),
-                    },
-                    "metrics": {"status": job.get("status", "running"), "planner": job.get("planner", planner)},
-                    "trace": [],
-                    "files": [],
-                }
+                return _job_placeholder_detail(run_id, runs_root / run_id, job, planner)
             raise HTTPException(status_code=404, detail=run_id)
         except ValueError as exc:
             raise HTTPException(status_code=404, detail=str(exc)) from exc
@@ -181,6 +168,48 @@ def create_app(runs_dir: str | Path, planner: str = "llama_cpp", web_token: str 
         return read_benchmark_rows(runs_root)
 
     return app
+
+
+def _job_placeholder_detail(run_id: str, run_dir: Path, job: dict[str, Any], default_planner: str) -> dict[str, Any]:
+    status = str(job.get("status") or "running")
+    metrics = {"status": status, "planner": job.get("planner", default_planner)}
+    if job.get("error"):
+        metrics["worker_error"] = job["error"]
+    return {
+        "summary": {
+            "run_id": run_id,
+            "status": status,
+            "planner": job.get("planner", default_planner),
+            "planner_mode": "running" if status == "running" else "failed",
+            "task_success": False,
+            "tool_call_count": 0,
+            "latency_ms": None,
+            "run_dir": str(run_dir),
+        },
+        "metrics": metrics,
+        "trace": [],
+        "files": [],
+    }
+
+
+def _merge_job_detail(detail: dict[str, Any], job: dict[str, Any], default_planner: str) -> dict[str, Any]:
+    if not job:
+        return detail
+    summary = dict(detail.get("summary") or {})
+    metrics = dict(detail.get("metrics") or {})
+    if summary.get("status") == "unknown" or not metrics:
+        status = str(job.get("status") or "running")
+        summary["status"] = status
+        summary["planner"] = job.get("planner", summary.get("planner", default_planner))
+        summary["planner_mode"] = "running" if status == "running" else "failed"
+        metrics.setdefault("status", status)
+        metrics.setdefault("planner", summary["planner"])
+        if job.get("error"):
+            metrics["worker_error"] = job["error"]
+    detail = dict(detail)
+    detail["summary"] = summary
+    detail["metrics"] = metrics
+    return detail
 
 
 def _index_html() -> str:
@@ -384,7 +413,9 @@ def _index_html() -> str:
       const m = detail.metrics || {}; status.textContent = detail.summary.status; status.className = detail.summary.status === 'completed' ? 'ok' : detail.summary.status === 'failed' ? 'fail' : 'warn';
       plannerMode.textContent = m.planner_mode || detail.summary.planner_mode || '-'; toolCount.textContent = m.tool_call_count ?? detail.summary.tool_call_count ?? '-';
       latency.textContent = m.latency_ms ? `${m.latency_ms} ms` : '-'; visionBackend.textContent = m.vision_backend || '-'; visionModel.textContent = m.vision_model || '-';
-      renderGraph(detail); renderStack(m); renderFiles(detail); renderVision(findVisionOutput(detail));
+      renderGraph(detail); renderStack(m); renderFiles(detail);
+      if (m.worker_error) { visionSummary.textContent = `后台任务异常：${m.worker_error}`; visionResults.innerHTML = ''; }
+      else renderVision(findVisionOutput(detail));
     }
     function renderGraph(detail){
       const trace = detail.trace || [], m = detail.metrics || {}, status = detail.summary.status;
@@ -397,6 +428,7 @@ def _index_html() -> str:
       const approved = trace.find(e => e.event === 'safety_guard.approved');
       if (rejected) state.safety = {status:'rejected', note:rejected.payload.error || 'rejected'};
       else if (approved) state.safety = {status:'approved', note:'whitelist approved'};
+      if (m.worker_error) state.planner = {status:'failed', note:m.worker_error};
       const completed = trace.filter(e => e.event === 'skill_call.completed').map(e => e.payload.call && e.payload.call.name);
       if (completed.includes('memory_query')) state.memory = {status:'completed', note:'context loaded'};
       if (completed.includes('capture_image')) state.capture = {status:'completed', note:'image artifact'};

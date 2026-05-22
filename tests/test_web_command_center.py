@@ -16,7 +16,7 @@ try:
 except Exception:  # pragma: no cover - optional API dependency
     TestClient = None
 
-from rvclaw.web.app import create_app
+from rvclaw.web.app import _merge_job_detail, create_app
 
 
 ONE_PIXEL_PNG = (
@@ -114,6 +114,26 @@ class WebUploadAnnotationTest(unittest.TestCase):
         self.assertIn("globals()[\"FastAPIUploadFile\"] = UploadFile", source)
         self.assertIn("file: FastAPIUploadFile = File(...)", source)
         self.assertNotIn("file: UploadFile = File(...)", source)
+
+    def test_running_job_keeps_partial_run_detail_running_until_metrics_exist(self) -> None:
+        detail = {
+            "summary": {
+                "run_id": "run-partial",
+                "status": "unknown",
+                "planner": "unknown",
+                "planner_mode": "unknown",
+                "tool_call_count": 0,
+            },
+            "metrics": {},
+            "trace": [{"event": "task.received", "payload": {}}],
+            "files": ["task.yaml", "trace.jsonl", "raw.log"],
+        }
+        merged = _merge_job_detail(detail, {"status": "running", "planner": "llama_cpp"}, "llama_cpp")
+
+        self.assertEqual(merged["summary"]["status"], "running")
+        self.assertEqual(merged["summary"]["planner"], "llama_cpp")
+        self.assertEqual(merged["metrics"]["status"], "running")
+        self.assertEqual(merged["trace"], detail["trace"])
 
 
 if __name__ == "__main__":
