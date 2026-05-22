@@ -69,9 +69,9 @@ git pull --ff-only
 
 ```bash
 cd /data/rvclaw/src
-wget https://archive.spacemit.com/spacemit-ai/llama.cpp/spacemit-llama.cpp.riscv64.0.0.8.tar.gz
-tar -xzvf spacemit-llama.cpp.riscv64.0.0.8.tar.gz
-ln -sfn spacemit-llama.cpp.riscv64.0.0.8 spacemit-llama.cpp
+wget https://archive.spacemit.com/spacemit-ai/llama.cpp/spacemit-llama.cpp.riscv64.0.0.9.tar.gz
+tar -xzvf spacemit-llama.cpp.riscv64.0.0.9.tar.gz
+ln -sfn spacemit-llama.cpp.riscv64.0.0.9 spacemit-llama.cpp
 ```
 
 ## 7. 下载模型

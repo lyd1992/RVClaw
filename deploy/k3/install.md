@@ -51,14 +51,14 @@ sudo chown -R "$USER":"$USER" /opt/rvclaw /data/rvclaw
 ## 3. Official SpacemiT llama.cpp Package
 
 Start with the official prebuilt package before attempting source builds.
-The Bianbu llama.cpp guide uses earlier packages, while the SpacemiT archive
-currently includes `0.0.8`.
+The Bianbu llama.cpp guide may use earlier packages, while the current K3
+bring-up path uses `0.0.9`.
 
 ```bash
 cd /data/rvclaw/src
-wget https://archive.spacemit.com/spacemit-ai/llama.cpp/spacemit-llama.cpp.riscv64.0.0.8.tar.gz
-tar -xzvf spacemit-llama.cpp.riscv64.0.0.8.tar.gz
-ln -sfn spacemit-llama.cpp.riscv64.0.0.8 spacemit-llama.cpp
+wget https://archive.spacemit.com/spacemit-ai/llama.cpp/spacemit-llama.cpp.riscv64.0.0.9.tar.gz
+tar -xzvf spacemit-llama.cpp.riscv64.0.0.9.tar.gz
+ln -sfn spacemit-llama.cpp.riscv64.0.0.9 spacemit-llama.cpp
 ```
 
 ## 4. K3 Demo Model

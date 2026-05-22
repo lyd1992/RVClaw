@@ -103,11 +103,13 @@ source /data/rvclaw/venv/bin/activate
 
 ## 4. 安装 spacemit-llama.cpp
 
+当前 K3 可用的官方预编译包使用 `0.0.9`。`env.sh` 只依赖 `/data/rvclaw/src/spacemit-llama.cpp` 这个软链接，所以后续换包时更新软链接即可。
+
 ```bash
 cd /data/rvclaw/src
-wget https://archive.spacemit.com/spacemit-ai/llama.cpp/spacemit-llama.cpp.riscv64.0.0.8.tar.gz
-tar -xzvf spacemit-llama.cpp.riscv64.0.0.8.tar.gz
-ln -sfn spacemit-llama.cpp.riscv64.0.0.8 spacemit-llama.cpp
+wget https://archive.spacemit.com/spacemit-ai/llama.cpp/spacemit-llama.cpp.riscv64.0.0.9.tar.gz
+tar -xzvf spacemit-llama.cpp.riscv64.0.0.9.tar.gz
+ln -sfn spacemit-llama.cpp.riscv64.0.0.9 spacemit-llama.cpp
 ```
 
 ## 5. 下载模型
@@ -120,6 +122,15 @@ mkdir -p /data/rvclaw/models
 ln -sfn ~/Qwen3-30B-A3B-Instruct-2507-Q4_0.gguf \
   /data/rvclaw/models/Qwen3-30B-A3B-Instruct-2507-Q4_0.gguf
 ```
+
+使用这个 30B-A3B 模型时，环境变量应设置为：
+
+```bash
+export RVCLAW_LLAMA_MODEL=Qwen3-30B-A3B-Instruct-2507-Q4_0
+export RVCLAW_LLAMA_MODEL_PATH=/data/rvclaw/models/Qwen3-30B-A3B-Instruct-2507-Q4_0.gguf
+```
+
+`deploy/k3/env.sh` 已经默认使用上面这两项；只有临时切换模型时才需要手动覆盖。
 
 如果只是快速确认链路，也可以下载小模型 smoke 包，并临时覆盖环境变量：
 
