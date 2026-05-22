@@ -107,5 +107,14 @@ class WebCommandCenterTest(unittest.TestCase):
         self.fail(f"run {run_id} did not finish")
 
 
+class WebUploadAnnotationTest(unittest.TestCase):
+    def test_upload_endpoint_uses_globally_resolvable_uploadfile_alias(self) -> None:
+        source = (ROOT / "src" / "rvclaw" / "web" / "app.py").read_text(encoding="utf-8")
+        self.assertIn("FastAPIUploadFile: Any = Any", source)
+        self.assertIn("globals()[\"FastAPIUploadFile\"] = UploadFile", source)
+        self.assertIn("file: FastAPIUploadFile = File(...)", source)
+        self.assertNotIn("file: UploadFile = File(...)", source)
+
+
 if __name__ == "__main__":
     unittest.main()

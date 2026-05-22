@@ -11,6 +11,8 @@ from rvclaw.utils import make_run_id
 from rvclaw.web.service import get_run_detail, list_run_files, list_runs, read_benchmark_rows, read_run_file
 from rvclaw.web.uploads import read_upload_bytes, resolve_upload_image_ref, save_upload_bytes
 
+FastAPIUploadFile: Any = Any
+
 
 def create_app(runs_dir: str | Path, planner: str = "llama_cpp", web_token: str | None = None):
     try:
@@ -19,6 +21,7 @@ def create_app(runs_dir: str | Path, planner: str = "llama_cpp", web_token: str 
     except ImportError as exc:
         raise RuntimeError("FastAPI is not installed. Install RVClaw with: python3 -m pip install -e '.[api]'") from exc
 
+    globals()["FastAPIUploadFile"] = UploadFile
     runs_root = Path(runs_dir)
     uploads_root = Path(os.environ.get("RVCLAW_UPLOADS_DIR") or runs_root.parent / "uploads")
     app = FastAPI(title="RVClaw K3 Agent Command Center", version="0.1.3")
@@ -65,7 +68,7 @@ def create_app(runs_dir: str | Path, planner: str = "llama_cpp", web_token: str 
         }
 
     @app.post("/api/uploads")
-    async def upload_image(file: UploadFile = File(...), _: None = Depends(check_token)) -> dict[str, Any]:
+    async def upload_image(file: FastAPIUploadFile = File(...), _: None = Depends(check_token)) -> dict[str, Any]:
         try:
             payload = save_upload_bytes(uploads_root, file.filename or "upload.png", await file.read())
         except ValueError as exc:
