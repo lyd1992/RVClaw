@@ -104,8 +104,8 @@ def _index_html() -> str:
     .event { display:flex; justify-content:space-between; gap:10px; border:1px solid var(--line); border-radius:6px; padding:10px; background:#101517; }
     .ok { color: var(--accent); } .fail { color: var(--bad); } .warn { color: var(--warn); }
     .images { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
-    .images img { width:100%; max-height:260px; object-fit:contain; border:1px solid var(--line); border-radius:6px; background:#090b0c; }
-    pre { max-height: 340px; overflow:auto; background:#090b0c; border:1px solid var(--line); border-radius:6px; padding:12px; white-space:pre-wrap; }
+    .images img, .file-image { width:100%; max-height:340px; object-fit:contain; border:1px solid var(--line); border-radius:6px; background:#090b0c; }
+    .file-view { max-height: 340px; overflow:auto; background:#090b0c; border:1px solid var(--line); border-radius:6px; padding:12px; white-space:pre-wrap; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
     .files { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
     .files button { width:auto; margin:0; padding:7px 10px; background:#11171a; border-color:var(--line); font-weight:500; }
     @media (max-width: 980px) { main { grid-template-columns: 1fr; } .images { grid-template-columns: 1fr; } }
@@ -136,7 +136,7 @@ def _index_html() -> str:
       <div class="images"><img id="capture" alt="capture"><img id="annotated" alt="annotated"></div>
       <h2>证据文件</h2>
       <div id="files" class="files"></div>
-      <pre id="fileView">等待运行...</pre>
+      <div id="fileView" class="file-view">等待运行...</div>
     </section>
   </main>
   <script>
@@ -166,10 +166,19 @@ def _index_html() -> str:
       timeline.innerHTML = detail.trace.filter(e => e.event.includes('skill_call') || e.event.includes('planner')).map(e => `<div class="event"><span>${e.event}</span><span>${(e.payload.call && e.payload.call.name) || e.payload.planner || ''}</span></div>`).join('');
       files.innerHTML = detail.files.map(f => `<button onclick="showFile('${f}')">${f}</button>`).join('');
       const annotatedFile = detail.files.find(f => f.endsWith('_annotated.png')); const captureFile = detail.files.find(f => f.endsWith('_capture.png'));
-      capture.src = captureFile ? `/api/runs/${runId}/files/${captureFile}` : ''; annotated.src = annotatedFile ? `/api/runs/${runId}/files/${annotatedFile}` : '';
+      capture.src = captureFile ? fileUrl(runId, captureFile) : ''; annotated.src = annotatedFile ? fileUrl(runId, annotatedFile) : '';
       if (detail.files.includes('report.md')) showFile('report.md');
     }
-    async function showFile(name){ if(!currentRun) return; const text = await (await api(`/api/runs/${currentRun}/files/${name}`)).text(); fileView.textContent = text; }
+    function fileUrl(runId, name) { return `/api/runs/${encodeURIComponent(runId)}/files/${name.split('/').map(encodeURIComponent).join('/')}`; }
+    async function showFile(name){
+      if(!currentRun) return;
+      if (/\\.(png|jpg|jpeg|webp)$/i.test(name)) {
+        fileView.innerHTML = `<img class="file-image" src="${fileUrl(currentRun, name)}" alt="${name}">`;
+        return;
+      }
+      const text = await (await api(fileUrl(currentRun, name))).text();
+      fileView.textContent = text;
+    }
     token.value = localStorage.getItem('rvclaw_web_token') || '';
     refreshHealth().catch(e => health.textContent=e.message); refreshRuns();
   </script>
