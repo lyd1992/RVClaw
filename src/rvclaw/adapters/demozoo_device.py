@@ -125,7 +125,10 @@ class DemoZooVisionDevice(CVSampleDevice):
         for candidate_model in _candidate_models(task=task, requested_model=requested_model):
             try:
                 payload = self.client.predict(source, task=task, model=candidate_model)
-                result = normalize_demozoo_payload(payload, task=task, model=candidate_model)
+                candidate_result = normalize_demozoo_payload(payload, task=task, model=candidate_model)
+                if not _is_usable_result(candidate_result):
+                    raise RuntimeError(f"{candidate_model} returned no usable {task} result")
+                result = candidate_result
                 if candidate_model != requested_model:
                     result["requested_model"] = requested_model
                     result["model_fallback_reason"] = "; ".join(model_errors)
@@ -219,3 +222,16 @@ def _candidate_models(task: str, requested_model: str) -> list[str]:
             seen.add(model)
             candidates.append(model)
     return candidates
+
+
+def _is_usable_result(result: dict[str, Any]) -> bool:
+    if result.get("image_base64"):
+        return True
+    task = normalize_vision_task(str(result.get("task") or "object_detection"))
+    if task == "classification":
+        return bool(result.get("labels"))
+    if task == "segmentation":
+        return bool(result.get("segments"))
+    if task == "face_detection":
+        return True
+    return bool(result.get("objects"))

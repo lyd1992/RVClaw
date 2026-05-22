@@ -221,53 +221,132 @@ def _heuristic_summary(task: str, source_hint: str) -> str:
 
 
 def _extract_labels(payload: dict[str, Any]) -> list[dict[str, Any]]:
-    candidates = payload.get("labels") or payload.get("topk") or payload.get("classes") or payload.get("predictions")
-    rows = candidates if isinstance(candidates, list) else []
+    rows: list[Any] = []
+    for view in _payload_views(payload):
+        for key in ("labels", "topk", "classes", "classifications", "predictions"):
+            value = view.get(key)
+            if isinstance(value, list):
+                rows.extend(value)
     labels = []
     for row in rows:
         if isinstance(row, str):
             labels.append({"label": row, "confidence": 1.0})
         elif isinstance(row, dict):
-            label = row.get("label") or row.get("class") or row.get("name") or row.get("category") or row.get("predicted_class")
+            label = _first_present(row, ("label", "class", "class_name", "name", "category", "category_name", "predicted_class"))
             if label:
-                labels.append({"label": str(label), "confidence": float(row.get("confidence", row.get("score", row.get("prob", 0))))})
-    if not labels and payload.get("predicted_class"):
-        labels.append({"label": str(payload["predicted_class"]), "confidence": float(payload.get("confidence", payload.get("score", 0)))})
+                labels.append({"label": str(label), "confidence": float(_first_present(row, ("confidence", "score", "prob", "probability", "conf"), 0))})
+    for view in _payload_views(payload):
+        label = _first_present(view, ("predicted_class", "class_name", "label", "category_name"))
+        if label:
+            labels.append({"label": str(label), "confidence": float(_first_present(view, ("confidence", "score", "prob", "probability", "conf"), 0))})
     return labels
 
 
 def _extract_objects(payload: dict[str, Any]) -> list[dict[str, Any]]:
-    rows = payload.get("objects") or payload.get("detections") or payload.get("boxes") or payload.get("results") or []
-    return [_normalize_region(row) for row in rows if isinstance(row, dict)]
+    rows = _collect_region_rows(
+        payload,
+        ("objects", "detections", "detection_results", "boxes", "bboxes", "results", "predictions", "items"),
+    )
+    return [_normalize_region(row) for row in rows]
 
 
 def _extract_segments(payload: dict[str, Any]) -> list[dict[str, Any]]:
-    rows = payload.get("segments") or payload.get("masks") or []
-    return [_normalize_region(row) for row in rows if isinstance(row, dict)]
+    rows = _collect_region_rows(payload, ("segments", "masks", "segmentation", "results", "predictions"))
+    return [_normalize_region(row) for row in rows]
 
 
 def _extract_faces(payload: dict[str, Any]) -> list[dict[str, Any]]:
-    rows = payload.get("faces") or payload.get("face_boxes") or []
-    return [_normalize_region(row, default_label="face") for row in rows if isinstance(row, dict)]
+    rows = _collect_region_rows(payload, ("faces", "face_boxes", "detections", "results", "predictions"))
+    return [_normalize_region(row, default_label="face") for row in rows]
 
 
 def _normalize_region(row: dict[str, Any], default_label: str = "object") -> dict[str, Any]:
-    bbox = row.get("bbox") or row.get("box") or row.get("xyxy") or row.get("rect") or []
+    bbox = row.get("bbox") or row.get("box") or row.get("xyxy") or row.get("rect") or row.get("coordinates") or row
     return {
-        "label": str(row.get("label") or row.get("class") or row.get("name") or default_label),
-        "confidence": float(row.get("confidence", row.get("score", row.get("prob", 0)))),
+        "label": str(_first_present(row, ("label", "class", "class_name", "name", "category", "category_name", "cls"), default_label)),
+        "confidence": float(_first_present(row, ("confidence", "score", "prob", "probability", "conf"), 0)),
         "bbox": _normalize_bbox(bbox),
     }
 
 
 def _normalize_bbox(bbox: Any) -> list[float]:
     if isinstance(bbox, dict):
-        values = [bbox.get("x1", bbox.get("left", 0)), bbox.get("y1", bbox.get("top", 0)), bbox.get("x2", bbox.get("right", 1)), bbox.get("y2", bbox.get("bottom", 1))]
+        x1 = _first_present(bbox, ("x1", "xmin", "x_min", "left", "x"), 0)
+        y1 = _first_present(bbox, ("y1", "ymin", "y_min", "top", "y"), 0)
+        x2 = _first_present(bbox, ("x2", "xmax", "x_max", "right"), None)
+        y2 = _first_present(bbox, ("y2", "ymax", "y_max", "bottom"), None)
+        if x2 is None:
+            x2 = float(x1) + float(_first_present(bbox, ("w", "width"), 1))
+        if y2 is None:
+            y2 = float(y1) + float(_first_present(bbox, ("h", "height"), 1))
+        values = [x1, y1, x2, y2]
     elif isinstance(bbox, (list, tuple)):
         values = list(bbox[:4])
     else:
         values = [0, 0, 1, 1]
     return [float(value) for value in values]
+
+
+def _payload_views(value: Any, depth: int = 0) -> list[dict[str, Any]]:
+    if depth > 4 or not isinstance(value, dict):
+        return []
+    views = [value]
+    for key in ("data", "result", "results", "output", "prediction", "predictions", "response"):
+        nested = value.get(key)
+        if isinstance(nested, dict):
+            views.extend(_payload_views(nested, depth + 1))
+        elif isinstance(nested, list):
+            views.append({key: nested})
+            for item in nested:
+                if isinstance(item, dict):
+                    views.extend(_payload_views(item, depth + 1))
+    return views
+
+
+def _collect_region_rows(payload: dict[str, Any], keys: tuple[str, ...]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for view in _payload_views(payload):
+        if _looks_like_region(view):
+            rows.append(view)
+        for key in keys:
+            value = view.get(key)
+            if isinstance(value, list):
+                rows.extend(row for row in value if isinstance(row, dict) and _looks_like_region(row))
+            elif isinstance(value, dict) and _looks_like_region(value):
+                rows.append(value)
+    return rows
+
+
+def _looks_like_region(row: dict[str, Any]) -> bool:
+    bbox_keys = {
+        "bbox",
+        "box",
+        "xyxy",
+        "rect",
+        "coordinates",
+        "x1",
+        "y1",
+        "x2",
+        "y2",
+        "xmin",
+        "ymin",
+        "xmax",
+        "ymax",
+        "left",
+        "top",
+        "right",
+        "bottom",
+    }
+    label_keys = {"label", "class", "class_name", "name", "category", "category_name", "cls"}
+    score_keys = {"confidence", "score", "prob", "probability", "conf"}
+    return bool(bbox_keys.intersection(row) or (label_keys.intersection(row) and score_keys.intersection(row)))
+
+
+def _first_present(row: dict[str, Any], keys: tuple[str, ...], default: Any = None) -> Any:
+    for key in keys:
+        if key in row and row[key] is not None:
+            return row[key]
+    return default
 
 
 def _objects_to_labels(objects: list[dict[str, Any]]) -> list[dict[str, Any]]:

@@ -174,7 +174,10 @@ def _vision_metrics_from_results(results: list[dict]) -> dict:
             metrics = {
                 "vision_task": output.get("task"),
                 "vision_backend": output.get("backend"),
+                "vision_backend_detail": output.get("backend_detail"),
                 "vision_model": output.get("model"),
+                "vision_requested_model": output.get("requested_model"),
+                "vision_model_fallback_reason": output.get("model_fallback_reason"),
                 "vision_summary": output.get("summary"),
                 "vision_latency_ms": output.get("latency_ms"),
                 "objects_count": len(output.get("objects") or []),

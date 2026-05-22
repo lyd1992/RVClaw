@@ -35,6 +35,9 @@ the same task family. For example, object detection tries `yolov8`, then
 `yolov5`, `yolov11`, and `yolov6`. This is still a real DemoZoo backend path,
 not `cv_sample`; `metrics.json` records the actual `vision_model`, and
 `vision_result.json` records `requested_model` plus `model_fallback_reason`.
+If every real model in the task family returns no usable structured result and
+no annotated image, `RVCLAW_REQUIRE_REAL_VISION=1` makes the run fail instead of
+showing a misleading completed run with `0` targets.
 
 ## Start DemoZoo
 
