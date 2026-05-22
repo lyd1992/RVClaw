@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/env.sh"
 
-mkdir -p "$RVCLAW_LOG_DIR" "$(dirname "$RVCLAW_VISION_SOURCE")"
+mkdir -p "$RVCLAW_LOG_DIR" "$RVCLAW_UPLOADS_DIR" "$(dirname "$RVCLAW_VISION_SOURCE")"
 
 DEFAULT_VISION_SOURCE="$RVCLAW_DATA_DIR/cache/a03_normal.png"
 if [ ! -f "$RVCLAW_VISION_SOURCE" ] || [ "$RVCLAW_VISION_SOURCE" = "$DEFAULT_VISION_SOURCE" ]; then

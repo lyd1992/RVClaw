@@ -56,6 +56,20 @@ class WebServiceTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as scratch:
             self.assertEqual(read_benchmark_rows(Path(scratch)), [])
 
+    def test_run_history_summary_exposes_vision_fields_for_drawer_filters(self) -> None:
+        with tempfile.TemporaryDirectory() as scratch:
+            runs_dir = Path(scratch)
+            run_demo(
+                goal="检测图片中的目标并生成结论",
+                runs_dir=runs_dir,
+                planner_name="mock",
+                run_id="test-web-vision",
+            )
+
+            runs = list_runs(runs_dir)
+            self.assertEqual(runs[0]["vision_task"], "object_detection")
+            self.assertEqual(runs[0]["vision_backend"], "mock")
+
 
 if __name__ == "__main__":
     unittest.main()

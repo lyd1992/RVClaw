@@ -1,6 +1,6 @@
 # RVClaw
 
-RVClaw 是 Demo Claw v0.1 的最小可运行框架，面向 RISC-V Linux 环境。当前已在 K3 Pico-ITX 32GB 上完成 `spacemit-llama.cpp` + GGUF 模型的软件闭环 smoke 验证，并正在推进 v0.1.2 Web + Multi-Vision DemoZoo demo；SG2044/openEuler 保留为服务器型验证和后续优化平台。
+RVClaw 是 Demo Claw v0.1 的最小可运行框架，面向 RISC-V Linux 环境。当前已在 K3 Pico-ITX 32GB 上完成 `spacemit-llama.cpp` + GGUF 模型的软件闭环 smoke 验证，并正在推进 v0.1.3 Agent Command Center：Web 端展示 Planner、Safety Guard、Skill 执行、图片上传、视觉结果和证据包；SG2044/openEuler 保留为服务器型验证和后续优化平台。
 
 当前阶段的目标不是追求单点 kernel 性能，而是先把具身智能 Agent 的任务闭环跑通：
 
@@ -159,7 +159,7 @@ source deploy/k3/env.sh
 bash deploy/k3/run_web_demo.sh
 ```
 
-浏览器打开 `http://<K3-IP>:8088` 后，可以提交自然语言任务、查看 skill timeline、图片 artifact、`metrics.json`、`trace.jsonl`、`report.md` 和 `raw.log`。
+浏览器打开 `http://<K3-IP>:8088` 后，可以提交自然语言任务、上传本地图片、查看 Agent 执行图、Runtime Stack Map、图片 artifact、`metrics.json`、`trace.jsonl`、`report.md` 和 `raw.log`。历史 run 从独立抽屉打开，不占用主演示界面。
 
 默认巡检任务在 K3 上的 `llama_cpp` planner 预期输出 6 个 tool calls：
 
@@ -287,7 +287,7 @@ bash deploy/sg2044/install_backends.sh mnn
 | Safety Guard | 已实现白名单、必填参数、类型、枚举、范围、timeout 默认值校验 | `src/rvclaw/agent/safety_guard.py` |
 | Tool Router | 已实现 skill 调用分发和结果记录 | `src/rvclaw/agent/tool_router.py` |
 | Mock Skills | 已实现 `memory_query`、`move_to`、`capture_image`、`detect_status`、`speak`、`upload_report`、`stop` | `src/rvclaw/skills/builtin.py` |
-| Web 控制台/API | 已实现 `rvclaw serve`、run history、artifact viewer、benchmark reader | `src/rvclaw/web/` |
+| Web 控制台/API | 已实现 Agent Command Center、图片上传、历史抽屉、artifact viewer、benchmark reader | `src/rvclaw/web/` |
 | CV sample Device | 已实现样例图片 capture/annotated artifact，OpenCV 可用时绘制标注，不可用时 fallback | `src/rvclaw/adapters/cv_sample_device.py` |
 | Multi-Vision Bridge | 已实现 `analyze_image`，支持分类、检测、分割、人脸检测的 DemoZoo sidecar/fallback | `src/rvclaw/adapters/demozoo_device.py` |
 | Zone 配置 | 已实现 `A-03`、`B-01`、`BASE` 可配置白名单 | `configs/zones.yaml` |

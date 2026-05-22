@@ -60,6 +60,21 @@ If DemoZoo is unavailable, the same `analyze_image` skill falls back to
 evidence. Face support is detection-only in v0.1.2; RVClaw does not perform
 identity recognition, face matching, or face-library management.
 
+## v0.1.3 Agent Command Center Loop
+
+```text
+Web task template / uploaded image
+  -> local upload:image_ref validation
+  -> async POST /api/runs
+  -> Agent graph polling trace.jsonl
+  -> Planner + Safety Guard nodes
+  -> Skill execution nodes
+  -> Runtime Stack Map + evidence file viewer
+```
+
+The main Web screen focuses on the current run. Historical runs are loaded from
+a drawer so roadshow demos can keep the story on the active Agent workflow.
+
 ## Stable Interfaces
 
 - `PlannerBackend`: converts task context into JSON `tool_calls`. Current local
@@ -76,6 +91,6 @@ identity recognition, face matching, or face-library management.
 ## Main Verification Documents
 
 - First K3 setup and verification: `docs/k3_start_here.md`.
-- Web + CV smoke demo: `docs/k3_web_cv_demo.md`.
+- Agent Command Center + CV demo: `docs/k3_web_cv_demo.md`.
 - Optional v0.1.2 DemoZoo sidecar: `docs/k3_demozoo_bridge.md`.
 - Current checkpoint and known gaps: `docs/development_status.md`.

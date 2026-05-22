@@ -20,11 +20,11 @@
 
 ```text
 浏览器自然语言任务
-  -> FastAPI Web 控制台
+  -> FastAPI Agent Command Center
   -> llama.cpp Planner
   -> Safety Guard
   -> cv_sample / mock device
-  -> timeline + 图片 artifact + metrics + trace + report
+  -> Agent 节点图 + 图片 artifact + metrics + trace + report
 ```
 
 最低验收要看到：
@@ -69,7 +69,7 @@ PY
 ## 2. 建立目录并拉代码
 
 ```bash
-sudo mkdir -p /opt/rvclaw /data/rvclaw/{models,runs,logs,cache,src}
+sudo mkdir -p /opt/rvclaw /data/rvclaw/{models,runs,logs,uploads,cache,src}
 sudo chown -R "$USER":"$USER" /opt/rvclaw /data/rvclaw
 
 cd /opt/rvclaw
@@ -191,7 +191,7 @@ http://<K3-IP>:8088
 检查 A-03 区域设备状态并生成报告
 ```
 
-页面应展示 skill timeline、原图、标注图、运行状态、`metrics.json`、`trace.jsonl`、`report.md` 和 `raw.log`。
+页面应展示 Agent 执行图、Runtime Stack Map、原图、标注图、运行状态、`metrics.json`、`trace.jsonl`、`report.md` 和 `raw.log`。v0.1.3 起页面支持上传 `png/jpg/jpeg/webp` 图片，上传后会以本地 `upload:<id>` 引用参与本次 run，不允许任意外部 URL。
 
 ## 9. 常见分支
 

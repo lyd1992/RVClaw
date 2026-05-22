@@ -2,7 +2,8 @@
 
 This runbook is the short operational reference. For first-time K3 deployment,
 start with `docs/k3_start_here.md`; for the v0.1.2 multi-vision sidecar, use
-`docs/k3_demozoo_bridge.md`.
+`docs/k3_demozoo_bridge.md`. The current Web surface is the v0.1.3 Agent
+Command Center.
 
 ## Local Development
 
@@ -63,7 +64,7 @@ source deploy/k3/env.sh
 bash deploy/k3/run_demo.sh
 ```
 
-## K3 Web + CV
+## K3 Agent Command Center + CV
 
 Install OpenCV if possible:
 
@@ -90,6 +91,10 @@ Open the Web UI from Windows:
 http://<K3-LAN-IP>:8088
 http://<K3-TAILSCALE-IP>:8088
 ```
+
+The main page should show a task-template dropdown, optional image upload,
+Agent execution graph, Runtime Stack Map, CV panel, and evidence file viewer.
+Historical runs are opened from the `历史记录` drawer.
 
 ## K3 DemoZoo Multi-Vision
 

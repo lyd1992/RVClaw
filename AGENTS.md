@@ -16,6 +16,7 @@ RVClaw 是 Demo Claw v0.1 的代码仓。进入本仓库时，请优先遵循以
 12. K3 Web/CV checkpoint 是 `v0.1.1-k3-web-cv-demo`：Web 控制台、CV sample、run history、RVBench artifacts、Qwen3-30B-A3B 正式演示模型。
 13. K3 第一次部署入口是 `docs/k3_start_here.md`；`deploy/k3/install.md` 只作为命令参考，`docs/k3_ssh_deployment.md` 作为详细排障 runbook。
 14. v0.1.2 多视觉增强通过 `analyze_image` + DemoZoo sidecar 接分类、检测、分割、人脸检测；人脸能力只做检测，不做身份识别。
+15. v0.1.3 Web 主界面是 Agent Command Center：当前任务、Agent 执行图、Runtime Stack Map、图片上传和证据文件在主界面；历史 run 放在独立抽屉，不再挤在主演示区。
 
 默认本地检查：
 

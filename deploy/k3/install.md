@@ -24,7 +24,7 @@ sudo apt install -y git curl wget rsync unzip tar tree htop tmux \
   sqlite3 jq v4l-utils ffmpeg python3-opencv
 ```
 
-`python3-opencv` is recommended for the v0.1.1/v0.1.2 Web + CV demo. If it is not
+`python3-opencv` is recommended for the Web + CV / Agent Command Center demo. If it is not
 installed, RVClaw still runs with a file-copy detector fallback, but the
 annotated image will not contain OpenCV overlays.
 
@@ -44,7 +44,7 @@ on OpenCV.
 ## 2. Data Directories
 
 ```bash
-sudo mkdir -p /opt/rvclaw /data/rvclaw/{models,runs,logs,cache,src}
+sudo mkdir -p /opt/rvclaw /data/rvclaw/{models,runs,logs,uploads,cache,src}
 sudo chown -R "$USER":"$USER" /opt/rvclaw /data/rvclaw
 ```
 
@@ -189,6 +189,7 @@ export RVCLAW_DEVICE_BACKEND=cv_sample
 export RVCLAW_VISION_SOURCE=/data/rvclaw/cache/a03_normal.png
 export RVCLAW_VISION_BACKEND=demozoo
 export RVCLAW_DEMOZOO_BASE_URL=http://127.0.0.1:8000
+export RVCLAW_UPLOADS_DIR=/data/rvclaw/uploads
 export RVCLAW_WEB_HOST=0.0.0.0
 export RVCLAW_WEB_PORT=8088
 export RVCLAW_PLANNER=llama_cpp

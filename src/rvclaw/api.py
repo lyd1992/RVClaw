@@ -20,6 +20,7 @@ def run_demo(
     planner_name: str = "auto",
     memory_db: str | Path | None = None,
     run_id: str | None = None,
+    image_ref: str | Path | None = None,
 ) -> RunSummary:
     runs_dir = ensure_dir(runs_dir)
     run_id = run_id or make_run_id()
@@ -28,7 +29,7 @@ def run_demo(
 
     memory_path = Path(memory_db) if memory_db else runs_dir / "memory.sqlite3"
     memory = MemoryManager.from_path(memory_path)
-    device, run_metadata = build_device(artifact_dir=run_dir / "artifacts")
+    device, run_metadata = build_device(artifact_dir=run_dir / "artifacts", vision_source=image_ref)
     registry = SkillRegistry.from_default()
     guard = SafetyGuard(registry)
     skills = build_builtin_skills(device=device, memory=memory, run_id=run_id)

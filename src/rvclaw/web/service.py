@@ -80,6 +80,8 @@ def _run_summary_from_dir(run_dir: Path) -> dict[str, Any]:
         "task_success": metrics.get("task_success", False),
         "tool_call_count": metrics.get("tool_call_count", 0),
         "latency_ms": metrics.get("latency_ms"),
+        "vision_task": metrics.get("vision_task"),
+        "vision_backend": metrics.get("vision_backend"),
         "run_dir": str(run_dir),
     }
 

@@ -25,6 +25,14 @@ class ToolRouter:
         self.recorder.trace("skill_call.started", call.to_dict())
         try:
             checked = self.safety_guard.validate(call)
+        except Exception as exc:
+            elapsed_ms = round((time.perf_counter() - started_at) * 1000, 3)
+            result = SkillResult(ok=False, output={"latency_ms": elapsed_ms}, error=str(exc))
+            self.recorder.trace("safety_guard.rejected", {"call": call.to_dict(), "error": str(exc)})
+            self.recorder.trace("skill_call.failed", {"call": call.to_dict(), "result": result.to_dict()})
+            return result
+        self.recorder.trace("safety_guard.approved", {"call": checked.to_dict()})
+        try:
             skill = self.skills[checked.name]
             output = skill(**checked.arguments)
             elapsed_ms = round((time.perf_counter() - started_at) * 1000, 3)
@@ -37,5 +45,5 @@ class ToolRouter:
         except Exception as exc:
             elapsed_ms = round((time.perf_counter() - started_at) * 1000, 3)
             result = SkillResult(ok=False, output={"latency_ms": elapsed_ms}, error=str(exc))
-            self.recorder.trace("skill_call.failed", {"call": call.to_dict(), "result": result.to_dict()})
+            self.recorder.trace("skill_call.failed", {"call": checked.to_dict(), "result": result.to_dict()})
             return result

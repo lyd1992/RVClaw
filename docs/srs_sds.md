@@ -1,4 +1,4 @@
-# Demo Claw v0.1.2 SRS/SDS Mapping
+# Demo Claw v0.1.3 SRS/SDS Mapping
 
 ## Functional Requirements
 
@@ -22,6 +22,8 @@
 | FR-016 | Record planner output mode | `planner_mode` in `metrics.json` and `trace.jsonl` |
 | FR-017 | Configurable zone whitelist | `configs/zones.yaml` |
 | FR-018 | Multi-vision image analysis | `analyze_image`, DemoZoo bridge, `vision_result.json` |
+| FR-019 | Web image upload with local-only `image_ref` | `web/uploads.py`, `POST /api/uploads`, `POST /api/runs` |
+| FR-020 | Agent Command Center workflow visualization | Agent graph, Safety Guard trace events, Runtime Stack Map |
 
 ## Design Modules
 
@@ -34,5 +36,5 @@
 | Skill Registry | Whitelist, parameter schema, safety level, zone constraints | `skills/registry.yaml`, `configs/zones.yaml` |
 | Safety Guard | Validate legality, safety, and executability | `agent/safety_guard.py` |
 | Device Adapter | Mock Device, CV sample Device, DemoZoo sidecar, future ROS2/OpenClaw | `adapters/` |
-| Web Console | Submit tasks, view run history, evidence files, and image artifacts | `web/` |
+| Web Console | Submit tasks, upload images, visualize Agent workflow, open history drawer, inspect evidence files | `web/` |
 | Observability | trace, metrics, report, raw log | `observability.py` |

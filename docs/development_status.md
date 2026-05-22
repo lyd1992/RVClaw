@@ -4,16 +4,16 @@ Updated: 2026-05-22
 
 Checkpoint tag: `v0.1.0-k3-llama-smoke`
 
-Current code checkpoint target: `v0.1.2-k3-demozoo-vision-bridge`
+Current code checkpoint target: `v0.1.3-k3-agent-command-center`
 
 ## Summary
 
-RVClaw has reached the first K3 smoke checkpoint and now has a v0.1.2 multi-vision Web demo implementation ready for K3 DemoZoo validation. The v0.1.0 checkpoint proved the Demo Claw software loop on K3 Pico-ITX 32GB with local `spacemit-llama.cpp`; v0.1.1 added the Web/CV surface; v0.1.2 adds `analyze_image` and a DemoZoo sidecar bridge for classification, object detection, segmentation, and face detection.
+RVClaw has reached the first K3 smoke checkpoint and now has a v0.1.3 Agent Command Center implementation ready for K3 validation. The v0.1.0 checkpoint proved the Demo Claw software loop on K3 Pico-ITX 32GB with local `spacemit-llama.cpp`; v0.1.1 added the Web/CV surface; v0.1.2 added `analyze_image` and a DemoZoo sidecar bridge; v0.1.3 makes the Agent workflow visible with image upload, an execution graph, Safety Guard nodes, a Runtime Stack Map, and a history drawer.
 
 This checkpoint proves the RVClaw runtime path is executable and auditable on the target RISC-V edge box:
 
 ```text
-browser or CLI natural-language task
+browser or CLI natural-language task / uploaded image
   -> task.yaml
   -> llama.cpp / mock PlannerBackend
   -> Agent Core
@@ -59,7 +59,7 @@ bash deploy/k3/run_llama_server.sh
 bash deploy/k3/run_web_demo.sh
 ```
 
-For v0.1.2 DemoZoo validation, also see `docs/k3_demozoo_bridge.md`.
+For v0.1.2 DemoZoo validation, also see `docs/k3_demozoo_bridge.md`. For the current Web demo, use `docs/k3_web_cv_demo.md`.
 
 Known successful K3 runs:
 
@@ -94,8 +94,12 @@ Known successful K3 runs:
   - `artifacts/a03_annotated.png`
 - Multi-vision `analyze_image` skill with normalized `vision_result.json`.
 - DemoZoo sidecar bridge with `cv_sample` fallback for classification, object detection, segmentation, and face detection.
+- Agent Command Center Web UI with task templates, active preset state, local image upload, Agent execution graph, Runtime Stack Map, and history drawer.
+- Explicit `safety_guard.approved` / `safety_guard.rejected` trace events for Web graph visualization.
 - Web console and API:
   - `GET /api/health`
+  - `POST /api/uploads`
+  - `GET /api/uploads/{upload_id}`
   - `POST /api/runs`
   - `GET /api/runs`
   - `GET /api/runs/{run_id}`
@@ -197,7 +201,7 @@ artifacts/
 
 1. Add a real camera-backed `capture_image` path while preserving mock fallback.
 2. Improve the OpenCV detector from sample-image annotation to a real status-light or anomaly rule set.
-3. Add `planner_mode` to the Web summary view if it is not already visible enough for demos.
+3. Validate v0.1.3 image upload and Agent graph on physical K3.
 4. Add a real camera backend behind the same `capture_image` contract.
 5. Add RuntimeBackend and MemoryBackend capability probes before wiring MNN/vLLM/Milvus into the main chain.
 6. Prepare ROS2/OpenClaw adapter contracts for v0.2, but keep real-device control gated by Safety Guard and explicit confirmation.

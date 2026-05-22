@@ -9,11 +9,13 @@ from rvclaw.adapters.demozoo_device import DemoZooVisionDevice
 from rvclaw.adapters.mock_device import MockDevice
 
 
-def build_device(artifact_dir: str | Path) -> tuple[MockDevice, dict[str, Any]]:
+def build_device(artifact_dir: str | Path, vision_source: str | Path | None = None) -> tuple[MockDevice, dict[str, Any]]:
     requested = os.environ.get("RVCLAW_DEVICE_BACKEND", "mock").strip().lower() or "mock"
     vision_backend = os.environ.get("RVCLAW_VISION_BACKEND", "cv_sample").strip().lower() or "cv_sample"
+    if vision_source is not None:
+        requested = "cv_sample" if requested == "mock" else requested
     if requested in {"cv_sample", "demozoo"} or vision_backend == "demozoo":
-        source = Path(os.environ.get("RVCLAW_VISION_SOURCE", "examples/vision/a03_normal.png"))
+        source = Path(vision_source) if vision_source is not None else Path(os.environ.get("RVCLAW_VISION_SOURCE", "examples/vision/a03_normal.png"))
         if source.exists():
             if vision_backend == "demozoo" or requested == "demozoo":
                 return DemoZooVisionDevice(artifact_dir=artifact_dir, vision_source=source), {

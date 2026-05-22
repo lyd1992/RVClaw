@@ -17,7 +17,16 @@ Checkpoint tag:
 v0.1.0-k3-llama-smoke
 ```
 
-## Current Checkpoint: v0.1.2 K3 Multi-Vision DemoZoo Bridge
+## Current Checkpoint: v0.1.3 K3 Agent Command Center
+
+- [x] Add image upload with local-only `upload:<id>` references.
+- [x] Move history into a drawer so the main screen focuses on the active run.
+- [x] Upgrade the Web UI from a log timeline to an Agent execution graph.
+- [x] Add explicit Safety Guard trace events for approved/rejected tool calls.
+- [x] Add Runtime Stack Map for active, fallback, and reserved backends.
+- [ ] Validate upload + Agent graph on the physical K3.
+
+## Previous Checkpoint: v0.1.2 K3 Multi-Vision DemoZoo Bridge
 
 - [x] Add `analyze_image` as the unified vision skill.
 - [x] Support classification, object detection, segmentation, and face detection task mapping.
@@ -25,7 +34,7 @@ v0.1.0-k3-llama-smoke
 - [x] Upgrade Web UI with visual task presets and result cards.
 - [ ] Validate DemoZoo sidecar on the physical K3.
 
-## Previous Checkpoint: v0.1.1 K3 Web + CV Demo
+## Earlier Checkpoint: v0.1.1 K3 Web + CV Demo
 
 - [x] Add FastAPI-compatible Web/API surface for runs, history, artifacts, and benchmark CSV.
 - [x] Add configurable zones with `A-03`, `B-01`, and `BASE`.
