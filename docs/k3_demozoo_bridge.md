@@ -33,6 +33,44 @@ image name in the official guide is:
 sudo docker pull harbor.spacemit.com/bianbu-robot/spacemit-demo:latest
 ```
 
+On some K3/Bianbu images, `dockerd` may fail with:
+
+```text
+iptables: Failed to initialize nft: Protocol not supported
+failed to create NAT chain DOCKER
+```
+
+For this local sidecar demo, bypass Docker's bridge/NAT path and run DemoZoo on
+the host network:
+
+```bash
+mkdir -p /etc/docker
+cat >/etc/docker/daemon.json <<'EOF'
+{
+  "iptables": false,
+  "ip6tables": false,
+  "bridge": "none"
+}
+EOF
+
+systemctl reset-failed docker
+systemctl restart containerd
+systemctl restart docker
+systemctl status docker --no-pager -l
+```
+
+Then start DemoZoo with host networking:
+
+```bash
+docker run -itd \
+  --network host \
+  --name spacemit-demo-container \
+  --privileged \
+  harbor.spacemit.com/bianbu-robot/spacemit-demo:latest
+```
+
+If the container name already exists, use `docker start spacemit-demo-container`.
+
 After the container is running, verify that the model service is reachable from
 the K3 shell:
 

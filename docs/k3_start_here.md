@@ -216,6 +216,9 @@ the error in `trace.jsonl` and `report.md`; it should not silently show
 `cv_sample` results as real recognition.
 
 See `docs/k3_demozoo_bridge.md` for model endpoints and display rules.
+If Docker fails on K3 with `iptables: Failed to initialize nft: Protocol not
+supported`, follow the host-network workaround in that document before starting
+`run_real_vision_web_demo.sh`.
 
 ## 10. 常见分支
 
