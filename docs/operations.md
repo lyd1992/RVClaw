@@ -110,9 +110,13 @@ export RVCLAW_VISION_BACKEND=demozoo
 export RVCLAW_DEMOZOO_BASE_URL=http://127.0.0.1:8000
 export RVCLAW_DEMOZOO_ENDPOINT_TEMPLATE='/predict/{model}'
 export RVCLAW_VISION_TIMEOUT_S=30
+export RVCLAW_REQUIRE_REAL_VISION=1
 
-bash deploy/k3/run_web_demo.sh
+bash deploy/k3/run_real_vision_web_demo.sh
 ```
+
+`RVCLAW_REQUIRE_REAL_VISION=1` is recommended for demos. It prevents DemoZoo
+errors from being hidden by the `cv_sample` smoke fallback.
 
 Use the four Web presets:
 

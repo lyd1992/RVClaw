@@ -135,6 +135,17 @@ class WebUploadAnnotationTest(unittest.TestCase):
         self.assertEqual(merged["metrics"]["status"], "running")
         self.assertEqual(merged["trace"], detail["trace"])
 
+    def test_index_documents_task_aware_cv_image_display_policy(self) -> None:
+        source = (ROOT / "src" / "rvclaw" / "web" / "app.py").read_text(encoding="utf-8")
+
+        self.assertIn("function imagePolicyForTask", source)
+        self.assertIn("classification:'single'", source)
+        self.assertIn("object_detection:'compare'", source)
+        self.assertIn("segmentation:'compare'", source)
+        self.assertIn("face_detection:'compare'", source)
+        self.assertIn("inspection:'compare'", source)
+        self.assertIn("non_vision:'none'", source)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from rvclaw.adapters.vision import local_vision_result, write_vision_result
@@ -49,7 +50,9 @@ class MockDevice:
         }
 
     def analyze_image(self, image_ref: str | None = "latest", task: str = "object_detection", model: str | None = None) -> dict:
-        result = local_vision_result(task=task, model=model)
+        if os.environ.get("RVCLAW_REQUIRE_REAL_VISION", "").strip().lower() in {"1", "true", "yes", "on"}:
+            raise RuntimeError("RVCLAW_REQUIRE_REAL_VISION=1 requires a real vision backend; active backend is mock")
+        result = local_vision_result(task=task, model=model, source=image_ref)
         result["backend"] = "mock"
         result["image_ref"] = image_ref
         write_vision_result(self.artifact_dir, result)

@@ -261,6 +261,9 @@ def _index_html() -> str:
     .node.fallback::before,.node.repaired::before { background:var(--accent2); }
     .node span { display:block; font-size:12px; color:var(--muted); line-height:1.4; word-break:break-word; }
     .images { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px; }
+    .images.single { grid-template-columns:1fr; }
+    .images.single #annotated,.images.none { display:none; }
+    .image-note { color:var(--muted); font-size:13px; margin:6px 0 8px; }
     .images img,.file-image { width:100%; max-height:340px; object-fit:contain; border:1px solid var(--line); border-radius:7px; background:#070a0b; }
     .results { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:8px; margin-top:10px; }
     .result-card { border:1px solid var(--line); border-radius:7px; padding:10px; background:#0f1518; }
@@ -325,7 +328,8 @@ def _index_html() -> str:
       <h2>Agent 执行图</h2>
       <div id="agentGraph" class="graph"></div>
       <h2>CV 画面</h2>
-      <div class="images"><img id="capture" alt="capture"><img id="annotated" alt="annotated"></div>
+      <div id="imageModeNote" class="image-note">等待视觉任务...</div>
+      <div id="imageGrid" class="images none"><img id="capture" alt="capture"><img id="annotated" alt="annotated"></div>
       <h2>识别结论</h2>
       <div id="visionSummary" class="metric">等待视觉任务...</div>
       <div id="visionResults" class="results"></div>
@@ -413,9 +417,10 @@ def _index_html() -> str:
       const m = detail.metrics || {}; status.textContent = detail.summary.status; status.className = detail.summary.status === 'completed' ? 'ok' : detail.summary.status === 'failed' ? 'fail' : 'warn';
       plannerMode.textContent = m.planner_mode || detail.summary.planner_mode || '-'; toolCount.textContent = m.tool_call_count ?? detail.summary.tool_call_count ?? '-';
       latency.textContent = m.latency_ms ? `${m.latency_ms} ms` : '-'; visionBackend.textContent = m.vision_backend || '-'; visionModel.textContent = m.vision_model || '-';
-      renderGraph(detail); renderStack(m); renderFiles(detail);
+      const visionOutput = findVisionOutput(detail);
+      renderGraph(detail); renderStack(m); renderFiles(detail, visionOutput);
       if (m.worker_error) { visionSummary.textContent = `后台任务异常：${m.worker_error}`; visionResults.innerHTML = ''; }
-      else renderVision(findVisionOutput(detail));
+      else renderVision(visionOutput);
     }
     function renderGraph(detail){
       const trace = detail.trace || [], m = detail.metrics || {}, status = detail.summary.status;
@@ -430,9 +435,12 @@ def _index_html() -> str:
       else if (approved) state.safety = {status:'approved', note:'whitelist approved'};
       if (m.worker_error) state.planner = {status:'failed', note:m.worker_error};
       const completed = trace.filter(e => e.event === 'skill_call.completed').map(e => e.payload.call && e.payload.call.name);
+      const failedCalls = trace.filter(e => e.event === 'skill_call.failed');
+      const failedVision = failedCalls.find(e => e.payload && e.payload.call && ['analyze_image','detect_status'].includes(e.payload.call.name));
       if (completed.includes('memory_query')) state.memory = {status:'completed', note:'context loaded'};
       if (completed.includes('capture_image')) state.capture = {status:'completed', note:'image artifact'};
       if (completed.includes('detect_status') || completed.includes('analyze_image')) state.vision = {status:m.vision_backend === 'mock_fallback' ? 'fallback':'completed', note:m.vision_task || m.vision_backend || 'status detection'};
+      if (failedVision) state.vision = {status:'failed', note:failedVision.payload.result.error || 'vision failed'};
       if (completed.includes('speak')) state.speak = {status:'completed', note:'status message'};
       if (completed.includes('upload_report')) state.report = {status:'completed', note:'report.md'};
       if (status === 'failed' && !state.report.status.includes('completed')) state.report = {status:'failed', note:'failed evidence kept'};
@@ -444,10 +452,30 @@ def _index_html() -> str:
       if (m.vision_backend === 'mock_fallback') document.getElementById('stack-vision').className = 'stack-item fallback';
       if (m.planner === 'mock') document.getElementById('stack-llama').className = 'stack-item fallback';
     }
-    function renderFiles(detail){
+    const imageDisplayPolicies = {classification:'single', object_detection:'compare', segmentation:'compare', face_detection:'compare', inspection:'compare', non_vision:'none'};
+    function imagePolicyForTask(task, hasStatusDetection){
+      if (hasStatusDetection) return imageDisplayPolicies.inspection;
+      return imageDisplayPolicies[task] || imageDisplayPolicies.non_vision;
+    }
+    function renderFiles(detail, visionOutput){
       files.innerHTML = (detail.files || []).map(f => `<button onclick="showFile('${f}')">${f}</button>`).join('');
       const annotatedFile = (detail.files || []).find(f => f.endsWith('_annotated.png')); const captureFile = (detail.files || []).find(f => f.endsWith('_capture.png'));
-      capture.src = captureFile ? fileUrl(detail.summary.run_id, captureFile) : ''; annotated.src = annotatedFile ? fileUrl(detail.summary.run_id, annotatedFile) : '';
+      const hasStatusDetection = (detail.trace || []).some(e => e.payload && e.payload.call && e.payload.call.name === 'detect_status');
+      const task = (visionOutput && visionOutput.task) || (hasStatusDetection ? 'inspection' : null);
+      const policy = imagePolicyForTask(task, hasStatusDetection);
+      imageGrid.className = `images ${policy}`;
+      capture.removeAttribute('src'); annotated.removeAttribute('src');
+      if (policy === 'none' || !captureFile) {
+        imageGrid.className = 'images none';
+        imageModeNote.textContent = detail.summary.status === 'failed' ? '当前 run 未进入图像处理阶段。' : '当前任务不需要显示图像。';
+      } else if (policy === 'single') {
+        imageModeNote.textContent = '图片分类展示输入图即可；分类结果在下方结构化卡片中呈现。';
+        capture.src = fileUrl(detail.summary.run_id, captureFile);
+      } else {
+        imageModeNote.textContent = '该任务展示原图和处理后图，用于对比检测框、分割叠加或巡检标注。';
+        capture.src = fileUrl(detail.summary.run_id, captureFile);
+        if (annotatedFile) annotated.src = fileUrl(detail.summary.run_id, annotatedFile);
+      }
       if ((detail.files || []).includes('report.md')) showFile('report.md');
     }
     function findVisionOutput(detail){ const rows = detail.trace || []; const ev = rows.findLast ? rows.findLast(e => e.payload && e.payload.call && e.payload.call.name === 'analyze_image') : [...rows].reverse().find(e => e.payload && e.payload.call && e.payload.call.name === 'analyze_image'); return ev && ev.payload.result && ev.payload.result.output; }
@@ -455,7 +483,8 @@ def _index_html() -> str:
       if (!output) { visionSummary.textContent = '当前 run 没有 analyze_image 结果。'; visionResults.innerHTML = ''; return; }
       visionSummary.textContent = output.summary || '视觉任务完成。';
       const rows = [...(output.labels || []), ...(output.objects || []), ...(output.segments || []), ...(output.faces || [])];
-      visionResults.innerHTML = rows.map(item => `<div class="result-card"><b>${item.label || 'result'}</b><span>confidence: ${Number(item.confidence || 0).toFixed(2)}</span><br><span>${item.bbox ? 'bbox: ' + item.bbox.join(', ') : ''}</span></div>`).join('') || '<div class="result-card"><b>无目标</b><span>未返回可视对象。</span></div>';
+      const warning = output.requires_real_model ? '<div class="result-card"><b>需要真实视觉后端</b><span>当前结果来自 cv_sample 启发式链路验证，不是模型推理。请启用 DemoZoo/MNN/ONNX。</span></div>' : '';
+      visionResults.innerHTML = warning + (rows.map(item => `<div class="result-card"><b>${item.label || 'result'}</b><span>confidence: ${Number(item.confidence || 0).toFixed(2)}</span><br><span>${item.bbox ? 'bbox: ' + item.bbox.join(', ') : ''}</span></div>`).join('') || '<div class="result-card"><b>无目标</b><span>未返回可视对象。</span></div>');
     }
     function fileUrl(runId, name){ return `/api/runs/${encodeURIComponent(runId)}/files/${name.split('/').map(encodeURIComponent).join('/')}`; }
     async function showFile(name){ if(!currentRun) return; if (/\\.(png|jpg|jpeg|webp)$/i.test(name)) { fileView.innerHTML = `<img class="file-image" src="${fileUrl(currentRun,name)}" alt="${name}">`; return; } fileView.textContent = await (await api(fileUrl(currentRun,name))).text(); }

@@ -19,9 +19,10 @@ def build_device(artifact_dir: str | Path, vision_source: str | Path | None = No
         if source.exists():
             if vision_backend == "demozoo" or requested == "demozoo":
                 return DemoZooVisionDevice(artifact_dir=artifact_dir, vision_source=source), {
-                    "device_backend": "cv_sample",
+                    "device_backend": "demozoo",
                     "vision_backend": "demozoo",
                     "demozoo_base_url": os.environ.get("RVCLAW_DEMOZOO_BASE_URL", "http://127.0.0.1:8000"),
+                    "require_real_vision": os.environ.get("RVCLAW_REQUIRE_REAL_VISION", "0"),
                     "vision_source": str(source),
                 }
             return CVSampleDevice(artifact_dir=artifact_dir, vision_source=source), {

@@ -93,7 +93,9 @@ Known successful K3 runs:
   - `artifacts/a03_capture.png`
   - `artifacts/a03_annotated.png`
 - Multi-vision `analyze_image` skill with normalized `vision_result.json`.
-- DemoZoo sidecar bridge with `cv_sample` fallback for classification, object detection, segmentation, and face detection.
+- DemoZoo sidecar bridge for real classification, object detection, segmentation, and face detection.
+- `cv_sample` remains a smoke/fallback backend only; `RVCLAW_REQUIRE_REAL_VISION=1` disables fallback and fails clearly if DemoZoo is unavailable.
+- Web CV display policy now follows task semantics: classification uses one image, detection/segmentation/face/inspection use input plus processed image, and non-vision tasks show no image.
 - Agent Command Center Web UI with task templates, active preset state, local image upload, Agent execution graph, Runtime Stack Map, and history drawer.
 - Explicit `safety_guard.approved` / `safety_guard.rejected` trace events for Web graph visualization.
 - Web console and API:

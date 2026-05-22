@@ -288,8 +288,8 @@ bash deploy/sg2044/install_backends.sh mnn
 | Tool Router | 已实现 skill 调用分发和结果记录 | `src/rvclaw/agent/tool_router.py` |
 | Mock Skills | 已实现 `memory_query`、`move_to`、`capture_image`、`detect_status`、`speak`、`upload_report`、`stop` | `src/rvclaw/skills/builtin.py` |
 | Web 控制台/API | 已实现 Agent Command Center、图片上传、历史抽屉、artifact viewer、benchmark reader | `src/rvclaw/web/` |
-| CV sample Device | 已实现样例图片 capture/annotated artifact，OpenCV 可用时绘制标注，不可用时 fallback | `src/rvclaw/adapters/cv_sample_device.py` |
-| Multi-Vision Bridge | 已实现 `analyze_image`，支持分类、检测、分割、人脸检测的 DemoZoo sidecar/fallback | `src/rvclaw/adapters/demozoo_device.py` |
+| CV sample Device | 已实现样例图片 capture/annotated artifact；仅用于 smoke/fallback，不代表真实模型识别 | `src/rvclaw/adapters/cv_sample_device.py` |
+| Multi-Vision Bridge | 已实现 `analyze_image`，支持分类、检测、分割、人脸检测的 DemoZoo sidecar；真实演示应设置 `RVCLAW_REQUIRE_REAL_VISION=1` | `src/rvclaw/adapters/demozoo_device.py` |
 | Zone 配置 | 已实现 `A-03`、`B-01`、`BASE` 可配置白名单 | `configs/zones.yaml` |
 | SQLite 事件记忆 | 已实现，内置 A-03 设备画像和历史巡检 seed | `src/rvclaw/memory/sqlite_event_store.py` |
 | Flat Vector baseline | 已实现轻量词法检索 baseline | `src/rvclaw/memory/flat_vector_store.py` |

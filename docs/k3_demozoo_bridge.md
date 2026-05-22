@@ -1,101 +1,131 @@
-# K3 DemoZoo Vision Bridge
+# K3 Real Vision DemoZoo Bridge
 
-This document records the v0.1.2 optional multi-vision path. RVClaw remains the
-Web/API command center and evidence system; DemoZoo runs as a local K3 sidecar
-for model inference.
+This document is the entry point for the real K3 vision demo. `cv_sample` is
+only an offline smoke backend. For classification, detection, segmentation, or
+face detection results that should be presented as model inference, RVClaw must
+call a real local vision backend such as Bianbu DemoZoo.
 
-## Goal
+## What Runs Where
 
 ```text
-RVClaw Web
+RVClaw Web / CLI
   -> analyze_image
-  -> DemoZoo HTTP sidecar
-  -> classification / object_detection / segmentation / face_detection
-  -> annotated image + vision_result.json + metrics + report
+  -> DemoZoo HTTP sidecar on K3
+  -> ResNet / YOLO / YOLOv8-Seg / YOLOv5-Face
+  -> normalized vision_result.json
+  -> trace / metrics / report
 ```
 
-The default Web demo still works without DemoZoo. When DemoZoo is unavailable,
-RVClaw falls back to `cv_sample` / `mock_fallback` and records that in
-`metrics.json`.
+Bianbu DemoZoo provides CV demos for classification, detection, segmentation,
+and face-related models. The documented HTTP route is:
 
-## Enable DemoZoo Backend
+```bash
+curl -X POST "http://localhost:8000/predict/yolov8" \
+  -F "image=@test_image.jpg"
+```
 
-Start DemoZoo separately according to the SpacemiT/Bianbu DemoZoo instructions.
-Then configure RVClaw:
+## Start DemoZoo
+
+Start DemoZoo according to the Bianbu/SpacemiT container guide. The common
+image name in the official guide is:
+
+```bash
+sudo docker pull harbor.spacemit.com/bianbu-robot/spacemit-demo:latest
+```
+
+After the container is running, verify that the model service is reachable from
+the K3 shell:
+
+```bash
+curl http://127.0.0.1:8000/
+```
+
+Then test one real model directly:
+
+```bash
+curl -X POST "http://127.0.0.1:8000/predict/resnet" \
+  -F "image=@/data/rvclaw/uploads/<your-upload>.png" | jq
+```
+
+Expected: JSON with a prediction field such as `predicted_class`, `labels`,
+`objects`, `detections`, `boxes`, `segments`, or `faces`.
+
+## Run RVClaw With Real Vision Required
+
+Use this mode for roadshow demos where wrong fallback results are worse than a
+clear failure:
 
 ```bash
 cd /opt/rvclaw/RVClaw
 source deploy/k3/env.sh
 
-export RVCLAW_DEVICE_BACKEND=cv_sample
 export RVCLAW_VISION_BACKEND=demozoo
 export RVCLAW_DEMOZOO_BASE_URL=http://127.0.0.1:8000
 export RVCLAW_DEMOZOO_ENDPOINT_TEMPLATE='/predict/{model}'
-export RVCLAW_VISION_TIMEOUT_S=30
+export RVCLAW_REQUIRE_REAL_VISION=1
 
 bash deploy/k3/run_web_demo.sh
 ```
 
-If your DemoZoo service uses a different route, only change
-`RVCLAW_DEMOZOO_ENDPOINT_TEMPLATE`. The template can use `{task}` and `{model}`.
+Equivalent shortcut:
 
-## Supported Tasks
+```bash
+bash deploy/k3/run_real_vision_web_demo.sh
+```
 
-| RVClaw task | Default model | Web preset |
+With `RVCLAW_REQUIRE_REAL_VISION=1`, RVClaw will not fall back to `cv_sample`.
+If DemoZoo is down or a model endpoint fails, the run becomes `failed`, the
+Vision node shows the error, and the evidence pack records the reason.
+
+## Task Display Policy
+
+The Web UI intentionally uses different image layouts by task:
+
+| Task | Display | Reason |
 |---|---|---|
-| `classification` | `resnet` | 分类这张图片并说明结果 |
-| `object_detection` | `yolov8` | 检测图片中的目标并生成结论 |
-| `segmentation` | `yolov8_seg` | 分割画面中的主要区域 |
-| `face_detection` | `yolov5_face` | 检测画面中是否有人脸 |
+| image classification | single input image | classification returns labels, not geometry; before/after images add noise |
+| object detection | input + annotated image | boxes need visual verification |
+| segmentation | input + overlay image | mask/region overlay needs comparison |
+| face detection | input + annotated image | boxes/count are the visual evidence; no identity recognition |
+| A-03 inspection / detect_status | input + annotated image | status-light/risk annotation is the evidence |
+| return BASE / safety rejection / planner failure | no CV image | the task does not need image evidence |
 
-Face support is detection-only. RVClaw does not perform identity recognition,
-face matching, or face-library management in v0.1.2.
+## Supported RVClaw Tasks
 
-## Expected Artifacts
+| RVClaw task | Default model | DemoZoo family |
+|---|---|---|
+| `classification` | `resnet` | ResNet/MobileNet/EfficientNet/Swin |
+| `object_detection` | `yolov8` | YOLOv5/YOLOv6/YOLOv8/YOLOv11 |
+| `segmentation` | `yolov8_seg` | YOLOv8-Seg/FCN/UNet/SAM |
+| `face_detection` | `yolov5_face` | YOLOv5-Face |
 
-Each successful vision run should produce:
-
-```text
-artifacts/
-  a03_capture.png
-  <task>_annotated.png
-  vision_result.json
-metrics.json
-trace.jsonl
-report.md
-raw.log
-```
-
-`vision_result.json` uses the RVClaw normalized schema:
-
-```json
-{
-  "task": "object_detection",
-  "model": "yolov8",
-  "backend": "demozoo",
-  "summary": "检测到 3 个目标。",
-  "labels": [],
-  "objects": [{"label": "person", "confidence": 0.92, "bbox": [0.1, 0.2, 0.4, 0.8]}],
-  "segments": [],
-  "faces": [],
-  "annotated_image_ref": ".../object_detection_annotated.png"
-}
-```
+Face support in RVClaw v0.1.x is detection-only. It does not do identity
+recognition, face matching, or face library management.
 
 ## Acceptance
-
-Run these on K3:
 
 ```bash
 source deploy/k3/env.sh
 python3 -m unittest discover -s tests
 python3 -m compileall -q src tests benchmarks
-bash deploy/k3/run_web_demo.sh
+bash deploy/k3/run_real_vision_web_demo.sh
 ```
 
-In the Web UI, run the four presets. Confirm:
+In the Web UI:
 
-- the CV panel shows capture and annotated images;
-- the result cards show top labels, boxes, masks, or face boxes;
-- `metrics.json` records `vision_task`, `vision_backend`, `vision_model`, and count fields;
-- `vision_result.json` exists for every visual run.
+1. Upload a normal image.
+2. Run `图片分类`; confirm only one image is shown and result cards come from
+   `vision_backend=demozoo`.
+3. Run `目标检测`; confirm original and annotated images are shown.
+4. Stop DemoZoo and run again; confirm the run fails instead of silently using
+   `cv_sample`.
+
+Evidence to check:
+
+```text
+artifacts/vision_result.json
+metrics.json
+trace.jsonl
+report.md
+raw.log
+```

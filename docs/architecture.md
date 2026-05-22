@@ -55,10 +55,12 @@ Web preset or natural-language vision task
   -> annotated image + result cards + metrics + report
 ```
 
-If DemoZoo is unavailable, the same `analyze_image` skill falls back to
-`cv_sample` and records `vision_backend=mock_fallback` or `cv_sample` in the run
-evidence. Face support is detection-only in v0.1.2; RVClaw does not perform
-identity recognition, face matching, or face-library management.
+If DemoZoo is unavailable, `analyze_image` can fall back to `cv_sample` only for
+offline smoke validation. Real visual demos should set
+`RVCLAW_REQUIRE_REAL_VISION=1`, which makes the run fail clearly instead of
+showing heuristic fallback output. Face support is detection-only in v0.1.2;
+RVClaw does not perform identity recognition, face matching, or face-library
+management.
 
 ## v0.1.3 Agent Command Center Loop
 

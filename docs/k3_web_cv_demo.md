@@ -23,7 +23,9 @@ The default visual input is a sample image, so the demo works before a USB
 camera is available. A future camera backend can reuse the same
 `capture_image` / `detect_status` skill contract.
 
-For the v0.1.2 multi-vision DemoZoo bridge, see `docs/k3_demozoo_bridge.md`.
+For real model inference, use the DemoZoo bridge in
+`docs/k3_demozoo_bridge.md`. `cv_sample` is only a smoke/fallback backend and
+must not be presented as a true classifier or detector.
 
 ## Dependencies
 
@@ -101,6 +103,19 @@ source deploy/k3/env.sh
 bash deploy/k3/run_web_demo.sh
 ```
 
+For a real vision demo, start DemoZoo first, then use:
+
+```bash
+export RVCLAW_VISION_BACKEND=demozoo
+export RVCLAW_DEMOZOO_BASE_URL=http://127.0.0.1:8000
+export RVCLAW_DEMOZOO_ENDPOINT_TEMPLATE='/predict/{model}'
+export RVCLAW_REQUIRE_REAL_VISION=1
+bash deploy/k3/run_real_vision_web_demo.sh
+```
+
+In this mode RVClaw fails clearly if DemoZoo is not reachable; it will not
+silently fall back to `cv_sample`.
+
 Open:
 
 ```text
@@ -114,7 +129,7 @@ http://<K3-IP>:8088
 3. Submit `检查 A-03 区域设备状态并生成报告`.
 4. Confirm the Agent graph shows Task Intake, Planner, Safety Guard, Memory, Capture, Vision, Speak, and Report nodes.
 5. Upload a `png/jpg/jpeg/webp` image, choose `目标检测`, and run again.
-6. Confirm the CV panel shows capture and annotated images and the result cards show structured vision output.
+6. Confirm the CV panel uses the right layout: classification shows one input image, detection/segmentation/face/inspection show input plus processed image, and non-vision failures show no image.
 7. Open `metrics.json`, `trace.jsonl`, `report.md`, and `raw.log` in the Web UI.
 8. Open `历史记录`; it should appear in a drawer rather than occupying the main screen.
 9. Submit an unsupported zone such as `移动到 Z-99 区域并拍照`; the Safety Guard node should show rejection/failure and still keep artifacts.
@@ -144,4 +159,5 @@ back to the mock device and records `device_backend=mock_fallback` in
 - The Agent graph shows Planner and Safety Guard nodes, including rejected unsafe runs.
 - `metrics.json` records `planner_mode` and `device_backend`.
 - CV sample runs produce `artifacts/a03_capture.png` and `artifacts/a03_annotated.png`.
+- Real vision runs record `vision_backend=demozoo`; `cv_sample` output is shown as fallback/smoke only.
 - Unknown zones are rejected by Safety Guard and produce failed run artifacts.

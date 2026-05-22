@@ -18,6 +18,9 @@ RVClaw 是 Demo Claw v0.1 的代码仓。进入本仓库时，请优先遵循以
 14. v0.1.2 多视觉增强通过 `analyze_image` + DemoZoo sidecar 接分类、检测、分割、人脸检测；人脸能力只做检测，不做身份识别。
 15. v0.1.3 Web 主界面是 Agent Command Center：当前任务、Agent 执行图、Runtime Stack Map、图片上传和证据文件在主界面；历史 run 放在独立抽屉，不再挤在主演示区。
 
+16. Real image recognition demos must use `RVCLAW_VISION_BACKEND=demozoo` with `RVCLAW_REQUIRE_REAL_VISION=1`; `cv_sample` is only a smoke/fallback backend and must not be described as true model inference.
+17. Web image display is task-specific: classification shows one input image, detection/segmentation/face/inspection show input plus processed image, and non-vision tasks show no image.
+
 默认本地检查：
 
 ```powershell

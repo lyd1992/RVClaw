@@ -41,7 +41,7 @@ class DemoZooClient:
 
 
 class DemoZooVisionDevice(CVSampleDevice):
-    backend_name = "cv_sample"
+    backend_name = "demozoo"
 
     def __init__(self, artifact_dir: str | Path, vision_source: str | Path, client: DemoZooClient | None = None):
         super().__init__(artifact_dir=artifact_dir, vision_source=vision_source)
@@ -58,7 +58,9 @@ class DemoZooVisionDevice(CVSampleDevice):
             result = normalize_demozoo_payload(payload, task=task, model=model)
         except (OSError, URLError, TimeoutError, json.JSONDecodeError, RuntimeError) as exc:
             fallback_reason = str(exc)
-            result = local_vision_result(task=task, model=model)
+            if _requires_real_vision():
+                raise RuntimeError(f"DemoZoo real vision backend is required but unavailable: {fallback_reason}") from exc
+            result = local_vision_result(task=task, model=model, source=source)
             result["backend"] = "mock_fallback"
             result["requested_backend"] = "demozoo"
             result["fallback_reason"] = fallback_reason
@@ -97,3 +99,7 @@ def _multipart_body(boundary: str, image_path: Path, fields: dict[str, str]) -> 
         ]
     )
     return b"".join(rows)
+
+
+def _requires_real_vision() -> bool:
+    return os.environ.get("RVCLAW_REQUIRE_REAL_VISION", "").strip().lower() in {"1", "true", "yes", "on"}

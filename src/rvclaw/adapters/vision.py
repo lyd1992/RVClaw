@@ -52,33 +52,26 @@ def default_model_for_task(task: str) -> str:
     return TASK_DEFAULT_MODELS.get(normalize_vision_task(task), "yolov8")
 
 
-def local_vision_result(task: str, model: str | None = None) -> dict[str, Any]:
+def local_vision_result(task: str, model: str | None = None, source: str | Path | None = None) -> dict[str, Any]:
     task = normalize_vision_task(task)
     model = model or default_model_for_task(task)
     result = _empty_result(task=task, model=model, backend="cv_sample")
+    result["backend_detail"] = "cv_sample_heuristic"
+    result["requires_real_model"] = True
+    source_hint = _source_hint(source)
+
     if task == "classification":
-        result["labels"] = [
-            {"label": "industrial control cabinet", "confidence": 0.91},
-            {"label": "edge AI box", "confidence": 0.73},
-            {"label": "status indicator", "confidence": 0.64},
-        ]
-        result["summary"] = "样例图像被分类为工业控制设备场景，状态灯区域清晰可见。"
+        result["labels"] = _classification_labels(source_hint)
+        result["summary"] = _classification_summary(source_hint)
     elif task == "segmentation":
-        result["segments"] = [
-            {"label": "device_panel", "confidence": 0.88, "bbox": [0.15, 0.18, 0.82, 0.78]},
-            {"label": "status_light", "confidence": 0.93, "bbox": [0.76, 0.38, 0.89, 0.63]},
-        ]
-        result["summary"] = "检测到设备面板和状态灯两个主要区域，状态灯区域已高亮。"
+        result["segments"] = _segmentation_regions(source_hint)
+        result["summary"] = _heuristic_summary("segmentation", source_hint)
     elif task == "face_detection":
         result["faces"] = []
-        result["summary"] = "样例巡检图中未检测到人脸，未触发人员隐私风险。"
+        result["summary"] = "cv_sample only validates the Agent vision workflow; enable DemoZoo/MNN/ONNX for real face detection. No identity recognition is performed."
     else:
-        result["objects"] = [
-            {"label": "device_panel", "confidence": 0.89, "bbox": [0.15, 0.18, 0.82, 0.78]},
-            {"label": "status_light", "confidence": 0.94, "bbox": [0.76, 0.38, 0.89, 0.63]},
-            {"label": "indicator_bar", "confidence": 0.78, "bbox": [0.21, 0.35, 0.56, 0.42]},
-        ]
-        result["summary"] = "检测到设备面板、状态灯和指示条，状态灯为绿色，风险等级较低。"
+        result["objects"] = _object_regions(source_hint)
+        result["summary"] = _heuristic_summary("object_detection", source_hint)
     return result
 
 
@@ -156,6 +149,64 @@ def _empty_result(task: str, model: str, backend: str) -> dict[str, Any]:
         "segments": [],
         "faces": [],
     }
+
+
+def _source_hint(source: str | Path | None) -> str:
+    if source is None:
+        return ""
+    return Path(source).name.lower()
+
+
+def _classification_labels(source_hint: str) -> list[dict[str, Any]]:
+    if any(key in source_hint for key in ("robot", "机器人", "humanoid")):
+        return [
+            {"label": "robot_scene_candidate", "confidence": 0.42},
+            {"label": "road_or_transit_scene_candidate", "confidence": 0.31},
+            {"label": "uploaded_image_sample", "confidence": 0.27},
+        ]
+    return [
+        {"label": "uploaded_image_sample", "confidence": 1.0},
+        {"label": "cv_sample_fallback", "confidence": 1.0},
+    ]
+
+
+def _classification_summary(source_hint: str) -> str:
+    if any(key in source_hint for key in ("robot", "机器人", "humanoid")):
+        return (
+            "cv_sample 根据上传文件名给出低置信度候选标签，用于验证 Agent 流程；"
+            "这不是模型分类结果。请启用 DemoZoo/MNN/ONNX 真实视觉后端后再判断图片内容。"
+        )
+    return (
+        "cv_sample 已完成图片分类链路验证，但当前未接入真实分类模型；"
+        "请启用 DemoZoo/MNN/ONNX 后端获取实际图像分类结果。"
+    )
+
+
+def _object_regions(source_hint: str) -> list[dict[str, Any]]:
+    if any(key in source_hint for key in ("robot", "机器人", "humanoid")):
+        return [
+            {"label": "robot_region_candidate", "confidence": 0.45, "bbox": [0.34, 0.12, 0.64, 0.92]},
+            {"label": "vehicle_region_candidate", "confidence": 0.32, "bbox": [0.66, 0.04, 0.98, 0.72]},
+        ]
+    return [
+        {"label": "sample_region", "confidence": 0.5, "bbox": [0.15, 0.18, 0.82, 0.78]},
+        {"label": "highlight_region", "confidence": 0.5, "bbox": [0.76, 0.38, 0.89, 0.63]},
+    ]
+
+
+def _segmentation_regions(source_hint: str) -> list[dict[str, Any]]:
+    return [
+        {**region, "label": region["label"].replace("_candidate", "_segment")}
+        for region in _object_regions(source_hint)
+    ]
+
+
+def _heuristic_summary(task: str, source_hint: str) -> str:
+    source_note = "uploaded image" if source_hint else "sample image"
+    return (
+        f"cv_sample generated heuristic {task} regions for the {source_note} to exercise the Agent workflow; "
+        "enable DemoZoo/MNN/ONNX for real model inference."
+    )
 
 
 def _extract_labels(payload: dict[str, Any]) -> list[dict[str, Any]]:

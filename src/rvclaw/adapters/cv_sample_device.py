@@ -57,10 +57,12 @@ class CVSampleDevice(MockDevice):
 
     def analyze_image(self, image_ref: str | None = "latest", task: str = "object_detection", model: str | None = None) -> dict[str, Any]:
         source = _resolve_image_ref(image_ref, self._latest_capture)
+        if _requires_real_vision():
+            raise RuntimeError("RVCLAW_REQUIRE_REAL_VISION=1 requires a real vision backend; active backend is cv_sample")
         task = normalize_vision_task(task)
         model = model or default_model_for_task(task)
         started_at = time.perf_counter()
-        result = local_vision_result(task=task, model=model)
+        result = local_vision_result(task=task, model=model, source=source)
         annotated = self.artifact_dir / f"{_slug(task)}_annotated.png"
         render_vision_annotation(source, annotated, result)
         result.update(
@@ -116,3 +118,7 @@ def _detect_with_opencv(source: Path, annotated: Path) -> dict[str, Any] | None:
 
 def _slug(target: str) -> str:
     return target.lower().replace("-", "")
+
+
+def _requires_real_vision() -> bool:
+    return os.environ.get("RVCLAW_REQUIRE_REAL_VISION", "").strip().lower() in {"1", "true", "yes", "on"}

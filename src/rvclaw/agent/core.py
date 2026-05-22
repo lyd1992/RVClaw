@@ -171,7 +171,7 @@ def _vision_metrics_from_results(results: list[dict]) -> dict:
         call = item.get("call", {})
         output = (item.get("result", {}) or {}).get("output", {}) or {}
         if call.get("name") == "analyze_image":
-            return {
+            metrics = {
                 "vision_task": output.get("task"),
                 "vision_backend": output.get("backend"),
                 "vision_model": output.get("model"),
@@ -182,4 +182,5 @@ def _vision_metrics_from_results(results: list[dict]) -> dict:
                 "segments_count": len(output.get("segments") or []),
                 "faces_count": len(output.get("faces") or []),
             }
+            return {key: value for key, value in metrics.items() if value is not None}
     return {}

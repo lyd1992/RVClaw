@@ -193,7 +193,31 @@ http://<K3-IP>:8088
 
 页面应展示 Agent 执行图、Runtime Stack Map、原图、标注图、运行状态、`metrics.json`、`trace.jsonl`、`report.md` 和 `raw.log`。v0.1.3 起页面支持上传 `png/jpg/jpeg/webp` 图片，上传后会以本地 `upload:<id>` 引用参与本次 run，不允许任意外部 URL。
 
-## 9. 常见分支
+## 9. Real vision mode
+
+`cv_sample` is only a smoke backend. It can verify the Agent workflow and image
+artifacts, but it is not real model inference. For uploaded images and roadshow
+vision demos, start the K3 DemoZoo sidecar and require the real backend:
+
+```bash
+cd /opt/rvclaw/RVClaw
+source deploy/k3/env.sh
+
+export RVCLAW_VISION_BACKEND=demozoo
+export RVCLAW_DEMOZOO_BASE_URL=http://127.0.0.1:8000
+export RVCLAW_DEMOZOO_ENDPOINT_TEMPLATE='/predict/{model}'
+export RVCLAW_REQUIRE_REAL_VISION=1
+
+bash deploy/k3/run_real_vision_web_demo.sh
+```
+
+If DemoZoo is unavailable in this mode, RVClaw should fail the run and preserve
+the error in `trace.jsonl` and `report.md`; it should not silently show
+`cv_sample` results as real recognition.
+
+See `docs/k3_demozoo_bridge.md` for model endpoints and display rules.
+
+## 10. 常见分支
 
 想验证 Safety Guard：
 
@@ -218,7 +242,7 @@ bash deploy/k3/run_demo.sh
 python3 benchmarks/run_agent_e2e.py --repeat 3 --planner llama_cpp --runs-dir /data/rvclaw/runs
 ```
 
-## 10. 继续阅读
+## 11. 继续阅读
 
 - `docs/k3_web_cv_demo.md`：Web 页面、CV sample、演示脚本和验收项。
 - `docs/k3_demozoo_bridge.md`：v0.1.2 多视觉 DemoZoo sidecar 增强。

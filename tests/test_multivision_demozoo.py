@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from rvclaw.adapters.demozoo_device import DemoZooClient
+from rvclaw.adapters.vision import local_vision_result
 from rvclaw.api import run_demo
 from rvclaw.agent.safety_guard import SafetyGuard, SkillRegistry
 from rvclaw.models import ToolCall
@@ -31,6 +32,7 @@ class MultiVisionDemoZooTest(unittest.TestCase):
             "RVCLAW_VISION_BACKEND": os.environ.get("RVCLAW_VISION_BACKEND"),
             "RVCLAW_VISION_SOURCE": os.environ.get("RVCLAW_VISION_SOURCE"),
             "RVCLAW_DEMOZOO_BASE_URL": os.environ.get("RVCLAW_DEMOZOO_BASE_URL"),
+            "RVCLAW_REQUIRE_REAL_VISION": os.environ.get("RVCLAW_REQUIRE_REAL_VISION"),
         }
 
     def tearDown(self) -> None:
@@ -107,6 +109,69 @@ class MultiVisionDemoZooTest(unittest.TestCase):
             self.assertEqual(summary.status, "completed")
             self.assertEqual(metrics["vision_backend"], "mock_fallback")
             self.assertGreater(metrics["objects_count"], 0)
+
+    def test_real_vision_required_does_not_fall_back_to_cv_sample(self) -> None:
+        with tempfile.TemporaryDirectory() as scratch:
+            source = Path(scratch) / "sample.png"
+            source.write_bytes(base64.b64decode(ONE_PIXEL_PNG))
+            os.environ["RVCLAW_DEVICE_BACKEND"] = "cv_sample"
+            os.environ["RVCLAW_VISION_BACKEND"] = "demozoo"
+            os.environ["RVCLAW_REQUIRE_REAL_VISION"] = "1"
+            os.environ["RVCLAW_VISION_SOURCE"] = str(source)
+
+            with patch.object(DemoZooClient, "predict", side_effect=OSError("demozoo down")):
+                summary = run_demo(
+                    goal="检测图片中的目标并生成结论",
+                    runs_dir=Path(scratch) / "runs",
+                    planner_name="mock",
+                    run_id="test-demozoo-required",
+                )
+
+            metrics = json.loads(Path(summary.metrics_path).read_text(encoding="utf-8"))
+            trace = [
+                json.loads(line)
+                for line in Path(summary.trace_path).read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+            self.assertEqual(summary.status, "failed")
+            self.assertEqual(metrics["vision_backend"], "demozoo")
+            failures = [row for row in trace if row["event"] == "skill_call.failed"]
+            self.assertTrue(failures)
+            self.assertIn("DemoZoo real vision backend is required", failures[-1]["payload"]["result"]["error"])
+
+    def test_real_vision_required_rejects_cv_sample_backend(self) -> None:
+        with tempfile.TemporaryDirectory() as scratch:
+            source = Path(scratch) / "sample.png"
+            source.write_bytes(base64.b64decode(ONE_PIXEL_PNG))
+            os.environ["RVCLAW_DEVICE_BACKEND"] = "cv_sample"
+            os.environ["RVCLAW_VISION_BACKEND"] = "cv_sample"
+            os.environ["RVCLAW_REQUIRE_REAL_VISION"] = "1"
+            os.environ["RVCLAW_VISION_SOURCE"] = str(source)
+
+            summary = run_demo(
+                goal="检测图片中的目标并生成结论",
+                runs_dir=Path(scratch) / "runs",
+                planner_name="mock",
+                run_id="test-cv-sample-required",
+            )
+
+            trace = [
+                json.loads(line)
+                for line in Path(summary.trace_path).read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+            self.assertEqual(summary.status, "failed")
+            failures = [row for row in trace if row["event"] == "skill_call.failed"]
+            self.assertIn("requires a real vision backend", failures[-1]["payload"]["result"]["error"])
+
+    def test_cv_sample_classification_is_explicitly_heuristic_for_uploaded_images(self) -> None:
+        result = local_vision_result(task="classification", model="resnet", source=Path("机器人.png"))
+
+        self.assertEqual(result["backend"], "cv_sample")
+        self.assertEqual(result["backend_detail"], "cv_sample_heuristic")
+        self.assertTrue(result["requires_real_model"])
+        self.assertNotIn("工业控制设备", result["summary"])
+        self.assertTrue(any("robot" in item["label"] for item in result["labels"]))
 
     def test_safety_guard_rejects_unknown_vision_task_and_model(self) -> None:
         guard = SafetyGuard(SkillRegistry.from_default())
