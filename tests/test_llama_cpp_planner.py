@@ -226,6 +226,76 @@ class LlamaCppPlannerTest(unittest.TestCase):
             ["memory_query", "move_to", "capture_image", "detect_status", "speak", "upload_report"],
         )
 
+    def test_llama_cpp_planner_repairs_complete_inspection_plan_with_invalid_arguments(self) -> None:
+        response = {
+            "choices": [
+                {
+                    "message": {
+                        "content": json.dumps(
+                            {
+                                "tool_calls": [
+                                    {"name": "memory_query", "arguments": {"query": "A-03 status", "context": "extra"}},
+                                    {"name": "move_to", "arguments": {"target": "A-03", "reason": "inspect"}},
+                                    {"name": "capture_image", "arguments": {"target": "A-03", "description": "full scene"}},
+                                    {"name": "detect_status", "arguments": {"image": "captured", "expected": "normal"}},
+                                    {"name": "speak", "arguments": {"text": "checking"}},
+                                    {"name": "upload_report", "arguments": {"report_id": "run-test", "status": "pending"}},
+                                ]
+                            }
+                        )
+                    }
+                }
+            ]
+        }
+        task = Task(task_id="run-test", goal="inspect A-03 device status and generate report", created_at="2026-05-21T00:00:00Z")
+        planner = LlamaCppPlannerBackend(base_url="http://127.0.0.1:9090/v1", model="Qwen3-0.6B", timeout_s=3)
+
+        with patch("rvclaw.agent.planner.urlopen", return_value=_FakeResponse(response)):
+            calls = planner.plan(task, memory_context=[])
+
+        self.assertEqual(planner.last_mode, "repaired_schema")
+        self.assertEqual(
+            [call.name for call in calls],
+            ["memory_query", "move_to", "capture_image", "detect_status", "speak", "upload_report"],
+        )
+        self.assertEqual(calls[0].arguments, {"query": task.goal, "limit": 5})
+        self.assertEqual(calls[3].arguments, {"target": "A-03", "image_ref": "latest"})
+        self.assertEqual(calls[5].arguments, {"title": "A-03 inspection report"})
+
+    def test_llama_cpp_planner_repairs_vision_plan_missing_capture_target(self) -> None:
+        response = {
+            "choices": [
+                {
+                    "message": {
+                        "content": json.dumps(
+                            {
+                                "tool_calls": [
+                                    {"name": "capture_image", "arguments": {}},
+                                    {"name": "analyze_image", "arguments": {"task": "object_detection"}},
+                                    {"name": "speak", "arguments": {"text": "analyzing"}},
+                                    {"name": "upload_report", "arguments": {"report": "done"}},
+                                ]
+                            }
+                        )
+                    }
+                }
+            ]
+        }
+        task = Task(task_id="run-test", goal="这个图片中有什么", created_at="2026-05-21T00:00:00Z")
+        planner = LlamaCppPlannerBackend(base_url="http://127.0.0.1:9090/v1", model="Qwen3-0.6B", timeout_s=3)
+
+        with patch("rvclaw.agent.planner.urlopen", return_value=_FakeResponse(response)):
+            calls = planner.plan(task, memory_context=[])
+
+        self.assertEqual(planner.last_mode, "repaired_incomplete")
+        self.assertEqual(
+            [call.name for call in calls],
+            ["memory_query", "capture_image", "analyze_image", "speak", "upload_report"],
+        )
+        self.assertEqual(calls[1].arguments, {"target": "A-03", "mode": "vision"})
+        self.assertEqual(calls[2].arguments, {"image_ref": "latest", "task": "object_detection", "model": "yolov8"})
+        self.assertEqual(calls[4].arguments, {"title": "RVClaw object_detection vision report"})
+
     def test_llama_cpp_planner_does_not_repair_non_inspection_plan(self) -> None:
         response = {
             "choices": [

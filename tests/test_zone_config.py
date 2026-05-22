@@ -37,6 +37,13 @@ class ZoneConfigTest(unittest.TestCase):
 
         self.assertEqual(checked.arguments["target"], "B-01")
 
+    def test_safety_guard_strips_unknown_arguments_before_skill_execution(self) -> None:
+        guard = SafetyGuard(SkillRegistry.from_default())
+
+        checked = guard.validate(ToolCall("memory_query", {"query": "A-03", "context": "extra"}))
+
+        self.assertEqual(checked.arguments, {"query": "A-03"})
+
     def test_unknown_zone_is_rejected_by_safety_guard(self) -> None:
         guard = SafetyGuard(SkillRegistry.from_default())
 

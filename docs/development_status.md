@@ -111,6 +111,7 @@ Known successful K3 runs:
 - E2E benchmark CSV with K3/llama.cpp environment metadata.
 - Planner hardening for small-model instability:
   - repairs incomplete inspection plans to the deterministic 6-step workflow;
+  - repairs complete-but-invalid inspection or vision plans to schema-safe deterministic workflows;
   - falls back to deterministic inspection workflow on malformed JSON for default inspection tasks;
   - records unsupported/non-inspection planner failures as `failed` artifacts instead of Python tracebacks.
 

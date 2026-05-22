@@ -131,9 +131,9 @@ class LlamaCppPlannerBackend:
             raise RuntimeError(f"llama.cpp planner returned malformed JSON content: {content[:240]!r}") from exc
         calls = _extract_tool_calls(parsed)
         tool_calls = [_tool_call_from_planner_payload(call) for call in calls]
-        repaired = _repair_incomplete_plan(task, tool_calls)
-        if repaired != tool_calls:
-            self.last_mode = "repaired_incomplete"
+        repaired, repair_mode = _repair_plan(task, tool_calls)
+        if repair_mode:
+            self.last_mode = repair_mode
         return repaired
 
     def _build_request(self, task: Task, memory_context: list[dict]) -> Request:
@@ -262,18 +262,52 @@ def _tool_call_from_planner_payload(call: dict) -> ToolCall:
     return ToolCall.from_dict(call)
 
 
-def _repair_incomplete_plan(task: Task, calls: list[ToolCall]) -> list[ToolCall]:
+WORKFLOW_SCHEMAS = {
+    "memory_query": ({"query"}, {"query", "limit"}),
+    "move_to": ({"target"}, {"target"}),
+    "capture_image": ({"target"}, {"target", "mode"}),
+    "detect_status": ({"target"}, {"target", "image_ref"}),
+    "analyze_image": ({"task"}, {"image_ref", "task", "model"}),
+    "speak": ({"text"}, {"text"}),
+    "upload_report": ({"title"}, {"title"}),
+    "stop": (set(), {"reason"}),
+}
+
+
+def _repair_plan(task: Task, calls: list[ToolCall]) -> tuple[list[ToolCall], str | None]:
     if _is_vision_analysis_task(task.goal):
         names = [call.name for call in calls]
         if all(name in names for name in VISION_WORKFLOW):
-            return calls
-        return _vision_workflow_for_goal(task.goal)
+            if _has_schema_issues(calls):
+                return _vision_workflow_for_goal(task.goal), "repaired_schema"
+            return calls, None
+        return _vision_workflow_for_goal(task.goal), "repaired_incomplete"
     if not _is_inspection_task(task.goal):
-        return calls
+        return calls, None
     names = [call.name for call in calls]
     if all(name in names for name in INSPECTION_WORKFLOW):
-        return calls
-    return MockPlannerBackend().plan(task, memory_context=[])
+        if _has_schema_issues(calls):
+            return MockPlannerBackend().plan(task, memory_context=[]), "repaired_schema"
+        return calls, None
+    return MockPlannerBackend().plan(task, memory_context=[]), "repaired_incomplete"
+
+
+def _repair_incomplete_plan(task: Task, calls: list[ToolCall]) -> list[ToolCall]:
+    return _repair_plan(task, calls)[0]
+
+
+def _has_schema_issues(calls: list[ToolCall]) -> bool:
+    for call in calls:
+        schema = WORKFLOW_SCHEMAS.get(call.name)
+        if schema is None:
+            return True
+        required, allowed = schema
+        keys = set(call.arguments)
+        if not required.issubset(keys):
+            return True
+        if not keys.issubset(allowed):
+            return True
+    return False
 
 
 def _vision_workflow_for_goal(goal: str) -> list[ToolCall]:
@@ -309,6 +343,10 @@ def _is_inspection_task(goal: str) -> bool:
 def _is_vision_analysis_task(goal: str) -> bool:
     normalized = goal.lower()
     markers = (
+        "图片",
+        "图像",
+        "这个图片",
+        "有什么",
         "分类",
         "识别这张",
         "这张图片",

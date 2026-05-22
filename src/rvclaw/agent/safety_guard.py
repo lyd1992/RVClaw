@@ -56,7 +56,8 @@ class SafetyGuard:
                 raise ValueError(f"Skill {call.name} missing required argument: {required}")
 
         properties = parameters.get("properties", {})
-        for key, value in arguments.items():
+        checked_arguments = {key: value for key, value in arguments.items() if key in properties}
+        for key, value in checked_arguments.items():
             prop = properties.get(key)
             if not prop:
                 continue
@@ -78,4 +79,5 @@ class SafetyGuard:
 
         if call.timeout_s is None:
             call.timeout_s = int(spec.get("timeout_s", 5))
+        call.arguments = checked_arguments
         return call

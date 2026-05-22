@@ -38,7 +38,7 @@ v0.1.0-k3-llama-smoke
 
 - [x] Add FastAPI-compatible Web/API surface for runs, history, artifacts, and benchmark CSV.
 - [x] Add configurable zones with `A-03`, `B-01`, and `BASE`.
-- [x] Add `planner_mode` metrics for direct, repaired, fallback, failed, and mock planner paths.
+- [x] Add `planner_mode` metrics for direct, repaired_incomplete, repaired_schema, fallback, failed, and mock planner paths.
 - [x] Add sample-image CV device backend with mock fallback.
 - [x] Default K3 formal demo model to Qwen3-30B-A3B GGUF while preserving the 0.6B smoke model.
 - [ ] Validate the Web demo on the physical K3.
