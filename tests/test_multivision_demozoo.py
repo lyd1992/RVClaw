@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import base64
-import io
 import json
 import os
 import sys
@@ -91,6 +90,34 @@ class MultiVisionDemoZooTest(unittest.TestCase):
             self.assertEqual(metrics["objects_count"], 1)
             self.assertEqual(result["objects"][0]["label"], "person")
 
+    def test_demozoo_uses_same_task_real_model_fallback_when_default_model_fails(self) -> None:
+        payload = {"objects": [{"label": "robot", "confidence": 0.88, "bbox": [0.2, 0.1, 0.7, 0.9]}]}
+        with tempfile.TemporaryDirectory() as scratch:
+            source = Path(scratch) / "sample.png"
+            source.write_bytes(base64.b64decode(ONE_PIXEL_PNG))
+            os.environ["RVCLAW_DEVICE_BACKEND"] = "cv_sample"
+            os.environ["RVCLAW_VISION_BACKEND"] = "demozoo"
+            os.environ["RVCLAW_REQUIRE_REAL_VISION"] = "1"
+            os.environ["RVCLAW_VISION_SOURCE"] = str(source)
+
+            with patch.object(DemoZooClient, "predict", side_effect=[RuntimeError("yolov8 failed"), payload]) as mocked:
+                summary = run_demo(
+                    goal="detect objects in this image and generate a conclusion",
+                    runs_dir=Path(scratch) / "runs",
+                    planner_name="mock",
+                    run_id="test-demozoo-model-fallback",
+                )
+
+            metrics = json.loads(Path(summary.metrics_path).read_text(encoding="utf-8"))
+            result = json.loads((Path(summary.run_dir) / "artifacts" / "vision_result.json").read_text(encoding="utf-8"))
+            called_models = [call.kwargs["model"] for call in mocked.call_args_list]
+            self.assertEqual(summary.status, "completed")
+            self.assertEqual(called_models[:2], ["yolov8", "yolov5"])
+            self.assertEqual(metrics["vision_backend"], "demozoo")
+            self.assertEqual(metrics["vision_model"], "yolov5")
+            self.assertEqual(result["requested_model"], "yolov8")
+            self.assertEqual(result["model_fallback_reason"], "yolov8: yolov8 failed")
+
     def test_demozoo_client_prefers_model_registry_endpoint_and_trailing_slash_retry(self) -> None:
         client = DemoZooClient(base_url="http://demo.local", endpoint_template="/fallback/{model}")
         client._model_endpoint_cache = {"yolov8": "/predict/yolov8"}
@@ -154,11 +181,12 @@ class MultiVisionDemoZooTest(unittest.TestCase):
                 code=404,
                 msg="Not Found",
                 hdrs={},
-                fp=io.BytesIO(b'{"detail":"not found"}'),
+                fp=None,
             )
 
             with patch("rvclaw.adapters.demozoo_device.urlopen", side_effect=[not_found, Response()]) as mocked:
                 payload = client.predict(source, task="object_detection", model="yolov8")
+            not_found.close()
 
         self.assertEqual(payload["objects"][0]["label"], "robot")
         self.assertEqual(payload["_rvclaw_demozoo_url"], "http://demo.local/predict/yolov8/")

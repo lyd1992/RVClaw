@@ -21,6 +21,14 @@ from rvclaw.adapters.vision import (
 )
 
 
+DEMOZOO_MODEL_FALLBACKS = {
+    "classification": ("resnet", "mobilenet_v2", "efficientnet", "swin_tiny"),
+    "object_detection": ("yolov8", "yolov5", "yolov11", "yolov6"),
+    "segmentation": ("yolov8_seg", "fcn", "unet", "sam"),
+    "face_detection": ("yolov5_face",),
+}
+
+
 class DemoZooClient:
     def __init__(self, base_url: str | None = None, timeout_s: float | None = None, endpoint_template: str | None = None):
         self.base_url = (base_url or os.environ.get("RVCLAW_DEMOZOO_BASE_URL") or "http://127.0.0.1:8000").rstrip("/")
@@ -48,7 +56,7 @@ class DemoZooClient:
                     return payload
             except HTTPError as exc:
                 body_text = _read_http_error_body(exc)
-                last_error = f"HTTP Error {exc.code}: {exc.reason}; url={url}; body={body_text[:240]}"
+                last_error = f"HTTP Error {exc.code}: {exc.reason}; url={url}; body={body_text[:2000]}"
                 if exc.code == 404:
                     continue
                 raise RuntimeError(last_error) from exc
@@ -108,17 +116,31 @@ class DemoZooVisionDevice(CVSampleDevice):
     def analyze_image(self, image_ref: str | None = "latest", task: str = "object_detection", model: str | None = None) -> dict[str, Any]:
         source = _resolve_image_ref(image_ref, self._latest_capture)
         task = normalize_vision_task(task)
-        model = model or default_model_for_task(task)
+        requested_model = model or default_model_for_task(task)
         started_at = time.perf_counter()
         fallback_reason = None
+        result: dict[str, Any] | None = None
+        model_errors: list[str] = []
+
+        for candidate_model in _candidate_models(task=task, requested_model=requested_model):
+            try:
+                payload = self.client.predict(source, task=task, model=candidate_model)
+                result = normalize_demozoo_payload(payload, task=task, model=candidate_model)
+                if candidate_model != requested_model:
+                    result["requested_model"] = requested_model
+                    result["model_fallback_reason"] = "; ".join(model_errors)
+                break
+            except (OSError, URLError, TimeoutError, json.JSONDecodeError, RuntimeError) as exc:
+                model_errors.append(f"{candidate_model}: {exc}")
+
         try:
-            payload = self.client.predict(source, task=task, model=model)
-            result = normalize_demozoo_payload(payload, task=task, model=model)
-        except (OSError, URLError, TimeoutError, json.JSONDecodeError, RuntimeError) as exc:
-            fallback_reason = str(exc)
+            if result is None:
+                fallback_reason = "; ".join(model_errors)
+                raise RuntimeError(fallback_reason)
+        except RuntimeError as exc:
             if _requires_real_vision():
                 raise RuntimeError(f"DemoZoo real vision backend is required but unavailable: {fallback_reason}") from exc
-            result = local_vision_result(task=task, model=model, source=source)
+            result = local_vision_result(task=task, model=requested_model, source=source)
             result["backend"] = "mock_fallback"
             result["requested_backend"] = "demozoo"
             result["fallback_reason"] = fallback_reason
@@ -186,3 +208,14 @@ def _read_http_error_body(exc: HTTPError) -> str:
 
 def _requires_real_vision() -> bool:
     return os.environ.get("RVCLAW_REQUIRE_REAL_VISION", "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _candidate_models(task: str, requested_model: str) -> list[str]:
+    ordered = [requested_model, *DEMOZOO_MODEL_FALLBACKS.get(normalize_vision_task(task), ())]
+    candidates: list[str] = []
+    seen: set[str] = set()
+    for model in ordered:
+        if model not in seen:
+            seen.add(model)
+            candidates.append(model)
+    return candidates

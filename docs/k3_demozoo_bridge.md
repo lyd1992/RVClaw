@@ -30,6 +30,12 @@ RVClaw retries the trailing-slash variant before reporting a failed run. The
 multipart request includes both `image` and `file` aliases so minor DemoZoo API
 field-name differences do not break the demo.
 
+For model-script failures inside DemoZoo, RVClaw may retry another real model in
+the same task family. For example, object detection tries `yolov8`, then
+`yolov5`, `yolov11`, and `yolov6`. This is still a real DemoZoo backend path,
+not `cv_sample`; `metrics.json` records the actual `vision_model`, and
+`vision_result.json` records `requested_model` plus `model_fallback_reason`.
+
 ## Start DemoZoo
 
 Start DemoZoo according to the Bianbu/SpacemiT container guide. The common

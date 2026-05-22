@@ -417,10 +417,11 @@ def _index_html() -> str:
       const m = detail.metrics || {}; status.textContent = detail.summary.status; status.className = detail.summary.status === 'completed' ? 'ok' : detail.summary.status === 'failed' ? 'fail' : 'warn';
       plannerMode.textContent = m.planner_mode || detail.summary.planner_mode || '-'; toolCount.textContent = m.tool_call_count ?? detail.summary.tool_call_count ?? '-';
       latency.textContent = m.latency_ms ? `${m.latency_ms} ms` : '-'; visionBackend.textContent = m.vision_backend || '-'; visionModel.textContent = m.vision_model || '-';
-      const visionOutput = findVisionOutput(detail);
+      const visionResult = findVisionResult(detail);
+      const visionOutput = visionResult && visionResult.output;
       renderGraph(detail); renderStack(m); renderFiles(detail, visionOutput);
       if (m.worker_error) { visionSummary.textContent = `后台任务异常：${m.worker_error}`; visionResults.innerHTML = ''; }
-      else renderVision(visionOutput);
+      else renderVision(visionResult);
     }
     function renderGraph(detail){
       const trace = detail.trace || [], m = detail.metrics || {}, status = detail.summary.status;
@@ -478,9 +479,11 @@ def _index_html() -> str:
       }
       if ((detail.files || []).includes('report.md')) showFile('report.md');
     }
-    function findVisionOutput(detail){ const rows = detail.trace || []; const ev = rows.findLast ? rows.findLast(e => e.payload && e.payload.call && e.payload.call.name === 'analyze_image') : [...rows].reverse().find(e => e.payload && e.payload.call && e.payload.call.name === 'analyze_image'); return ev && ev.payload.result && ev.payload.result.output; }
-    function renderVision(output){
-      if (!output) { visionSummary.textContent = '当前 run 没有 analyze_image 结果。'; visionResults.innerHTML = ''; return; }
+    function findVisionResult(detail){ const rows = detail.trace || []; const ev = rows.findLast ? rows.findLast(e => e.payload && e.payload.call && e.payload.call.name === 'analyze_image') : [...rows].reverse().find(e => e.payload && e.payload.call && e.payload.call.name === 'analyze_image'); return ev && ev.payload.result; }
+    function renderVision(result){
+      if (!result) { visionSummary.textContent = '当前 run 没有 analyze_image 结果。'; visionResults.innerHTML = ''; return; }
+      if (!result.ok) { visionSummary.textContent = `视觉任务失败：${result.error || 'backend error'}`; visionResults.innerHTML = '<div class="result-card"><b>视觉任务失败</b><span>请查看 trace.jsonl 和 report.md 中的后端错误。</span></div>'; return; }
+      const output = result.output || {};
       visionSummary.textContent = output.summary || '视觉任务完成。';
       const rows = [...(output.labels || []), ...(output.objects || []), ...(output.segments || []), ...(output.faces || [])];
       const warning = output.requires_real_model ? '<div class="result-card"><b>需要真实视觉后端</b><span>当前结果来自 cv_sample 启发式链路验证，不是模型推理。请启用 DemoZoo/MNN/ONNX。</span></div>' : '';
