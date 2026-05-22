@@ -13,6 +13,8 @@ RVClaw 是 Demo Claw v0.1 的代码仓。进入本仓库时，请优先遵循以
 9. `llama_cpp` planner 的默认巡检任务必须产出完整 6 步闭环：`memory_query -> move_to -> capture_image -> detect_status -> speak -> upload_report`。如果小模型返回不完整巡检计划，适配器应修复为 deterministic workflow。
 10. 不支持的任务、非法 skill 参数或非巡检 planner 解析失败，应以 `failed` run artifact 收敛，不要让 CLI 直接 traceback。
 11. 当前 K3 smoke checkpoint 记录在 `docs/development_status.md`，上游 tag 为 `v0.1.0-k3-llama-smoke`。
+12. 下一个 K3 可视化 checkpoint 是 `v0.1.1-k3-web-cv-demo`：Web 控制台、CV sample、run history、RVBench artifacts、Qwen3-30B-A3B 正式演示模型。
+13. K3 第一次部署入口是 `docs/k3_start_here.md`；`deploy/k3/install.md` 只作为命令参考，`docs/k3_ssh_deployment.md` 作为详细排障 runbook。
 
 默认本地检查：
 
@@ -28,6 +30,7 @@ K3 SSH 验收入口：
 source deploy/k3/env.sh
 bash deploy/k3/run_llama_server.sh
 bash deploy/k3/run_demo.sh
+bash deploy/k3/run_web_demo.sh
 ```
 
 本地 `llama.cpp` Planner 入口：

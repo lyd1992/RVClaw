@@ -1,27 +1,29 @@
 # RVClaw Development Status
 
-Updated: 2026-05-21
+Updated: 2026-05-22
 
 Checkpoint tag: `v0.1.0-k3-llama-smoke`
 
+Current code checkpoint target: `v0.1.1-k3-web-cv-demo`
+
 ## Summary
 
-RVClaw has reached the first K3 smoke checkpoint: the Demo Claw v0.1 software loop runs on K3 Pico-ITX 32GB with a local `spacemit-llama.cpp` server and a Qwen3-0.6B GGUF smoke model.
+RVClaw has reached the first K3 smoke checkpoint and now has a v0.1.1 Web + CV demo implementation ready for K3 validation. The v0.1.0 checkpoint proved the Demo Claw software loop on K3 Pico-ITX 32GB with local `spacemit-llama.cpp`; v0.1.1 adds a visual control surface, sample-image CV artifacts, configurable zones, and planner/device mode metadata.
 
 This checkpoint proves the RVClaw runtime path is executable and auditable on the target RISC-V edge box:
 
 ```text
-natural-language task
+browser or CLI natural-language task
   -> task.yaml
   -> llama.cpp / mock PlannerBackend
   -> Agent Core
   -> Safety Guard
   -> Tool Router
-  -> Mock Skills + SQLite memory
+  -> Mock or CV sample Device + SQLite memory
   -> trace.jsonl / metrics.json / report.md / raw.log
 ```
 
-This is still a Mock Device software loop. It is not yet ROS2/OpenClaw real-device control, real camera capture, or MNN/ONNX vision inference.
+This is still not ROS2/OpenClaw real-device control, real camera capture, or MNN/ONNX vision inference. Those remain v0.2+ adapter work.
 
 ## Validated On K3
 
@@ -33,6 +35,7 @@ Environment observed during validation:
 | OS | Bianbu / RISC-V Linux |
 | Python | 3.14.3 |
 | Local LLM server | `spacemit-llama.cpp` |
+| Formal demo model | Qwen3-30B-A3B-Instruct-2507-Q4_0 GGUF |
 | Smoke model | `planner-smoke.gguf` / Qwen3-0.6B GGUF |
 | RVClaw data root | `/data/rvclaw` |
 | RVClaw source root | `/opt/rvclaw/RVClaw` |
@@ -48,13 +51,21 @@ python3 -m unittest discover -s tests
 python3 benchmarks/run_agent_e2e.py --repeat 3 --planner mock --runs-dir /data/rvclaw/runs
 ```
 
+For v0.1.1 Web + CV validation, start from `docs/k3_start_here.md`, then run:
+
+```bash
+source deploy/k3/env.sh
+bash deploy/k3/run_llama_server.sh
+bash deploy/k3/run_web_demo.sh
+```
+
 Known successful K3 runs:
 
 | Run ID | Goal | Planner | Expected result |
 |---|---|---|---|
 | `run-20260521T083749Z` | 检查 A-03 区域设备状态并生成报告 | `llama_cpp` | `completed`, 6-step inspection workflow |
 | `run-20260521T091220Z` | 返回 BASE | `mock` | `completed`, moves to `BASE` |
-| `run-20260521T091245Z` | 移动到 B-01 区域并拍照 | `llama_cpp` | `failed`, unsupported target handled with artifacts |
+| `run-20260521T091245Z` | 移动到 B-01 区域并拍照 | `llama_cpp` | historical pre-v0.1.1 result: `failed`, unsupported target handled with artifacts |
 
 ## Implemented
 
@@ -63,8 +74,9 @@ Known successful K3 runs:
 - `mock`, `claude_cli`, `auto`, and `llama_cpp` PlannerBackend selection.
 - OpenAI-compatible `llama.cpp` planner adapter for local `llama-server`.
 - K3-specific environment and run scripts under `deploy/k3/`.
-- K3 SSH deployment and verification runbook.
+- K3 first-run guide, SSH deployment runbook, and Web + CV demo runbook.
 - Skill whitelist, argument schema checks, timeout defaults, and failed-run artifact capture.
+- Configurable zone whitelist loaded from `configs/zones.yaml` with `A-03`, `B-01`, and `BASE`.
 - Built-in mock skills:
   - `memory_query`
   - `move_to`
@@ -75,6 +87,17 @@ Known successful K3 runs:
   - `stop`
 - SQLite event memory and flat retrieval baseline.
 - Mock Device movement, image placeholder capture, status detection, speak, upload, and stop behavior.
+- CV sample device backend that writes real image artifacts:
+  - `artifacts/a03_capture.png`
+  - `artifacts/a03_annotated.png`
+- Web console and API:
+  - `GET /api/health`
+  - `POST /api/runs`
+  - `GET /api/runs`
+  - `GET /api/runs/{run_id}`
+  - `GET /api/runs/{run_id}/files`
+  - `GET /api/benchmarks`
+- `planner_mode` and `device_backend` metrics for demo explainability.
 - E2E benchmark CSV with K3/llama.cpp environment metadata.
 - Planner hardening for small-model instability:
   - repairs incomplete inspection plans to the deterministic 6-step workflow;
@@ -114,7 +137,7 @@ move_to(BASE)
 speak
 ```
 
-Unsupported targets such as `B-01` are expected to fail safely unless the registry is expanded.
+`B-01` is now in the default zone whitelist and can be used by mock/CV sample workflows. Unknown targets such as `Z-99` are expected to fail safely while still writing artifacts.
 
 ## Not Yet Implemented
 
@@ -125,7 +148,6 @@ Unsupported targets such as `B-01` are expected to fail safely unless the regist
 - Real report upload service.
 - MNN/ONNX/CV model-backed anomaly detection.
 - Milvus/Knowhere high-performance memory backend.
-- Web/FastAPI control console.
 - Interactive human confirmation UI.
 
 ## Acceptance Criteria For This Checkpoint
@@ -140,6 +162,7 @@ bash deploy/k3/run_demo.sh | tee /tmp/rvclaw_llama_run.json
 jq -r '.status' /tmp/rvclaw_llama_run.json
 jq -r '.tool_calls[].name' /tmp/rvclaw_llama_run.json
 python3 -m unittest discover -s tests
+bash deploy/k3/run_web_demo.sh
 ```
 
 Expected `run_demo.sh` summary:
@@ -168,8 +191,8 @@ artifacts/
 ## Next Steps
 
 1. Add a real camera-backed `capture_image` path while preserving mock fallback.
-2. Add a small rule-based or OpenCV status detector before introducing MNN/ONNX.
-3. Expand the skill registry from `A-03`/`BASE` to a configurable zone list.
-4. Add a `planner_mode` metric that records whether `llama_cpp` output was used directly or repaired/fallback.
-5. Add a simple FastAPI endpoint after the CLI path remains stable on K3.
+2. Improve the OpenCV detector from sample-image annotation to a real status-light or anomaly rule set.
+3. Add `planner_mode` to the Web summary view if it is not already visible enough for demos.
+4. Add a real camera backend behind the same `capture_image` contract.
+5. Add RuntimeBackend and MemoryBackend capability probes before wiring MNN/vLLM/Milvus into the main chain.
 6. Prepare ROS2/OpenClaw adapter contracts for v0.2, but keep real-device control gated by Safety Guard and explicit confirmation.

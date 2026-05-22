@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 from rvclaw.api import run_demo
@@ -41,6 +42,12 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--runs-dir", default="runs", help="directory for run artifacts")
     run_parser.add_argument("--memory-db", default=None, help="SQLite memory database path")
     run_parser.add_argument("--json", action="store_true", help="print machine-readable summary")
+
+    serve_parser = subparsers.add_parser("serve", help="run the RVClaw K3 Web console")
+    serve_parser.add_argument("--host", default="127.0.0.1", help="host interface for the Web console")
+    serve_parser.add_argument("--port", default=8088, type=int, help="port for the Web console")
+    serve_parser.add_argument("--planner", default="llama_cpp", choices=["auto", "mock", "claude", "llama_cpp"], help="default planner backend")
+    serve_parser.add_argument("--runs-dir", default="runs", help="directory for run artifacts")
 
     replay_parser = subparsers.add_parser("replay", help="print a saved trace.jsonl")
     replay_parser.add_argument("trace", help="path to trace.jsonl")
@@ -113,6 +120,9 @@ def main(argv: list[str] | None = None) -> int:
         print(Path(args.trace).read_text(encoding="utf-8"))
         return 0
 
+    if args.command == "serve":
+        return _handle_serve(args)
+
     if args.command == "doctor":
         report = collect_doctor()
         if args.json:
@@ -129,6 +139,23 @@ def main(argv: list[str] | None = None) -> int:
 
     parser.print_help()
     return 1
+
+
+def _handle_serve(args: argparse.Namespace) -> int:
+    try:
+        import uvicorn
+    except ImportError:
+        print("Missing optional Web dependency. Install with: python3 -m pip install -e '.[api]'")
+        return 2
+    from rvclaw.web.app import create_app
+
+    app = create_app(
+        runs_dir=args.runs_dir,
+        planner=args.planner,
+        web_token=os.environ.get("RVCLAW_WEB_TOKEN") or None,
+    )
+    uvicorn.run(app, host=args.host, port=args.port)
+    return 0
 
 
 def _add_install_args(parser: argparse.ArgumentParser) -> None:

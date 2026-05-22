@@ -5,6 +5,7 @@ from importlib import resources
 from pathlib import Path
 from typing import Any
 
+from rvclaw.config import load_zone_ids
 from rvclaw.models import ToolCall
 
 
@@ -16,7 +17,8 @@ class SkillRegistry:
     @classmethod
     def from_default(cls) -> "SkillRegistry":
         with resources.files("rvclaw.skills").joinpath("registry.yaml").open("r", encoding="utf-8") as f:
-            return cls(json.load(f))
+            registry = json.load(f)
+        return cls(_with_configured_zones(registry, load_zone_ids()))
 
     @classmethod
     def from_file(cls, path: str | Path) -> "SkillRegistry":
@@ -24,6 +26,17 @@ class SkillRegistry:
 
     def get(self, name: str) -> dict[str, Any] | None:
         return self.skills.get(name)
+
+
+def _with_configured_zones(registry: dict[str, Any], zones: list[str]) -> dict[str, Any]:
+    patched = json.loads(json.dumps(registry))
+    for skill in patched.get("skills", []):
+        parameters = skill.get("parameters", {})
+        properties = parameters.get("properties", {})
+        target = properties.get("target")
+        if isinstance(target, dict) and "enum" in target:
+            target["enum"] = zones
+    return patched
 
 
 class SafetyGuard:

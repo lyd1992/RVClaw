@@ -23,8 +23,21 @@ CLI/API task
   -> Safety Guard
   -> Tool Router
   -> Skills(memory_query/move_to/capture_image/detect_status/speak/upload_report/stop)
-  -> Mock Device + SQLite Memory
+  -> Mock/CV sample Device + SQLite Memory
   -> Observability(task/trace/metrics/report/raw log)
+```
+
+## v0.1.1 Web + CV 执行链路
+
+```text
+Web console
+  -> POST /api/runs
+  -> run_demo()
+  -> llama.cpp Planner
+  -> configurable zone Safety Guard
+  -> cv_sample capture/detect
+  -> artifacts/a03_capture.png + artifacts/a03_annotated.png
+  -> Web artifact viewer
 ```
 
 ## 插件边界

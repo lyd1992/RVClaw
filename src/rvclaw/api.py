@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from rvclaw.adapters.mock_device import MockDevice
+from rvclaw.adapters.factory import build_device
 from rvclaw.agent.core import AgentCore
 from rvclaw.agent.planner import planner_from_name
 from rvclaw.agent.safety_guard import SafetyGuard, SkillRegistry
@@ -28,12 +28,12 @@ def run_demo(
 
     memory_path = Path(memory_db) if memory_db else runs_dir / "memory.sqlite3"
     memory = MemoryManager.from_path(memory_path)
-    device = MockDevice(artifact_dir=run_dir / "artifacts")
+    device, run_metadata = build_device(artifact_dir=run_dir / "artifacts")
     registry = SkillRegistry.from_default()
     guard = SafetyGuard(registry)
     skills = build_builtin_skills(device=device, memory=memory, run_id=run_id)
     router = ToolRouter(skills=skills, safety_guard=guard, recorder=recorder)
     planner = planner_from_name(planner_name)
 
-    core = AgentCore(planner=planner, router=router, memory=memory, recorder=recorder)
+    core = AgentCore(planner=planner, router=router, memory=memory, recorder=recorder, run_metadata=run_metadata)
     return core.run(goal=goal)

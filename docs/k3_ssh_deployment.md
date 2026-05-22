@@ -2,6 +2,8 @@
 
 本文只记录 K3 Pico-ITX 32GB 机器侧部署步骤。RVClaw 代码优化仍然在本地/上游 GitHub 仓库中完成，K3 只作为运行和验收环境。
 
+第一次部署建议先看 `docs/k3_start_here.md`。本文保留更细的 SSH、tmux、benchmark 和 troubleshooting 步骤，适合作为排障 runbook。
+
 ## 1. 工作边界
 
 - 代码仓：从上游 GitHub 拉取或更新 `RVClaw`，不要在 K3 上维护长期分叉。
@@ -72,18 +74,29 @@ tar -xzvf spacemit-llama.cpp.riscv64.0.0.8.tar.gz
 ln -sfn spacemit-llama.cpp.riscv64.0.0.8 spacemit-llama.cpp
 ```
 
-## 7. 下载 smoke 模型
+## 7. 下载模型
+
+正式 K3 演示默认使用厂商文档推荐的 Qwen3-30B-A3B GGUF：
+
+```bash
+wget https://www.modelscope.cn/models/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF/resolve/master/Qwen3-30B-A3B-Instruct-2507-Q4_0.gguf -P ~/
+mkdir -p /data/rvclaw/models
+ln -sfn ~/Qwen3-30B-A3B-Instruct-2507-Q4_0.gguf \
+  /data/rvclaw/models/Qwen3-30B-A3B-Instruct-2507-Q4_0.gguf
+```
+
+快速 smoke test 可继续使用 Qwen3-0.6B：
 
 ```bash
 wget https://modelscope.cn/models/unsloth/Qwen3-0.6B-GGUF/resolve/master/Qwen3-0.6B-Q4_0.gguf \
   -O /data/rvclaw/models/planner-smoke.gguf
 ```
 
-后续正式演示可以换成 1.5B、1.7B 或 4B 量化模型，只需要覆盖：
+如需临时切回 smoke 模型，只需要覆盖：
 
 ```bash
-export RVCLAW_LLAMA_MODEL_PATH=/data/rvclaw/models/<your-model>.gguf
-export RVCLAW_LLAMA_MODEL=<model-name>
+export RVCLAW_LLAMA_MODEL=Qwen3-0.6B
+export RVCLAW_LLAMA_MODEL_PATH=/data/rvclaw/models/planner-smoke.gguf
 ```
 
 ## 8. 验证 mock 主链路
@@ -268,8 +281,8 @@ ls -lh "$RVCLAW_LLAMA_MODEL_PATH"
 ```text
 K3-Pico-ITX-32GB
 http://127.0.0.1:9090/v1
-/data/rvclaw/models/planner-smoke.gguf
-模型文件存在，大小约 364M
+/data/rvclaw/models/Qwen3-30B-A3B-Instruct-2507-Q4_0.gguf
+模型文件存在；如临时切 smoke，应显示 /data/rvclaw/models/planner-smoke.gguf
 ```
 
 ### 14.3 启动并验证 llama-server
@@ -291,7 +304,7 @@ curl http://127.0.0.1:9090/v1/models | jq '.data[0].id'
 预期：
 
 ```text
-"planner-smoke.gguf"
+"Qwen3-30B-A3B-Instruct-2507-Q4_0.gguf"
 ```
 
 ### 14.4 跑 mock 基线
@@ -424,8 +437,8 @@ choices[0].text
 
 ```text
 K3 Pico-ITX 32GB 上 RVClaw Demo Claw v0.1 初步闭环通过：
-本地 spacemit-llama.cpp/Qwen3-0.6B Planner 接入成功，
-Agent Core/Safety Guard/Mock Device/SQLite memory/RVBench 产物链路可复现。
+本地 spacemit-llama.cpp/Qwen3-30B-A3B Planner 接入成功，
+Agent Core/Safety Guard/Mock or CV sample Device/SQLite memory/RVBench/Web 产物链路可复现。
 ```
 
 不要写成：

@@ -23,6 +23,7 @@ class PlannerBackend(Protocol):
 
 class MockPlannerBackend:
     name = "mock"
+    last_mode = "mock"
 
     def plan(self, task: Task, memory_context: list[dict]) -> list[ToolCall]:
         if _is_return_to_base_task(task.goal):
@@ -99,8 +100,10 @@ class LlamaCppPlannerBackend:
         self.model = model or os.environ.get("RVCLAW_LLAMA_MODEL") or "Qwen3-0.6B"
         self.timeout_s = timeout_s if timeout_s is not None else int(os.environ.get("RVCLAW_LLAMA_TIMEOUT_S", "120"))
         self.max_tokens = max_tokens if max_tokens is not None else int(os.environ.get("RVCLAW_LLAMA_MAX_TOKENS", "512"))
+        self.last_mode = "unknown"
 
     def plan(self, task: Task, memory_context: list[dict]) -> list[ToolCall]:
+        self.last_mode = "direct"
         request = self._build_request(task, memory_context)
         try:
             with urlopen(request, timeout=self.timeout_s) as response:
@@ -115,11 +118,16 @@ class LlamaCppPlannerBackend:
             parsed = _extract_json(content)
         except json.JSONDecodeError as exc:
             if _is_inspection_task(task.goal):
+                self.last_mode = "fallback_malformed_json"
                 return MockPlannerBackend().plan(task, memory_context=[])
+            self.last_mode = "failed"
             raise RuntimeError(f"llama.cpp planner returned malformed JSON content: {content[:240]!r}") from exc
         calls = _extract_tool_calls(parsed)
         tool_calls = [_tool_call_from_planner_payload(call) for call in calls]
-        return _repair_incomplete_inspection_plan(task, tool_calls)
+        repaired = _repair_incomplete_inspection_plan(task, tool_calls)
+        if repaired != tool_calls:
+            self.last_mode = "repaired_incomplete"
+        return repaired
 
     def _build_request(self, task: Task, memory_context: list[dict]) -> Request:
         payload = {
@@ -178,7 +186,9 @@ class AutoPlannerBackend:
         self.name = f"auto/{self.backend.name}"
 
     def plan(self, task: Task, memory_context: list[dict]) -> list[ToolCall]:
-        return self.backend.plan(task, memory_context)
+        calls = self.backend.plan(task, memory_context)
+        self.last_mode = getattr(self.backend, "last_mode", self.backend.name)
+        return calls
 
 
 def planner_from_name(name: str) -> PlannerBackend:
@@ -253,7 +263,19 @@ def _repair_incomplete_inspection_plan(task: Task, calls: list[ToolCall]) -> lis
 
 def _is_inspection_task(goal: str) -> bool:
     normalized = goal.lower()
-    markers = ("检查", "巡检", "设备状态", "生成报告", "inspection", "inspect", "status", "report")
+    markers = (
+        "检查",
+        "巡检",
+        "设备状态",
+        "生成报告",
+        "拍照",
+        "inspection",
+        "inspect",
+        "status",
+        "report",
+        "photo",
+        "capture",
+    )
     return any(marker in normalized for marker in markers)
 
 

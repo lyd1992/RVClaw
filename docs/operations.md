@@ -49,6 +49,48 @@ docs/k3_ssh_deployment.md
 docs/development_status.md
 ```
 
+## K3 Web + CV 运行
+
+K3 正式 Web 演示默认使用 Qwen3-30B-A3B GGUF。OpenCV 推荐安装：
+
+```bash
+sudo apt update
+sudo apt install -y python3-opencv ffmpeg v4l-utils
+python3 - <<'PY'
+import cv2
+print(cv2.__version__)
+PY
+```
+
+如果 OpenCV 暂不可用，`cv_sample` 会回退到图片复制检测路径，demo 仍可运行。
+
+启动 llama-server：
+
+```bash
+cd /opt/rvclaw/RVClaw
+source deploy/k3/env.sh
+bash deploy/k3/run_llama_server.sh
+```
+
+另一个 SSH 终端启动 Web：
+
+```bash
+source deploy/k3/env.sh
+bash deploy/k3/run_web_demo.sh
+```
+
+浏览器访问：
+
+```text
+http://<K3-IP>:8088
+```
+
+详见：
+
+```text
+docs/k3_web_cv_demo.md
+```
+
 ## SG2044 运行
 
 参考 `deploy/sg2044/install.md`。首次验收建议固定记录：

@@ -1,0 +1,11 @@
+version: "0.1.1"
+zones:
+  - id: A-03
+    label: A-03 inspection area
+    kind: inspection
+  - id: B-01
+    label: B-01 inspection area
+    kind: inspection
+  - id: BASE
+    label: Base station
+    kind: base

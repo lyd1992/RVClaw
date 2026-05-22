@@ -15,11 +15,13 @@ class AgentCore:
         router: ToolRouter,
         memory: MemoryManager,
         recorder: RunRecorder,
+        run_metadata: dict | None = None,
     ):
         self.planner = planner
         self.router = router
         self.memory = memory
         self.recorder = recorder
+        self.run_metadata = run_metadata or {}
 
     def run(self, goal: str, source: str = "cli") -> RunSummary:
         task = Task(
@@ -40,9 +42,18 @@ class AgentCore:
         status = "completed"
         results = []
         planner_error = None
+        planner_mode = getattr(self.planner, "last_mode", self.planner.name)
         try:
             calls = self.planner.plan(task, memory_context)
-            self.recorder.trace("planner.completed", {"planner": self.planner.name, "tool_calls": [c.to_dict() for c in calls]})
+            planner_mode = getattr(self.planner, "last_mode", planner_mode)
+            self.recorder.trace(
+                "planner.completed",
+                {
+                    "planner": self.planner.name,
+                    "planner_mode": planner_mode,
+                    "tool_calls": [c.to_dict() for c in calls],
+                },
+            )
 
             for call in calls:
                 result = self.router.execute(call)
@@ -57,7 +68,8 @@ class AgentCore:
             status = "failed"
             calls = []
             planner_error = str(exc)
-            self.recorder.trace("planner.failed", {"planner": self.planner.name, "error": planner_error})
+            planner_mode = getattr(self.planner, "last_mode", "failed")
+            self.recorder.trace("planner.failed", {"planner": self.planner.name, "planner_mode": planner_mode, "error": planner_error})
             self.recorder.raw(f"Planner failed: {planner_error}")
 
         report = self._build_report(task, status, results, planner_error=planner_error)
@@ -72,6 +84,7 @@ class AgentCore:
             "run_id": self.recorder.run_id,
             "status": status,
             "planner": self.planner.name,
+            "planner_mode": planner_mode,
             "platform": task.platform,
             "task_success": status == "completed",
             "tool_call_count": len(results),
@@ -82,6 +95,7 @@ class AgentCore:
                 "raw_log": str(self.recorder.raw_log_path),
             },
         }
+        metrics.update(self.run_metadata)
         if planner_error:
             metrics["planner_error"] = planner_error
         self.recorder.write_metrics(metrics)

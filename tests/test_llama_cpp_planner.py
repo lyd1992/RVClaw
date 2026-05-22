@@ -34,6 +34,27 @@ class LlamaCppPlannerTest(unittest.TestCase):
 
         self.assertEqual(args.planner, "llama_cpp")
 
+    def test_cli_accepts_serve_command_for_web_console(self) -> None:
+        args = build_parser().parse_args(
+            [
+                "serve",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "8088",
+                "--planner",
+                "llama_cpp",
+                "--runs-dir",
+                "/data/rvclaw/runs",
+            ]
+        )
+
+        self.assertEqual(args.command, "serve")
+        self.assertEqual(args.host, "0.0.0.0")
+        self.assertEqual(args.port, 8088)
+        self.assertEqual(args.planner, "llama_cpp")
+        self.assertEqual(args.runs_dir, "/data/rvclaw/runs")
+
     def test_planner_from_name_supports_llama_cpp_alias(self) -> None:
         planner = planner_from_name("llama_cpp")
 

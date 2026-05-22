@@ -1,6 +1,6 @@
 # RVClaw
 
-RVClaw 是 Demo Claw v0.1 的最小可运行框架，面向 RISC-V Linux 环境。当前已在 K3 Pico-ITX 32GB 上完成 `spacemit-llama.cpp` + Qwen3-0.6B GGUF 的软件闭环 smoke 验证；SG2044/openEuler 保留为服务器型验证和后续优化平台。
+RVClaw 是 Demo Claw v0.1 的最小可运行框架，面向 RISC-V Linux 环境。当前已在 K3 Pico-ITX 32GB 上完成 `spacemit-llama.cpp` + GGUF 模型的软件闭环 smoke 验证，并正在推进 v0.1.1 Web + CV 可视化 demo；SG2044/openEuler 保留为服务器型验证和后续优化平台。
 
 当前阶段的目标不是追求单点 kernel 性能，而是先把具身智能 Agent 的任务闭环跑通：
 
@@ -20,7 +20,7 @@ RVClaw 是 Demo Claw v0.1 的最小可运行框架，面向 RISC-V Linux 环境�
 
 ## 目标运行环境
 
-当前已验证的 K3 smoke 环境：
+当前已验证和推荐的 K3 环境：
 
 | 项目 | 当前口径 |
 |---|---|
@@ -28,8 +28,9 @@ RVClaw 是 Demo Claw v0.1 的最小可运行框架，面向 RISC-V Linux 环境�
 | OS | Bianbu / RISC-V Linux |
 | Python | 3.14.3 |
 | Local LLM | `spacemit-llama.cpp` |
+| Formal demo model | Qwen3-30B-A3B-Instruct-2507-Q4_0 GGUF |
 | Smoke model | Qwen3-0.6B GGUF / `planner-smoke.gguf` |
-| 当前边界 | Mock Device + 本地 Planner 软件闭环 |
+| 当前边界 | Mock Device + sample-image CV + 本地 Planner 软件闭环 |
 
 SG2044/openEuler 相关脚本仍保留在 `deploy/sg2044/`，用于服务器型验证、后端构建和后续 RVV 优化对比。
 
@@ -141,11 +142,24 @@ bash deploy/k3/run_llama_server.sh
 bash deploy/k3/run_demo.sh
 ```
 
-SSH 部署步骤见：
+第一次部署建议从这里开始：
 
-- `docs/k3_ssh_deployment.md`
-- `deploy/k3/install.md`
-- `docs/development_status.md`
+- `docs/k3_start_here.md`：首次上手，一条线跑通 K3 CLI + Web + CV demo。
+- `deploy/k3/install.md`：安装命令和环境变量参考。
+- `docs/k3_web_cv_demo.md`：Web 控制台演示脚本和验收项。
+- `docs/k3_ssh_deployment.md`：SSH/tmux/benchmark/troubleshooting 详细 runbook。
+- `docs/development_status.md`：当前 checkpoint、tag 和开发状态。
+
+K3 正式演示模型默认使用 `Qwen3-30B-A3B-Instruct-2507-Q4_0.gguf`；`planner-smoke.gguf` / Qwen3-0.6B 仍保留为快速 smoke test。
+
+Web + CV 可视化 demo：
+
+```bash
+source deploy/k3/env.sh
+bash deploy/k3/run_web_demo.sh
+```
+
+浏览器打开 `http://<K3-IP>:8088` 后，可以提交自然语言任务、查看 skill timeline、图片 artifact、`metrics.json`、`trace.jsonl`、`report.md` 和 `raw.log`。
 
 默认巡检任务在 K3 上的 `llama_cpp` planner 预期输出 6 个 tool calls：
 
@@ -273,6 +287,9 @@ bash deploy/sg2044/install_backends.sh mnn
 | Safety Guard | 已实现白名单、必填参数、类型、枚举、范围、timeout 默认值校验 | `src/rvclaw/agent/safety_guard.py` |
 | Tool Router | 已实现 skill 调用分发和结果记录 | `src/rvclaw/agent/tool_router.py` |
 | Mock Skills | 已实现 `memory_query`、`move_to`、`capture_image`、`detect_status`、`speak`、`upload_report`、`stop` | `src/rvclaw/skills/builtin.py` |
+| Web 控制台/API | 已实现 `rvclaw serve`、run history、artifact viewer、benchmark reader | `src/rvclaw/web/` |
+| CV sample Device | 已实现样例图片 capture/annotated artifact，OpenCV 可用时绘制标注，不可用时 fallback | `src/rvclaw/adapters/cv_sample_device.py` |
+| Zone 配置 | 已实现 `A-03`、`B-01`、`BASE` 可配置白名单 | `configs/zones.yaml` |
 | SQLite 事件记忆 | 已实现，内置 A-03 设备画像和历史巡检 seed | `src/rvclaw/memory/sqlite_event_store.py` |
 | Flat Vector baseline | 已实现轻量词法检索 baseline | `src/rvclaw/memory/flat_vector_store.py` |
 | Mock Device | 已实现移动、拍照、状态检测、播报、上报、停止 mock 行为 | `src/rvclaw/adapters/mock_device.py` |
@@ -287,7 +304,7 @@ bash deploy/sg2044/install_backends.sh mnn
 
 | 模块 | 当前状态 |
 |---|---|
-| FastAPI / Web API | 尚未实现；当前先提供 CLI 和 Python API |
+| FastAPI / Web API | 已实现最小 Web console；后续补实时流式事件和更完整权限 |
 | ROS 2 Adapter | 仅占位 |
 | OpenClaw Adapter | 仅占位 |
 | llama.cpp / GGUF RuntimeBackend | RuntimeBackend 仍为占位；PlannerBackend 已接入本地 `llama-server` |
@@ -295,7 +312,7 @@ bash deploy/sg2044/install_backends.sh mnn
 | vLLM RuntimeBackend | 服务适配器仍为占位；源码/Python development 安装管理已实现 |
 | ONNX Runtime 后端 | 仅占位 |
 | Knowhere / Milvus MemoryBackend | 尚未实现 |
-| 真实相机 / IMU / 底盘控制 | 尚未实现，当前为 Mock Device |
+| 真实相机 / IMU / 底盘控制 | 尚未实现；当前为 Mock Device + sample-image CV |
 | 人工确认 UI | Safety Guard 预留边界，尚未实现交互式确认界面 |
 
 ## 仓库结构
