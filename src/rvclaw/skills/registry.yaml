@@ -69,7 +69,7 @@
           "task": {"type": "string", "enum": ["classification", "object_detection", "segmentation", "face_detection"]},
           "model": {
             "type": "string",
-            "enum": ["resnet", "mobilenet_v2", "efficientnet", "swin_tiny", "yolov5", "yolov8", "yolov11", "yolov8_seg", "fcn", "unet", "sam", "yolov5_face"]
+            "enum": ["resnet", "mobilenet_v2", "efficientnet", "swin_tiny", "yolov5", "yolov8", "yolov11", "yolov8_seg", "yolov8_pose", "fcn", "unet", "sam", "yolov5_face"]
           }
         }
       }

@@ -24,6 +24,7 @@ ALLOWED_VISION_MODELS = (
     "yolov8",
     "yolov11",
     "yolov8_seg",
+    "yolov8_pose",
     "fcn",
     "unet",
     "sam",
@@ -78,8 +79,9 @@ def local_vision_result(task: str, model: str | None = None, source: str | Path 
 def normalize_demozoo_payload(payload: dict[str, Any], task: str, model: str) -> dict[str, Any]:
     task = normalize_vision_task(task)
     result = _empty_result(task=task, model=model, backend="demozoo")
-    if payload.get("image_base64"):
-        result["image_base64"] = payload["image_base64"]
+    image_base64 = _extract_image_base64(payload)
+    if image_base64:
+        result["image_base64"] = image_base64
         result["content_type"] = payload.get("content_type", "application/octet-stream")
         result["backend_detail"] = "demozoo_image_result"
         result["raw"] = payload
@@ -258,6 +260,34 @@ def _extract_segments(payload: dict[str, Any]) -> list[dict[str, Any]]:
 def _extract_faces(payload: dict[str, Any]) -> list[dict[str, Any]]:
     rows = _collect_region_rows(payload, ("faces", "face_boxes", "detections", "results", "predictions"))
     return [_normalize_region(row, default_label="face") for row in rows]
+
+
+def _extract_image_base64(payload: dict[str, Any]) -> str | None:
+    for view in _payload_views(payload):
+        for key in (
+            "image_base64",
+            "result_image",
+            "annotated_image",
+            "output_image",
+            "mask_image",
+            "segmentation_image",
+            "image",
+        ):
+            encoded = _coerce_base64_image(view.get(key))
+            if encoded:
+                return encoded
+    return None
+
+
+def _coerce_base64_image(value: Any) -> str | None:
+    if not isinstance(value, str):
+        return None
+    text = value.strip()
+    if text.startswith("data:image/") and "," in text:
+        text = text.split(",", 1)[1].strip()
+    if text.startswith(("iVBOR", "/9j/", "R0lGOD", "UklGR")):
+        return text
+    return None
 
 
 def _normalize_region(row: dict[str, Any], default_label: str = "object") -> dict[str, Any]:

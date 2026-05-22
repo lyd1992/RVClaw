@@ -132,9 +132,9 @@ class MultiVisionDemoZooTest(unittest.TestCase):
             result = json.loads((Path(summary.run_dir) / "artifacts" / "vision_result.json").read_text(encoding="utf-8"))
             called_models = [call.kwargs["model"] for call in mocked.call_args_list]
             self.assertEqual(summary.status, "completed")
-            self.assertEqual(called_models[:2], ["yolov8", "yolov5"])
+            self.assertEqual(called_models[:2], ["yolov8", "yolov11"])
             self.assertEqual(metrics["vision_backend"], "demozoo")
-            self.assertEqual(metrics["vision_model"], "yolov5")
+            self.assertEqual(metrics["vision_model"], "yolov11")
             self.assertEqual(metrics["vision_requested_model"], "yolov8")
             self.assertEqual(metrics["vision_model_fallback_reason"], "yolov8: yolov8 failed")
             self.assertEqual(result["requested_model"], "yolov8")
@@ -161,9 +161,49 @@ class MultiVisionDemoZooTest(unittest.TestCase):
             metrics = json.loads(Path(summary.metrics_path).read_text(encoding="utf-8"))
             called_models = [call.kwargs["model"] for call in mocked.call_args_list]
             self.assertEqual(summary.status, "completed")
-            self.assertEqual(called_models[:2], ["yolov8", "yolov5"])
+            self.assertEqual(called_models[:2], ["yolov8", "yolov11"])
             self.assertEqual(metrics["objects_count"], 1)
-            self.assertEqual(metrics["vision_model"], "yolov5")
+            self.assertEqual(metrics["vision_model"], "yolov11")
+
+    def test_demozoo_uninformative_error_includes_payload_preview(self) -> None:
+        with tempfile.TemporaryDirectory() as scratch:
+            source = Path(scratch) / "sample.png"
+            source.write_bytes(base64.b64decode(ONE_PIXEL_PNG))
+            os.environ["RVCLAW_DEVICE_BACKEND"] = "cv_sample"
+            os.environ["RVCLAW_VISION_BACKEND"] = "demozoo"
+            os.environ["RVCLAW_REQUIRE_REAL_VISION"] = "1"
+            os.environ["RVCLAW_VISION_SOURCE"] = str(source)
+
+            with patch.object(DemoZooClient, "predict", return_value={"success": True, "result": "no boxes"}):
+                summary = run_demo(
+                    goal="detect objects in this image and generate a conclusion",
+                    runs_dir=Path(scratch) / "runs",
+                    planner_name="mock",
+                    run_id="test-demozoo-preview",
+                )
+
+            trace = [
+                json.loads(line)
+                for line in Path(summary.trace_path).read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+            failures = [row for row in trace if row["event"] == "skill_call.failed"]
+            self.assertEqual(summary.status, "failed")
+            self.assertIn("payload=", failures[-1]["payload"]["result"]["error"])
+            self.assertIn("no boxes", failures[-1]["payload"]["result"]["error"])
+
+    def test_demozoo_json_image_result_is_treated_as_usable_annotation(self) -> None:
+        payload = {
+            "success": True,
+            "data": {
+                "result_image": f"data:image/png;base64,{ONE_PIXEL_PNG}",
+            },
+        }
+
+        result = normalize_demozoo_payload(payload, task="object_detection", model="yolov8_pose")
+
+        self.assertEqual(result["backend_detail"], "demozoo_image_result")
+        self.assertEqual(result["image_base64"], ONE_PIXEL_PNG)
 
     def test_demozoo_real_detection_required_fails_when_all_models_are_uninformative(self) -> None:
         with tempfile.TemporaryDirectory() as scratch:

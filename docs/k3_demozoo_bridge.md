@@ -32,9 +32,10 @@ field-name differences do not break the demo.
 
 For model-script failures inside DemoZoo, RVClaw may retry another real model in
 the same task family. For example, object detection tries `yolov8`, then
-`yolov5`, `yolov11`, and `yolov6`. This is still a real DemoZoo backend path,
-not `cv_sample`; `metrics.json` records the actual `vision_model`, and
-`vision_result.json` records `requested_model` plus `model_fallback_reason`.
+`yolov11`, `yolov8_seg`, `yolov8_pose`, `yolov5`, and `yolov6`. This is still a
+real DemoZoo backend path, not `cv_sample`; `metrics.json` records the actual
+`vision_model`, and `vision_result.json` records `requested_model` plus
+`model_fallback_reason`.
 If every real model in the task family returns no usable structured result and
 no annotated image, `RVCLAW_REQUIRE_REAL_VISION=1` makes the run fail instead of
 showing a misleading completed run with `0` targets.
@@ -161,7 +162,7 @@ The Web UI intentionally uses different image layouts by task:
 | RVClaw task | Default model | DemoZoo family |
 |---|---|---|
 | `classification` | `resnet` | ResNet/MobileNet/EfficientNet/Swin |
-| `object_detection` | `yolov8` | YOLOv5/YOLOv6/YOLOv8/YOLOv11 |
+| `object_detection` | `yolov8` | YOLOv8/YOLOv11/YOLOv8-Seg/YOLOv8-Pose/YOLOv5/YOLOv6 |
 | `segmentation` | `yolov8_seg` | YOLOv8-Seg/FCN/UNet/SAM |
 | `face_detection` | `yolov5_face` | YOLOv5-Face |
 

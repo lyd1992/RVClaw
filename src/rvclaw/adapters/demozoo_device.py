@@ -23,7 +23,7 @@ from rvclaw.adapters.vision import (
 
 DEMOZOO_MODEL_FALLBACKS = {
     "classification": ("resnet", "mobilenet_v2", "efficientnet", "swin_tiny"),
-    "object_detection": ("yolov8", "yolov5", "yolov11", "yolov6"),
+    "object_detection": ("yolov8", "yolov11", "yolov8_seg", "yolov8_pose", "yolov5", "yolov6"),
     "segmentation": ("yolov8_seg", "fcn", "unet", "sam"),
     "face_detection": ("yolov5_face",),
 }
@@ -127,7 +127,7 @@ class DemoZooVisionDevice(CVSampleDevice):
                 payload = self.client.predict(source, task=task, model=candidate_model)
                 candidate_result = normalize_demozoo_payload(payload, task=task, model=candidate_model)
                 if not _is_usable_result(candidate_result):
-                    raise RuntimeError(f"{candidate_model} returned no usable {task} result")
+                    raise RuntimeError(f"{candidate_model} returned no usable {task} result; payload={_payload_preview(payload)}")
                 result = candidate_result
                 if candidate_model != requested_model:
                     result["requested_model"] = requested_model
@@ -222,6 +222,14 @@ def _candidate_models(task: str, requested_model: str) -> list[str]:
             seen.add(model)
             candidates.append(model)
     return candidates
+
+
+def _payload_preview(payload: dict[str, Any], limit: int = 500) -> str:
+    try:
+        text = json.dumps(payload, ensure_ascii=False, default=str)
+    except TypeError:
+        text = repr(payload)
+    return text[:limit]
 
 
 def _is_usable_result(result: dict[str, Any]) -> bool:
