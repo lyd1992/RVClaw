@@ -24,6 +24,12 @@ curl -X POST "http://localhost:8000/predict/yolov8" \
   -F "image=@test_image.jpg"
 ```
 
+RVClaw also reads `GET /models` and prefers the endpoint advertised for the
+selected model, for example `/predict/yolov8`. If a model route returns 404,
+RVClaw retries the trailing-slash variant before reporting a failed run. The
+multipart request includes both `image` and `file` aliases so minor DemoZoo API
+field-name differences do not break the demo.
+
 ## Start DemoZoo
 
 Start DemoZoo according to the Bianbu/SpacemiT container guide. The common
@@ -75,18 +81,31 @@ After the container is running, verify that the model service is reachable from
 the K3 shell:
 
 ```bash
-curl http://127.0.0.1:8000/
+curl http://127.0.0.1:8000/health
+curl http://127.0.0.1:8000/models | jq
 ```
 
 Then test one real model directly:
 
 ```bash
 curl -X POST "http://127.0.0.1:8000/predict/resnet" \
-  -F "image=@/data/rvclaw/uploads/<your-upload>.png" | jq
+  -F "image=@/data/rvclaw/uploads/<your-upload>.png" \
+  -F "file=@/data/rvclaw/uploads/<your-upload>.png" | jq
 ```
 
 Expected: JSON with a prediction field such as `predicted_class`, `labels`,
 `objects`, `detections`, `boxes`, `segments`, or `faces`.
+
+If direct detection still returns 404, test the trailing slash and inspect the
+container route logs:
+
+```bash
+curl -X POST "http://127.0.0.1:8000/predict/yolov8/" \
+  -F "image=@/data/rvclaw/uploads/<your-upload>.png" \
+  -F "file=@/data/rvclaw/uploads/<your-upload>.png" -v
+
+docker logs --tail=80 spacemit-demo-container
+```
 
 ## Run RVClaw With Real Vision Required
 

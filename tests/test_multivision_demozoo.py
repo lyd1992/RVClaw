@@ -1,19 +1,21 @@
 from __future__ import annotations
 
 import base64
+import io
 import json
 import os
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from urllib.error import HTTPError
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from rvclaw.adapters.demozoo_device import DemoZooClient
-from rvclaw.adapters.vision import local_vision_result
+from rvclaw.adapters.demozoo_device import DemoZooClient, _multipart_body
+from rvclaw.adapters.vision import local_vision_result, normalize_demozoo_payload
 from rvclaw.api import run_demo
 from rvclaw.agent.safety_guard import SafetyGuard, SkillRegistry
 from rvclaw.models import ToolCall
@@ -88,6 +90,79 @@ class MultiVisionDemoZooTest(unittest.TestCase):
             self.assertEqual(metrics["vision_model"], "yolov8")
             self.assertEqual(metrics["objects_count"], 1)
             self.assertEqual(result["objects"][0]["label"], "person")
+
+    def test_demozoo_client_prefers_model_registry_endpoint_and_trailing_slash_retry(self) -> None:
+        client = DemoZooClient(base_url="http://demo.local", endpoint_template="/fallback/{model}")
+        client._model_endpoint_cache = {"yolov8": "/predict/yolov8"}
+
+        urls = client._candidate_urls(task="object_detection", model="yolov8")
+
+        self.assertEqual(
+            urls,
+            [
+                "http://demo.local/predict/yolov8",
+                "http://demo.local/predict/yolov8/",
+                "http://demo.local/fallback/yolov8",
+                "http://demo.local/fallback/yolov8/",
+            ],
+        )
+
+    def test_demozoo_binary_image_payload_keeps_real_backend_summary(self) -> None:
+        payload = {
+            "image_base64": ONE_PIXEL_PNG,
+            "content_type": "image/png",
+            "_rvclaw_demozoo_url": "http://demo.local/predict/yolov8/",
+        }
+
+        result = normalize_demozoo_payload(payload, task="object_detection", model="yolov8")
+
+        self.assertEqual(result["backend"], "demozoo")
+        self.assertEqual(result["backend_detail"], "demozoo_image_result")
+        self.assertIn("annotated image", result["summary"])
+        self.assertEqual(result["raw"]["_rvclaw_demozoo_url"], "http://demo.local/predict/yolov8/")
+
+    def test_demozoo_multipart_sends_image_and_file_aliases(self) -> None:
+        with tempfile.TemporaryDirectory() as scratch:
+            source = Path(scratch) / "sample.png"
+            source.write_bytes(base64.b64decode(ONE_PIXEL_PNG))
+
+            body = _multipart_body(boundary="rvclaw-test", image_path=source, fields={"task": "object_detection"})
+
+        self.assertIn(b'name="image"; filename="sample.png"', body)
+        self.assertIn(b'name="file"; filename="sample.png"', body)
+
+    def test_demozoo_predict_retries_after_404(self) -> None:
+        class Response:
+            headers = type("Headers", (), {"get_content_type": lambda self: "application/json"})()
+
+            def __enter__(self) -> "Response":
+                return self
+
+            def __exit__(self, *_args: object) -> None:
+                return None
+
+            def read(self) -> bytes:
+                return b'{"objects":[{"label":"robot","score":0.9}]}'
+
+        with tempfile.TemporaryDirectory() as scratch:
+            source = Path(scratch) / "sample.png"
+            source.write_bytes(base64.b64decode(ONE_PIXEL_PNG))
+            client = DemoZooClient(base_url="http://demo.local", endpoint_template="/fallback/{model}")
+            client._model_endpoint_cache = {"yolov8": "/predict/yolov8"}
+            not_found = HTTPError(
+                url="http://demo.local/predict/yolov8",
+                code=404,
+                msg="Not Found",
+                hdrs={},
+                fp=io.BytesIO(b'{"detail":"not found"}'),
+            )
+
+            with patch("rvclaw.adapters.demozoo_device.urlopen", side_effect=[not_found, Response()]) as mocked:
+                payload = client.predict(source, task="object_detection", model="yolov8")
+
+        self.assertEqual(payload["objects"][0]["label"], "robot")
+        self.assertEqual(payload["_rvclaw_demozoo_url"], "http://demo.local/predict/yolov8/")
+        self.assertEqual(mocked.call_count, 2)
 
     def test_demozoo_unavailable_falls_back_to_mock_result(self) -> None:
         with tempfile.TemporaryDirectory() as scratch:

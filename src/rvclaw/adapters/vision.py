@@ -78,6 +78,17 @@ def local_vision_result(task: str, model: str | None = None, source: str | Path 
 def normalize_demozoo_payload(payload: dict[str, Any], task: str, model: str) -> dict[str, Any]:
     task = normalize_vision_task(task)
     result = _empty_result(task=task, model=model, backend="demozoo")
+    if payload.get("image_base64"):
+        result["image_base64"] = payload["image_base64"]
+        result["content_type"] = payload.get("content_type", "application/octet-stream")
+        result["backend_detail"] = "demozoo_image_result"
+        result["raw"] = payload
+        result["summary"] = str(
+            payload.get("summary")
+            or "DemoZoo returned an annotated image result; structured labels or boxes were not provided."
+        )
+        return result
+
     labels = _extract_labels(payload)
     objects = _extract_objects(payload)
     segments = _extract_segments(payload)
