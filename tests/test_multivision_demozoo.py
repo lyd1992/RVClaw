@@ -247,6 +247,14 @@ class MultiVisionDemoZooTest(unittest.TestCase):
             ],
         )
 
+    def test_demozoo_client_falls_back_when_endpoint_template_is_malformed(self) -> None:
+        client = DemoZooClient(base_url="http://demo.local", endpoint_template="/predict/{model}}")
+        client._model_endpoint_cache = {}
+
+        urls = client._candidate_urls(task="object_detection", model="yolov8")
+
+        self.assertEqual(urls[:2], ["http://demo.local/predict/yolov8", "http://demo.local/predict/yolov8/"])
+
     def test_demozoo_binary_image_payload_keeps_real_backend_summary(self) -> None:
         payload = {
             "image_base64": ONE_PIXEL_PNG,

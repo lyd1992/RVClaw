@@ -70,7 +70,7 @@ class DemoZooClient:
         registry_endpoint = self._model_endpoints().get(model)
         if registry_endpoint:
             endpoints.append(registry_endpoint)
-        endpoints.append(self.endpoint_template.format(task=task, model=model))
+        endpoints.append(_format_endpoint_template(self.endpoint_template, task=task, model=model))
 
         urls: list[str] = []
         seen: set[str] = set()
@@ -211,6 +211,13 @@ def _read_http_error_body(exc: HTTPError) -> str:
 
 def _requires_real_vision() -> bool:
     return os.environ.get("RVCLAW_REQUIRE_REAL_VISION", "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _format_endpoint_template(template: str, task: str, model: str) -> str:
+    try:
+        return template.format(task=task, model=model)
+    except ValueError:
+        return f"/predict/{model}"
 
 
 def _candidate_models(task: str, requested_model: str) -> list[str]:
