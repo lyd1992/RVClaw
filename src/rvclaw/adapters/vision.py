@@ -85,9 +85,11 @@ def normalize_demozoo_payload(payload: dict[str, Any], task: str, model: str) ->
         result["content_type"] = payload.get("content_type", "application/octet-stream")
         result["backend_detail"] = "demozoo_image_result"
         result["raw"] = payload
+        result["visual_result_only"] = True
+        result["structured_result_available"] = False
         result["summary"] = str(
             payload.get("summary")
-            or "DemoZoo returned an annotated image result; structured labels or boxes were not provided."
+            or "DemoZoo returned an annotated image result, but did not provide structured labels, boxes, or confidence JSON. Treat the image as visual evidence."
         )
         return result
     container_image_ref = _extract_container_image_ref(payload)
@@ -95,9 +97,11 @@ def normalize_demozoo_payload(payload: dict[str, Any], task: str, model: str) ->
         result["container_image_ref"] = container_image_ref
         result["backend_detail"] = "demozoo_container_image_result"
         result["raw"] = payload
+        result["visual_result_only"] = True
+        result["structured_result_available"] = False
         result["summary"] = str(
             payload.get("summary")
-            or "DemoZoo generated an annotated result image inside the model container."
+            or "DemoZoo generated an annotated image result inside the model container, but did not provide structured labels, boxes, or confidence JSON. Treat the image as visual evidence."
         )
         return result
 
@@ -116,6 +120,8 @@ def normalize_demozoo_payload(payload: dict[str, Any], task: str, model: str) ->
         result["objects"] = objects
 
     result["raw"] = payload
+    result["visual_result_only"] = False
+    result["structured_result_available"] = True
     result["summary"] = str(payload.get("summary") or _build_summary(result))
     return result
 
@@ -171,6 +177,8 @@ def _empty_result(task: str, model: str, backend: str) -> dict[str, Any]:
         "objects": [],
         "segments": [],
         "faces": [],
+        "visual_result_only": False,
+        "structured_result_available": True,
     }
 
 

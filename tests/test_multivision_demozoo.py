@@ -204,6 +204,8 @@ class MultiVisionDemoZooTest(unittest.TestCase):
 
         self.assertEqual(result["backend_detail"], "demozoo_image_result")
         self.assertEqual(result["image_base64"], ONE_PIXEL_PNG)
+        self.assertTrue(result["visual_result_only"])
+        self.assertFalse(result["structured_result_available"])
 
     def test_demozoo_json_result_image_path_is_treated_as_container_annotation(self) -> None:
         payload = {
@@ -217,6 +219,9 @@ class MultiVisionDemoZooTest(unittest.TestCase):
 
         self.assertEqual(result["backend_detail"], "demozoo_container_image_result")
         self.assertEqual(result["container_image_ref"], "/app/examples/CV/yolov11/python/result.jpg")
+        self.assertTrue(result["visual_result_only"])
+        self.assertFalse(result["structured_result_available"])
+        self.assertIn("structured", result["summary"])
 
     def test_demozoo_copies_container_result_image_for_model_fallback(self) -> None:
         payload = {
@@ -254,8 +259,13 @@ class MultiVisionDemoZooTest(unittest.TestCase):
             self.assertEqual(called_models[:2], ["yolov8", "yolov11"])
             self.assertEqual(metrics["vision_model"], "yolov11")
             self.assertEqual(metrics["vision_backend_detail"], "demozoo_container_image_result")
+            self.assertTrue(metrics["vision_visual_result_only"])
+            self.assertFalse(metrics["vision_structured_result_available"])
             self.assertTrue(Path(result["annotated_image_ref"]).exists())
             self.assertIn("spacemit-demo-container:/app/examples/CV/yolov11/python/result.jpg", docker_cp.call_args.args[0])
+            report = Path(summary.report_path).read_text(encoding="utf-8")
+            self.assertIn("Structured result: unavailable", report)
+            self.assertNotIn("Objects: 0", report)
 
     def test_demozoo_real_detection_required_fails_when_all_models_are_uninformative(self) -> None:
         with tempfile.TemporaryDirectory() as scratch:

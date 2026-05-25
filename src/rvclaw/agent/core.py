@@ -150,9 +150,12 @@ class AgentCore:
                 lines.append(f"   - Upload: {output['remote_uri']}")
             if "summary" in output:
                 lines.append(f"   - Vision: {output['summary']}")
-            if "objects" in output:
+            if output.get("visual_result_only"):
+                lines.append("   - Visual result: annotated image generated")
+                lines.append("   - Structured result: unavailable")
+            if "objects" in output and not output.get("visual_result_only"):
                 lines.append(f"   - Objects: {len(output.get('objects') or [])}")
-            if "faces" in output:
+            if "faces" in output and not output.get("visual_result_only"):
                 lines.append(f"   - Faces: {len(output.get('faces') or [])}")
         lines.extend(
             [
@@ -180,6 +183,8 @@ def _vision_metrics_from_results(results: list[dict]) -> dict:
                 "vision_model_fallback_reason": output.get("model_fallback_reason"),
                 "vision_summary": output.get("summary"),
                 "vision_latency_ms": output.get("latency_ms"),
+                "vision_visual_result_only": output.get("visual_result_only"),
+                "vision_structured_result_available": output.get("structured_result_available"),
                 "objects_count": len(output.get("objects") or []),
                 "labels_count": len(output.get("labels") or []),
                 "segments_count": len(output.get("segments") or []),

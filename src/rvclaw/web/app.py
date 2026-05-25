@@ -471,9 +471,16 @@ def _index_html() -> str:
         imageModeNote.textContent = detail.summary.status === 'failed' ? '当前 run 未进入图像处理阶段。' : '当前任务不需要显示图像。';
       } else if (policy === 'single') {
         imageModeNote.textContent = '图片分类展示输入图即可；分类结果在下方结构化卡片中呈现。';
-        capture.src = fileUrl(detail.summary.run_id, captureFile);
+        if (visionOutput && visionOutput.visual_result_only) {
+          imageModeNote.textContent = 'DemoZoo returned one processed image only; RVClaw shows a single visual evidence image for this task.';
+        }
+        const singleFile = visionOutput && visionOutput.visual_result_only && annotatedFile ? annotatedFile : captureFile;
+        capture.src = fileUrl(detail.summary.run_id, singleFile);
       } else {
         imageModeNote.textContent = '该任务展示原图和处理后图，用于对比检测框、分割叠加或巡检标注。';
+        if (visionOutput && visionOutput.visual_result_only) {
+          imageModeNote.textContent = 'DemoZoo returned a processed image only; RVClaw shows the original and model output image as visual evidence.';
+        }
         capture.src = fileUrl(detail.summary.run_id, captureFile);
         if (annotatedFile) annotated.src = fileUrl(detail.summary.run_id, annotatedFile);
       }
@@ -488,6 +495,10 @@ def _index_html() -> str:
       const rows = [...(output.labels || []), ...(output.objects || []), ...(output.segments || []), ...(output.faces || [])];
       const warning = output.requires_real_model ? '<div class="result-card"><b>需要真实视觉后端</b><span>当前结果来自 cv_sample 启发式链路验证，不是模型推理。请启用 DemoZoo/MNN/ONNX。</span></div>' : '';
       visionResults.innerHTML = warning + (rows.map(item => `<div class="result-card"><b>${item.label || 'result'}</b><span>confidence: ${Number(item.confidence || 0).toFixed(2)}</span><br><span>${item.bbox ? 'bbox: ' + item.bbox.join(', ') : ''}</span></div>`).join('') || '<div class="result-card"><b>无目标</b><span>未返回可视对象。</span></div>');
+      const visualOnly = Boolean(output.visual_result_only || output.structured_result_available === false);
+      if (visualOnly && rows.length === 0) {
+        visionResults.innerHTML = warning + '<div class="result-card"><b>Visual-only model output</b><span>DemoZoo returned a processed image, but no structured labels, boxes, or confidence JSON. Use the image above as visual evidence.</span></div>';
+      }
     }
     function fileUrl(runId, name){ return `/api/runs/${encodeURIComponent(runId)}/files/${name.split('/').map(encodeURIComponent).join('/')}`; }
     async function showFile(name){ if(!currentRun) return; if (/\\.(png|jpg|jpeg|webp)$/i.test(name)) { fileView.innerHTML = `<img class="file-image" src="${fileUrl(currentRun,name)}" alt="${name}">`; return; } fileView.textContent = await (await api(fileUrl(currentRun,name))).text(); }
