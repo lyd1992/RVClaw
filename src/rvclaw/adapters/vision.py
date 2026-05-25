@@ -90,6 +90,16 @@ def normalize_demozoo_payload(payload: dict[str, Any], task: str, model: str) ->
             or "DemoZoo returned an annotated image result; structured labels or boxes were not provided."
         )
         return result
+    container_image_ref = _extract_container_image_ref(payload)
+    if container_image_ref:
+        result["container_image_ref"] = container_image_ref
+        result["backend_detail"] = "demozoo_container_image_result"
+        result["raw"] = payload
+        result["summary"] = str(
+            payload.get("summary")
+            or "DemoZoo generated an annotated result image inside the model container."
+        )
+        return result
 
     labels = _extract_labels(payload)
     objects = _extract_objects(payload)
@@ -276,6 +286,16 @@ def _extract_image_base64(payload: dict[str, Any]) -> str | None:
             encoded = _coerce_base64_image(view.get(key))
             if encoded:
                 return encoded
+    return None
+
+
+def _extract_container_image_ref(payload: dict[str, Any]) -> str | None:
+    for view in _payload_views(payload):
+        generated = bool(view.get("result_image_generated") or view.get("image_generated"))
+        for key in ("result_image_path", "annotated_image_path", "output_image_path", "mask_image_path"):
+            value = view.get(key)
+            if isinstance(value, str) and value.strip() and (generated or value.lower().endswith((".jpg", ".jpeg", ".png", ".webp"))):
+                return value.strip()
     return None
 
 

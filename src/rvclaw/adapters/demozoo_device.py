@@ -3,6 +3,8 @@ from __future__ import annotations
 import base64
 import json
 import os
+import shutil
+import subprocess
 import time
 import uuid
 from pathlib import Path
@@ -149,10 +151,7 @@ class DemoZooVisionDevice(CVSampleDevice):
             result["fallback_reason"] = fallback_reason
 
         annotated = self.artifact_dir / f"{_slug(task)}_annotated.png"
-        if result.get("image_base64"):
-            annotated.write_bytes(base64.b64decode(str(result["image_base64"])))
-        else:
-            render_vision_annotation(source, annotated, result)
+        _materialize_annotation(source=source, annotated=annotated, result=result)
         result.update(
             {
                 "image_ref": str(source),
@@ -213,6 +212,33 @@ def _requires_real_vision() -> bool:
     return os.environ.get("RVCLAW_REQUIRE_REAL_VISION", "").strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _materialize_annotation(source: Path, annotated: Path, result: dict[str, Any]) -> None:
+    if result.get("image_base64"):
+        annotated.write_bytes(base64.b64decode(str(result["image_base64"])))
+    elif result.get("container_image_ref"):
+        _copy_container_image(str(result["container_image_ref"]), annotated)
+    else:
+        render_vision_annotation(source, annotated, result)
+
+
+def _copy_container_image(container_path: str, annotated: Path) -> None:
+    local_path = Path(container_path)
+    if local_path.exists():
+        shutil.copyfile(local_path, annotated)
+        return
+    container = os.environ.get("RVCLAW_DEMOZOO_CONTAINER", "spacemit-demo-container")
+    source = f"{container}:{container_path}"
+    completed = subprocess.run(
+        ["docker", "cp", source, str(annotated)],
+        capture_output=True,
+        text=True,
+        timeout=float(os.environ.get("RVCLAW_DEMOZOO_COPY_TIMEOUT_S", "10")),
+        check=False,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(f"failed to copy DemoZoo result image from {source}: {completed.stderr.strip() or completed.stdout.strip()}")
+
+
 def _format_endpoint_template(template: str, task: str, model: str) -> str:
     try:
         return template.format(task=task, model=model)
@@ -240,7 +266,7 @@ def _payload_preview(payload: dict[str, Any], limit: int = 500) -> str:
 
 
 def _is_usable_result(result: dict[str, Any]) -> bool:
-    if result.get("image_base64"):
+    if result.get("image_base64") or result.get("container_image_ref"):
         return True
     task = normalize_vision_task(str(result.get("task") or "object_detection"))
     if task == "classification":

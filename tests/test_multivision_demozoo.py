@@ -205,6 +205,58 @@ class MultiVisionDemoZooTest(unittest.TestCase):
         self.assertEqual(result["backend_detail"], "demozoo_image_result")
         self.assertEqual(result["image_base64"], ONE_PIXEL_PNG)
 
+    def test_demozoo_json_result_image_path_is_treated_as_container_annotation(self) -> None:
+        payload = {
+            "success": True,
+            "output": "Results saved to result.jpg\n",
+            "result_image_generated": True,
+            "result_image_path": "/app/examples/CV/yolov11/python/result.jpg",
+        }
+
+        result = normalize_demozoo_payload(payload, task="object_detection", model="yolov11")
+
+        self.assertEqual(result["backend_detail"], "demozoo_container_image_result")
+        self.assertEqual(result["container_image_ref"], "/app/examples/CV/yolov11/python/result.jpg")
+
+    def test_demozoo_copies_container_result_image_for_model_fallback(self) -> None:
+        payload = {
+            "success": True,
+            "output": "Results saved to result.jpg\n",
+            "result_image_generated": True,
+            "result_image_path": "/app/examples/CV/yolov11/python/result.jpg",
+        }
+
+        def fake_docker_cp(args: list[str], **_kwargs: object):
+            Path(args[-1]).write_bytes(base64.b64decode(ONE_PIXEL_PNG))
+            return type("Completed", (), {"returncode": 0, "stderr": "", "stdout": ""})()
+
+        with tempfile.TemporaryDirectory() as scratch:
+            source = Path(scratch) / "sample.png"
+            source.write_bytes(base64.b64decode(ONE_PIXEL_PNG))
+            os.environ["RVCLAW_DEVICE_BACKEND"] = "cv_sample"
+            os.environ["RVCLAW_VISION_BACKEND"] = "demozoo"
+            os.environ["RVCLAW_REQUIRE_REAL_VISION"] = "1"
+            os.environ["RVCLAW_VISION_SOURCE"] = str(source)
+
+            with patch.object(DemoZooClient, "predict", side_effect=[RuntimeError("yolov8 failed"), payload]) as mocked:
+                with patch("rvclaw.adapters.demozoo_device.subprocess.run", side_effect=fake_docker_cp) as docker_cp:
+                    summary = run_demo(
+                        goal="detect objects in this image and generate a conclusion",
+                        runs_dir=Path(scratch) / "runs",
+                        planner_name="mock",
+                        run_id="test-demozoo-container-image",
+                    )
+
+            metrics = json.loads(Path(summary.metrics_path).read_text(encoding="utf-8"))
+            result = json.loads((Path(summary.run_dir) / "artifacts" / "vision_result.json").read_text(encoding="utf-8"))
+            called_models = [call.kwargs["model"] for call in mocked.call_args_list]
+            self.assertEqual(summary.status, "completed")
+            self.assertEqual(called_models[:2], ["yolov8", "yolov11"])
+            self.assertEqual(metrics["vision_model"], "yolov11")
+            self.assertEqual(metrics["vision_backend_detail"], "demozoo_container_image_result")
+            self.assertTrue(Path(result["annotated_image_ref"]).exists())
+            self.assertIn("spacemit-demo-container:/app/examples/CV/yolov11/python/result.jpg", docker_cp.call_args.args[0])
+
     def test_demozoo_real_detection_required_fails_when_all_models_are_uninformative(self) -> None:
         with tempfile.TemporaryDirectory() as scratch:
             source = Path(scratch) / "sample.png"

@@ -39,6 +39,10 @@ real DemoZoo backend path, not `cv_sample`; `metrics.json` records the actual
 If every real model in the task family returns no usable structured result and
 no annotated image, `RVCLAW_REQUIRE_REAL_VISION=1` makes the run fail instead of
 showing a misleading completed run with `0` targets.
+Some DemoZoo endpoints return JSON such as `result_image_generated=true` and a
+container path like `/app/examples/CV/yolov11/python/result.jpg` instead of
+embedding the image bytes. RVClaw copies that artifact with `docker cp` from
+`RVCLAW_DEMOZOO_CONTAINER`, which defaults to `spacemit-demo-container`.
 
 ## Start DemoZoo
 
@@ -128,6 +132,7 @@ source deploy/k3/env.sh
 
 export RVCLAW_VISION_BACKEND=demozoo
 export RVCLAW_DEMOZOO_BASE_URL=http://127.0.0.1:8000
+export RVCLAW_DEMOZOO_CONTAINER=spacemit-demo-container
 export RVCLAW_DEMOZOO_ENDPOINT_TEMPLATE='/predict/{model}'
 export RVCLAW_REQUIRE_REAL_VISION=1
 
