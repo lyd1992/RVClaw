@@ -32,7 +32,7 @@ def run_demo(
     device, run_metadata = build_device(artifact_dir=run_dir / "artifacts", vision_source=image_ref)
     registry = SkillRegistry.from_default()
     guard = SafetyGuard(registry)
-    skills = build_builtin_skills(device=device, memory=memory, run_id=run_id)
+    skills = build_builtin_skills(device=device, memory=memory, run_id=run_id, artifact_dir=run_dir / "artifacts")
     router = ToolRouter(skills=skills, safety_guard=guard, recorder=recorder)
     planner = planner_from_name(planner_name)
 

@@ -5,6 +5,7 @@ from collections.abc import Callable
 from typing import Any
 
 from rvclaw.agent.safety_guard import SafetyGuard
+from rvclaw.benchmark.mnn_rvv import BenchmarkUnsupportedError
 from rvclaw.models import SkillResult, ToolCall
 from rvclaw.observability import RunRecorder
 
@@ -41,6 +42,15 @@ class ToolRouter:
                 "skill_call.completed",
                 {"call": checked.to_dict(), "result": result.to_dict()},
             )
+            return result
+        except BenchmarkUnsupportedError as exc:
+            elapsed_ms = round((time.perf_counter() - started_at) * 1000, 3)
+            result = SkillResult(
+                ok=False,
+                output={"latency_ms": elapsed_ms, "support_hint": exc.support_hint},
+                error=str(exc),
+            )
+            self.recorder.trace("skill_call.failed", {"call": checked.to_dict(), "result": result.to_dict()})
             return result
         except Exception as exc:
             elapsed_ms = round((time.perf_counter() - started_at) * 1000, 3)

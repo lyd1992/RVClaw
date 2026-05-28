@@ -52,6 +52,14 @@ def build_parser() -> argparse.ArgumentParser:
     replay_parser = subparsers.add_parser("replay", help="print a saved trace.jsonl")
     replay_parser.add_argument("trace", help="path to trace.jsonl")
 
+    benchmark_parser = subparsers.add_parser("benchmark", help="run benchmark workflows")
+    benchmark_subparsers = benchmark_parser.add_subparsers(dest="benchmark_command")
+    mnn_rvv_parser = benchmark_subparsers.add_parser("mnn-rvv", help="run a single MNN RVV function benchmark")
+    mnn_rvv_parser.add_argument("--function", required=True, help="MNN function name or test binary, for example MNNSoftmax")
+    mnn_rvv_parser.add_argument("--refresh", action="store_true", help="rerun the remote SG2044 test script before collecting output")
+    mnn_rvv_parser.add_argument("--runs-dir", default="runs", help="directory for run artifacts")
+    mnn_rvv_parser.add_argument("--json", action="store_true", help="print machine-readable summary")
+
     doctor_parser = subparsers.add_parser("doctor", help="inspect backend build prerequisites")
     doctor_parser.add_argument("--json", action="store_true", help="print machine-readable diagnostics")
 
@@ -120,6 +128,9 @@ def main(argv: list[str] | None = None) -> int:
         print(Path(args.trace).read_text(encoding="utf-8"))
         return 0
 
+    if args.command == "benchmark":
+        return _handle_benchmark(args, parser)
+
     if args.command == "serve":
         return _handle_serve(args)
 
@@ -156,6 +167,24 @@ def _handle_serve(args: argparse.Namespace) -> int:
     )
     uvicorn.run(app, host=args.host, port=args.port)
     return 0
+
+
+def _handle_benchmark(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
+    command = getattr(args, "benchmark_command", None)
+    if command != "mnn-rvv":
+        parser.print_help()
+        return 1
+    refresh = "并刷新远端output" if args.refresh else "使用已有output"
+    goal = f"测试MNN函数{args.function}在RVV上的优化提升，{refresh}"
+    summary = run_demo(goal=goal, runs_dir=args.runs_dir, planner_name="mock")
+    if args.json:
+        print(json.dumps(summary.to_dict(), ensure_ascii=False, indent=2))
+    else:
+        print(f"RVClaw benchmark {summary.run_id} finished: {summary.status}")
+        print(f"  run_dir: {summary.run_dir}")
+        print(f"  report:  {summary.report_path}")
+        print(f"  metrics: {summary.metrics_path}")
+    return 0 if summary.status == "completed" else 1
 
 
 def _add_install_args(parser: argparse.ArgumentParser) -> None:

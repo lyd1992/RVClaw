@@ -14,6 +14,7 @@ TEXT_CONTENT_TYPES = {
     ".log": "text/plain",
     ".md": "text/markdown",
     ".txt": "text/plain",
+    ".svg": "image/svg+xml",
     ".yaml": "application/yaml",
     ".yml": "application/yaml",
 }
@@ -82,6 +83,8 @@ def _run_summary_from_dir(run_dir: Path) -> dict[str, Any]:
         "latency_ms": metrics.get("latency_ms"),
         "vision_task": metrics.get("vision_task"),
         "vision_backend": metrics.get("vision_backend"),
+        "benchmark_function": metrics.get("benchmark_function"),
+        "benchmark_framework": metrics.get("benchmark_framework"),
         "run_dir": str(run_dir),
     }
 
