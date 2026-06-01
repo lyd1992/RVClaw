@@ -5,9 +5,10 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from rvclaw.api import run_demo
-from rvclaw.benchmark.mnn_rvv import resolve_test_spec, summarize_results, write_speedup_svg
+from rvclaw.benchmark.mnn_rvv import resolve_test_spec, run_benchmark, summarize_results, write_speedup_svg
 
 
 class MnnRvvBenchmarkTest(unittest.TestCase):
@@ -61,6 +62,41 @@ class MnnRvvBenchmarkTest(unittest.TestCase):
             self.assertEqual(metrics["speedup_mean"], 3.0)
             self.assertTrue((Path(summary.run_dir) / "artifacts" / "mnn_speedup_bar.svg").is_file())
             self.assertTrue((Path(summary.run_dir) / "artifacts" / "mnn_rvv" / "all_results.jsonl").is_file())
+
+    def test_refresh_with_local_output_reruns_before_import(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            workdir = root / "mnn_rvv_tests"
+            output = workdir / "output"
+            output.mkdir(parents=True)
+            (workdir / "run_all_and_report.sh").write_text("#!/usr/bin/env bash\n", encoding="utf-8")
+            _write_jsonl(
+                output / "all_results.jsonl",
+                [
+                    {"test": "test_softmax", "config": "axis=32", "passed": True, "speedup": 2.0, "scalar_s": 1.0, "rvv_s": 0.5},
+                ],
+            )
+            old_output = os.environ.get("RVCLAW_MNN_RVV_OUTPUT_DIR")
+            old_workdir = os.environ.get("RVCLAW_SG2044_WORKDIR")
+            os.environ["RVCLAW_MNN_RVV_OUTPUT_DIR"] = str(output)
+            os.environ["RVCLAW_SG2044_WORKDIR"] = str(workdir)
+            try:
+                with patch("rvclaw.benchmark.mnn_rvv.run_command") as run_command:
+                    run_command.return_value.stdout = "reran\n"
+                    run_command.return_value.stderr = ""
+                    result = run_benchmark("MNN", "MNNSoftmax", "single", True, root / "artifacts")
+            finally:
+                if old_output is None:
+                    os.environ.pop("RVCLAW_MNN_RVV_OUTPUT_DIR", None)
+                else:
+                    os.environ["RVCLAW_MNN_RVV_OUTPUT_DIR"] = old_output
+                if old_workdir is None:
+                    os.environ.pop("RVCLAW_SG2044_WORKDIR", None)
+                else:
+                    os.environ["RVCLAW_SG2044_WORKDIR"] = old_workdir
+            self.assertEqual(result["benchmark_source"], "local_refresh")
+            self.assertTrue(result["refresh"])
+            run_command.assert_called_once()
 
     def test_unsupported_framework_keeps_failed_artifacts(self):
         with tempfile.TemporaryDirectory() as tmp:

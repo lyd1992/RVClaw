@@ -250,6 +250,8 @@ def _index_html() -> str:
     .upload-row button { width:auto; min-width:92px; }
     .upload-preview { margin-top:8px; display:none; grid-template-columns:72px 1fr; gap:10px; align-items:center; }
     .upload-preview img { width:72px; height:52px; object-fit:cover; border:1px solid var(--line); border-radius:6px; }
+    .option-row { display:none; align-items:center; gap:8px; margin:10px 0; color:var(--muted); font-size:13px; }
+    .option-row input { width:auto; margin:0; }
     .expected { color:var(--muted); font-size:13px; margin-top:8px; line-height:1.5; }
     .graph { display:grid; grid-template-columns:repeat(4,minmax(130px,1fr)); gap:10px; margin-bottom:14px; }
     .node { border:1px solid var(--line); border-radius:8px; padding:10px; background:#0f1518; min-height:86px; position:relative; overflow:hidden; }
@@ -301,6 +303,7 @@ def _index_html() -> str:
       <h2>任务编排器</h2>
       <select id="taskTemplate" onchange="selectTemplate(this.value)"></select>
       <div id="templateInfo" class="expected"></div>
+      <label id="benchmarkRefreshRow" class="option-row"><input id="benchmarkRefresh" type="checkbox" checked><span>重新跑2044测试数据</span></label>
       <div id="presetChips" class="chips" style="margin:10px 0"></div>
       <textarea id="goal"></textarea>
       <div class="upload-row">
@@ -359,7 +362,7 @@ def _index_html() -> str:
       segmentation:{label:'语义分割', goal:'分割画面中的主要区域', chain:'memory_query -> capture_image -> analyze_image(segmentation) -> speak -> upload_report', kind:'vision'},
       face:{label:'人脸检测', goal:'检测画面中是否有人脸', chain:'memory_query -> capture_image -> analyze_image(face_detection) -> speak -> upload_report', kind:'vision'},
       unsafe:{label:'安全拒绝演示', goal:'移动到 Z-99 区域并拍照', chain:'planner -> Safety Guard(rejected) -> failed evidence pack', kind:'inspection'},
-      mnnBenchmark:{label:'MNNRVVbenchmark', goal:'测试MNNSoftmax在RVV上的优化提升，使用已有output', chain:'run_mnn_rvv_benchmark -> speedup chart -> evidence pack', kind:'benchmark'}
+      mnnBenchmark:{label:'MNNRVVbenchmark', goal:'测试MNNSoftmax在RVV上的优化提升，重新跑数据', chain:'run_mnn_rvv_benchmark -> speedup chart -> evidence pack', kind:'benchmark'}
     };
     const graphNodes = [
       ['intake','Task Intake'], ['planner','Planner'], ['safety','Safety Guard'], ['memory','Memory'],
@@ -390,6 +393,8 @@ def _index_html() -> str:
     function selectTemplate(id){
       taskTemplate.value = id; const t = templates[id]; goal.value = t.goal;
       templateInfo.textContent = `当前模板：${t.label} | 预期工具链：${t.chain}`;
+      benchmarkRefreshRow.style.display = t.kind === 'benchmark' ? 'flex' : 'none';
+      benchmarkRefresh.checked = t.kind === 'benchmark';
       Object.keys(templates).forEach(key => document.getElementById(`chip-${key}`).classList.toggle('active', key === id));
     }
     async function uploadImage(){
@@ -403,7 +408,9 @@ def _index_html() -> str:
     async function runTask(){
       runButton.disabled = true; runButton.textContent = 'Planner 生成中'; status.textContent = 'running'; status.className = 'warn';
       renderGraph({summary:{status:'running'}, metrics:{}, trace:[], files:[]});
-      const payload = {goal:goal.value, planner:planner.value}; if (currentImageRef) payload.image_ref = currentImageRef;
+      let requestedGoal = goal.value;
+      if (benchmarkRefreshRow.style.display !== 'none' && benchmarkRefresh.checked) requestedGoal = `${requestedGoal} refresh`;
+      const payload = {goal:requestedGoal, planner:planner.value}; if (currentImageRef) payload.image_ref = currentImageRef;
       const created = await (await api('/api/runs', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)})).json();
       currentRun = created.run_id; runButton.textContent = '执行中'; pollRun(currentRun);
     }

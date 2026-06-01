@@ -221,12 +221,14 @@ def run_benchmark(
     source = "ssh"
 
     if local_output:
-        source = "local_output"
+        source = "local_refresh" if refresh else "local_output"
+        if refresh:
+            raw_log = run_local_refresh(remote.workdir)
         try:
             copy_existing_output(Path(local_output), mnn_dir)
         except Exception as exc:
             raise BenchmarkUnsupportedError(str(exc), output_location_hint(local=True)) from exc
-        raw_log = f"Imported local MNNRVV output from {local_output}"
+        raw_log += f"\nImported local MNNRVV output from {local_output}"
     else:
         try:
             raw_log = fetch_remote_output(remote, mnn_dir, refresh=refresh)
@@ -305,9 +307,17 @@ def fetch_remote_output(remote: MnnRvvRemoteConfig, target_dir: Path, refresh: b
     return raw_log
 
 
-def run_command(args: list[str], timeout_s: int) -> subprocess.CompletedProcess[str]:
+def run_local_refresh(workdir: str) -> str:
+    script = Path(workdir) / "run_all_and_report.sh"
+    if not script.is_file():
+        raise FileNotFoundError(f"MNNRVV本地测试脚本不存在:{script}")
+    completed = run_command(["bash", str(script), "--run-only"], timeout_s=900, cwd=Path(workdir))
+    return completed.stdout + completed.stderr
+
+
+def run_command(args: list[str], timeout_s: int, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
     try:
-        completed = subprocess.run(args, text=True, capture_output=True, check=False, timeout=timeout_s)
+        completed = subprocess.run(args, text=True, capture_output=True, check=False, timeout=timeout_s, cwd=cwd)
     except FileNotFoundError as exc:
         raise RuntimeError("缺少ssh/scp命令，请确认本机已安装OpenSSH客户端。") from exc
     if completed.returncode != 0:
