@@ -223,7 +223,7 @@ def run_benchmark(
     if local_output:
         source = "local_refresh" if refresh else "local_output"
         if refresh:
-            raw_log = run_local_refresh(remote.workdir)
+            raw_log = run_local_refresh(remote.workdir, spec)
         try:
             copy_existing_output(Path(local_output), mnn_dir)
         except Exception as exc:
@@ -231,7 +231,7 @@ def run_benchmark(
         raw_log += f"\nImported local MNNRVV output from {local_output}"
     else:
         try:
-            raw_log = fetch_remote_output(remote, mnn_dir, refresh=refresh)
+            raw_log = fetch_remote_output(remote, mnn_dir, refresh=refresh, spec=spec)
         except Exception as exc:
             raise BenchmarkUnsupportedError(str(exc), output_location_hint(local=False)) from exc
 
@@ -285,9 +285,9 @@ def output_location_hint(local: bool) -> str:
     return "请检查RVCLAW_SG2044_HOST/RVCLAW_SG2044_USER/RVCLAW_SG2044_PORT/RVCLAW_SG2044_WORKDIR以及远端output/all_results.jsonl。"
 
 
-def fetch_remote_output(remote: MnnRvvRemoteConfig, target_dir: Path, refresh: bool) -> str:
+def fetch_remote_output(remote: MnnRvvRemoteConfig, target_dir: Path, refresh: bool, spec: MnnRvvTestSpec) -> str:
     if refresh:
-        command = f"cd {shell_quote(remote.workdir)} && bash run_all_and_report.sh --run-only"
+        command = single_test_shell_command(remote.workdir, spec)
         completed = run_command(["ssh", "-p", str(remote.port), remote.target, command], timeout_s=900)
         raw_log = completed.stdout + completed.stderr
     else:
@@ -307,12 +307,37 @@ def fetch_remote_output(remote: MnnRvvRemoteConfig, target_dir: Path, refresh: b
     return raw_log
 
 
-def run_local_refresh(workdir: str) -> str:
-    script = Path(workdir) / "run_all_and_report.sh"
-    if not script.is_file():
-        raise FileNotFoundError(f"MNNRVV本地测试脚本不存在:{script}")
-    completed = run_command(["bash", str(script), "--run-only"], timeout_s=900, cwd=Path(workdir))
+def run_local_refresh(workdir: str, spec: MnnRvvTestSpec) -> str:
+    binary = Path(workdir) / "bin" / spec.test_binary
+    if not binary.is_file():
+        raise FileNotFoundError(f"MNNRVV本地测试程序不存在:{binary}")
+    completed = run_command(["bash", "-lc", single_test_shell_command(".", spec)], timeout_s=900, cwd=Path(workdir))
     return completed.stdout + completed.stderr
+
+
+def single_test_shell_command(workdir: str, spec: MnnRvvTestSpec) -> str:
+    binary = f"bin/{spec.test_binary}"
+    stderr_log = f"output/{spec.test_binary}.stderr.log"
+    return " && ".join(
+        [
+            f"cd {shell_quote(workdir)}",
+            "mkdir -p output",
+            f"test -f {shell_quote(binary)}",
+            f"chmod +x {shell_quote(binary)}",
+            f"{shell_quote(binary)} > output/all_results.jsonl 2> {shell_quote(stderr_log)}",
+            (
+                "if test -f parse_jsonl_report.py; then "
+                "python3 parse_jsonl_report.py output/all_results.jsonl > output/report.md "
+                f"2>> {shell_quote(stderr_log)} || true; "
+                "fi"
+            ),
+            (
+                "test -s output/report.md || "
+                "printf '# MNNRVV single benchmark\\n\\nGenerated from single test binary.\\n' > output/report.md"
+            ),
+            f"cat {shell_quote(stderr_log)} >&2 || true",
+        ]
+    )
 
 
 def run_command(args: list[str], timeout_s: int, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:

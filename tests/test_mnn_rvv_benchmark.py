@@ -8,7 +8,13 @@ from pathlib import Path
 from unittest.mock import patch
 
 from rvclaw.api import run_demo
-from rvclaw.benchmark.mnn_rvv import resolve_test_spec, run_benchmark, summarize_results, write_speedup_svg
+from rvclaw.benchmark.mnn_rvv import (
+    resolve_test_spec,
+    run_benchmark,
+    single_test_shell_command,
+    summarize_results,
+    write_speedup_svg,
+)
 
 
 class MnnRvvBenchmarkTest(unittest.TestCase):
@@ -69,7 +75,9 @@ class MnnRvvBenchmarkTest(unittest.TestCase):
             workdir = root / "mnn_rvv_tests"
             output = workdir / "output"
             output.mkdir(parents=True)
-            (workdir / "run_all_and_report.sh").write_text("#!/usr/bin/env bash\n", encoding="utf-8")
+            bin_dir = workdir / "bin"
+            bin_dir.mkdir()
+            (bin_dir / "test_softmax").write_text("#!/usr/bin/env bash\n", encoding="utf-8")
             _write_jsonl(
                 output / "all_results.jsonl",
                 [
@@ -97,6 +105,16 @@ class MnnRvvBenchmarkTest(unittest.TestCase):
             self.assertEqual(result["benchmark_source"], "local_refresh")
             self.assertTrue(result["refresh"])
             run_command.assert_called_once()
+            called_args = run_command.call_args.args[0]
+            self.assertIn("bin/test_softmax", called_args[2])
+            self.assertNotIn("run_all_and_report.sh", called_args[2])
+
+    def test_single_test_shell_command_targets_only_one_binary(self):
+        spec = resolve_test_spec("MNNSoftmax")
+        command = single_test_shell_command("/data/zl/mnn_rvv_tests", spec)
+        self.assertIn("bin/test_softmax", command)
+        self.assertIn("output/all_results.jsonl", command)
+        self.assertNotIn("run_all_and_report.sh", command)
 
     def test_unsupported_framework_keeps_failed_artifacts(self):
         with tempfile.TemporaryDirectory() as tmp:
