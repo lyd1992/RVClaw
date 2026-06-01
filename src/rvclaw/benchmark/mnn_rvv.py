@@ -360,8 +360,17 @@ def normalize_result_file(path: Path, spec: MnnRvvTestSpec) -> None:
 def parse_text_results(text: str, spec: MnnRvvTestSpec) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     current: dict[str, Any] | None = None
+    pending_pass_rows: list[dict[str, Any]] = []
     for line in text.splitlines():
         line = line.strip()
+        inline_row = parse_inline_text_result(line, spec)
+        if inline_row is not None:
+            needs_later_pass = bool(inline_row.pop("_pending_pass", False))
+            rows.append(inline_row)
+            if needs_later_pass:
+                pending_pass_rows.append(inline_row)
+            current = None
+            continue
         scalar_match = re.fullmatch(r"Scalar time\s*:\s*([0-9.]+)\s*sec", line)
         if scalar_match:
             if current is None:
@@ -381,14 +390,21 @@ def parse_text_results(text: str, spec: MnnRvvTestSpec) -> list[dict[str, Any]]:
             if current is None:
                 current = new_text_result_row(spec, f"case={len(rows) + 1}")
                 rows.append(current)
-            current["speedup"] = float(speedup_match.group(1))
+            current["speedup"] = parse_speedup(speedup_match.group(1))
             continue
-        passed_match = re.fullmatch(r"Test\s+.+:\s+(PASSED|FAILED)", line)
+        passed_match = re.fullmatch(r"Test\s+.+:?\s+(PASSED|FAILED)", line)
         if passed_match:
+            passed = passed_match.group(1) == "PASSED"
+            had_pending = bool(pending_pass_rows)
+            for row in pending_pass_rows:
+                row["passed"] = passed
+            pending_pass_rows = []
             if current is None:
+                if had_pending:
+                    continue
                 current = new_text_result_row(spec, f"case={len(rows) + 1}")
                 rows.append(current)
-            current["passed"] = passed_match.group(1) == "PASSED"
+            current["passed"] = passed
             current = None
             continue
         if is_text_config_line(line):
@@ -405,6 +421,42 @@ def new_text_result_row(spec: MnnRvvTestSpec, config: str) -> dict[str, Any]:
         "passed": False,
         "speedup": 0.0,
     }
+
+
+def parse_inline_text_result(line: str, spec: MnnRvvTestSpec) -> dict[str, Any] | None:
+    if not line or "Speedup:" not in line:
+        return None
+    parts = [part.strip() for part in line.split("|")]
+    if len(parts) > 1:
+        row = new_text_result_row(spec, parts[0])
+        row["_pending_pass"] = True
+        for part in parts[1:]:
+            scalar_match = re.fullmatch(r"Scalar:\s*([0-9.]+)\s*s", part)
+            if scalar_match:
+                row["scalar_s"] = float(scalar_match.group(1))
+                continue
+            rvv_match = re.fullmatch(r"RVV:\s*([0-9.]+)\s*s", part)
+            if rvv_match:
+                row["rvv_s"] = float(rvv_match.group(1))
+                continue
+            speedup_match = re.fullmatch(r"Speedup:\s*([0-9.]+|inf)x", part)
+            if speedup_match:
+                row["speedup"] = parse_speedup(speedup_match.group(1))
+        return row
+    inline_match = re.fullmatch(r"(.+?)\s+Speedup:\s*([0-9.]+|inf)x(?:\s+Test:\s+(PASSED|FAILED))?", line)
+    if not inline_match:
+        return None
+    row = new_text_result_row(spec, inline_match.group(1).strip())
+    row["speedup"] = parse_speedup(inline_match.group(2))
+    if inline_match.group(3):
+        row["passed"] = inline_match.group(3) == "PASSED"
+    return row
+
+
+def parse_speedup(value: str) -> float:
+    if value == "inf":
+        return 0.0
+    return float(value)
 
 
 def is_text_config_line(line: str) -> bool:

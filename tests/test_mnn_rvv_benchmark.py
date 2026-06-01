@@ -162,6 +162,44 @@ class MnnRvvBenchmarkTest(unittest.TestCase):
         self.assertEqual(rows[0]["speedup"], 2.0)
         self.assertTrue(rows[0]["passed"])
 
+    def test_parse_inline_speedup_text_output(self):
+        spec = resolve_test_spec("MNNConvRunForLineInt8")
+        rows = parse_text_results(
+            "\n".join(
+                [
+                    "w=4 sdq=1 Speedup: 2.62x Test: PASSED",
+                    "w=4 sdq=2 Speedup: infx Test: PASSED",
+                ]
+            ),
+            spec,
+        )
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0]["config"], "w=4 sdq=1")
+        self.assertEqual(rows[0]["speedup"], 2.62)
+        self.assertTrue(rows[0]["passed"])
+        self.assertEqual(rows[1]["speedup"], 0.0)
+        self.assertTrue(rows[1]["passed"])
+
+    def test_parse_pipe_speedup_text_output(self):
+        spec = resolve_test_spec("MNNC3ToBGR555")
+        rows = parse_text_results(
+            "\n".join(
+                [
+                    "[RGB] count=1024 | Scalar: 0.000001 s | RVV: 0.000002 s | Speedup: 0.50x",
+                    "[BGR] count=1024 | Scalar: 0.000001 s | RVV: 0.000001 s | Speedup: 1.00x",
+                    "Test size=1024 PASSED",
+                ]
+            ),
+            spec,
+        )
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0]["config"], "[RGB] count=1024")
+        self.assertEqual(rows[0]["scalar_s"], 0.000001)
+        self.assertEqual(rows[0]["rvv_s"], 0.000002)
+        self.assertEqual(rows[1]["speedup"], 1.0)
+        self.assertTrue(rows[0]["passed"])
+        self.assertTrue(rows[1]["passed"])
+
     def test_unsupported_framework_keeps_failed_artifacts(self):
         with tempfile.TemporaryDirectory() as tmp:
             summary = run_demo("测试PyTorchConv优化提升", runs_dir=Path(tmp) / "runs", planner_name="mock")
