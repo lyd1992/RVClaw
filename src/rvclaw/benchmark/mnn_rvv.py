@@ -426,6 +426,13 @@ def new_text_result_row(spec: MnnRvvTestSpec, config: str) -> dict[str, Any]:
 def parse_inline_text_result(line: str, spec: MnnRvvTestSpec) -> dict[str, Any] | None:
     if not line or "Speedup:" not in line:
         return None
+    bare_match = re.fullmatch(r"Speedup:\s*([0-9.]+|inf)x(?:\s+Test:\s+(PASSED|FAILED))?", line)
+    if bare_match:
+        row = new_text_result_row(spec, "case=1")
+        row["speedup"] = parse_speedup(bare_match.group(1))
+        if bare_match.group(2):
+            row["passed"] = bare_match.group(2) == "PASSED"
+        return row
     parts = [part.strip() for part in line.split("|")]
     if len(parts) > 1:
         row = new_text_result_row(spec, parts[0])

@@ -180,6 +180,14 @@ class MnnRvvBenchmarkTest(unittest.TestCase):
         self.assertEqual(rows[1]["speedup"], 0.0)
         self.assertTrue(rows[1]["passed"])
 
+    def test_parse_bare_speedup_text_output(self):
+        spec = resolve_test_spec("MNNConvRunForUnitInt8")
+        rows = parse_text_results("Speedup: 2.25x Test: PASSED\nFinal Result: ALL TESTS PASSED", spec)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["config"], "case=1")
+        self.assertEqual(rows[0]["speedup"], 2.25)
+        self.assertTrue(rows[0]["passed"])
+
     def test_parse_pipe_speedup_text_output(self):
         spec = resolve_test_spec("MNNC3ToBGR555")
         rows = parse_text_results(
