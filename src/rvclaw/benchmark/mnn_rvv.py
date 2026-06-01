@@ -237,6 +237,7 @@ def run_benchmark(
 
     jsonl_path = mnn_dir / "all_results.jsonl"
     try:
+        normalize_result_file(jsonl_path, spec)
         rows = read_jsonl(jsonl_path)
     except Exception as exc:
         raise BenchmarkUnsupportedError(str(exc), output_location_hint(local=bool(local_output))) from exc
@@ -338,6 +339,57 @@ def single_test_shell_command(workdir: str, spec: MnnRvvTestSpec) -> str:
             f"cat {shell_quote(stderr_log)} >&2 || true",
         ]
     )
+
+
+def normalize_result_file(path: Path, spec: MnnRvvTestSpec) -> None:
+    text = path.read_text(encoding="utf-8")
+    try:
+        rows = [json.loads(line) for line in text.splitlines() if line.strip()]
+    except json.JSONDecodeError:
+        rows = []
+    if rows:
+        return
+    parsed = parse_text_results(text, spec)
+    if not parsed:
+        return
+    with path.open("w", encoding="utf-8") as handle:
+        for row in parsed:
+            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+
+def parse_text_results(text: str, spec: MnnRvvTestSpec) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    current: dict[str, Any] | None = None
+    for line in text.splitlines():
+        line = line.strip()
+        size_match = re.fullmatch(r"size=(.+)", line)
+        if size_match:
+            current = {
+                "test": spec.test_binary,
+                "function": spec.function_name,
+                "config": f"size={size_match.group(1).strip()}",
+                "passed": False,
+            }
+            rows.append(current)
+            continue
+        if current is None:
+            continue
+        scalar_match = re.fullmatch(r"Scalar time\s*:\s*([0-9.]+)\s*sec", line)
+        if scalar_match:
+            current["scalar_s"] = float(scalar_match.group(1))
+            continue
+        rvv_match = re.fullmatch(r"RVV time\s*:\s*([0-9.]+)\s*sec", line)
+        if rvv_match:
+            current["rvv_s"] = float(rvv_match.group(1))
+            continue
+        speedup_match = re.fullmatch(r"Speedup\s*:\s*([0-9.]+)x", line)
+        if speedup_match:
+            current["speedup"] = float(speedup_match.group(1))
+            continue
+        passed_match = re.fullmatch(r"Test\s+.+:\s+(PASSED|FAILED)", line)
+        if passed_match:
+            current["passed"] = passed_match.group(1) == "PASSED"
+    return rows
 
 
 def run_command(args: list[str], timeout_s: int, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:

@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 from rvclaw.api import run_demo
 from rvclaw.benchmark.mnn_rvv import (
+    parse_text_results,
     resolve_test_spec,
     run_benchmark,
     single_test_shell_command,
@@ -115,6 +116,31 @@ class MnnRvvBenchmarkTest(unittest.TestCase):
         self.assertIn("bin/test_softmax", command)
         self.assertIn("output/all_results.jsonl", command)
         self.assertNotIn("run_all_and_report.sh", command)
+
+    def test_parse_single_binary_text_output(self):
+        spec = resolve_test_spec("MNNSoftmax")
+        rows = parse_text_results(
+            "\n".join(
+                [
+                    "size=100",
+                    "Scalar time: 0.0001 sec",
+                    "RVV time   : 0.0001 sec",
+                    "Speedup    : 1.00x",
+                    "Test size=100: PASSED",
+                    "size=1024",
+                    "Scalar time: 0.0002 sec",
+                    "RVV time   : 0.0001 sec",
+                    "Speedup    : 2.00x",
+                    "Test size=1024: PASSED",
+                ]
+            ),
+            spec,
+        )
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0]["test"], "test_softmax")
+        self.assertEqual(rows[0]["config"], "size=100")
+        self.assertEqual(rows[1]["speedup"], 2.0)
+        self.assertTrue(rows[1]["passed"])
 
     def test_unsupported_framework_keeps_failed_artifacts(self):
         with tempfile.TemporaryDirectory() as tmp:
