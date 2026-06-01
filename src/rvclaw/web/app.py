@@ -255,6 +255,7 @@ def _index_html() -> str:
     .node { border:1px solid var(--line); border-radius:8px; padding:10px; background:#0f1518; min-height:86px; position:relative; overflow:hidden; }
     .node::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--idle); }
     .node.pending { opacity:.72; }
+    .node.skipped { opacity:.54; }
     .node.running::before { background:var(--warn); }
     .node.completed::before,.node.approved::before { background:var(--accent); }
     .node.failed::before,.node.rejected::before { background:var(--bad); }
@@ -447,7 +448,13 @@ def _index_html() -> str:
       if (failedVision) state.vision = {status:'failed', note:failedVision.payload.result.error || 'vision failed'};
       if (completed.includes('speak')) state.speak = {status:'completed', note:'status message'};
       if (completed.includes('upload_report')) state.report = {status:'completed', note:'report.md'};
+      if ((detail.files || []).includes('report.md') && status === 'completed') state.report = {status:'completed', note:'report.md'};
       if (status === 'failed' && !state.report.status.includes('completed')) state.report = {status:'failed', note:'failed evidence kept'};
+      if (status === 'completed' || status === 'failed') {
+        Object.keys(state).forEach(id => {
+          if (state[id].status === 'pending') state[id] = {status:'skipped', note:'\u672a\u4f7f\u7528'};
+        });
+      }
       agentGraph.innerHTML = graphNodes.map(([id,label]) => `<div class="node ${state[id].status}"><b>${label}</b><span>${state[id].status}</span><span>${state[id].note || ''}</span></div>`).join('');
     }
     function plannerStatus(mode){ if (!mode) return 'completed'; if (mode.includes('fallback')) return 'fallback'; if (mode.includes('repair')) return 'repaired'; if (mode === 'failed') return 'failed'; return 'completed'; }
