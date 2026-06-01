@@ -362,34 +362,63 @@ def parse_text_results(text: str, spec: MnnRvvTestSpec) -> list[dict[str, Any]]:
     current: dict[str, Any] | None = None
     for line in text.splitlines():
         line = line.strip()
-        size_match = re.fullmatch(r"size=(.+)", line)
-        if size_match:
-            current = {
-                "test": spec.test_binary,
-                "function": spec.function_name,
-                "config": f"size={size_match.group(1).strip()}",
-                "passed": False,
-            }
-            rows.append(current)
-            continue
-        if current is None:
-            continue
         scalar_match = re.fullmatch(r"Scalar time\s*:\s*([0-9.]+)\s*sec", line)
         if scalar_match:
+            if current is None:
+                current = new_text_result_row(spec, f"case={len(rows) + 1}")
+                rows.append(current)
             current["scalar_s"] = float(scalar_match.group(1))
             continue
         rvv_match = re.fullmatch(r"RVV time\s*:\s*([0-9.]+)\s*sec", line)
         if rvv_match:
+            if current is None:
+                current = new_text_result_row(spec, f"case={len(rows) + 1}")
+                rows.append(current)
             current["rvv_s"] = float(rvv_match.group(1))
             continue
         speedup_match = re.fullmatch(r"Speedup\s*:\s*([0-9.]+)x", line)
         if speedup_match:
+            if current is None:
+                current = new_text_result_row(spec, f"case={len(rows) + 1}")
+                rows.append(current)
             current["speedup"] = float(speedup_match.group(1))
             continue
         passed_match = re.fullmatch(r"Test\s+.+:\s+(PASSED|FAILED)", line)
         if passed_match:
+            if current is None:
+                current = new_text_result_row(spec, f"case={len(rows) + 1}")
+                rows.append(current)
             current["passed"] = passed_match.group(1) == "PASSED"
+            current = None
+            continue
+        if is_text_config_line(line):
+            current = new_text_result_row(spec, line)
+            rows.append(current)
     return rows
+
+
+def new_text_result_row(spec: MnnRvvTestSpec, config: str) -> dict[str, Any]:
+    return {
+        "test": spec.test_binary,
+        "function": spec.function_name,
+        "config": config,
+        "passed": False,
+        "speedup": 0.0,
+    }
+
+
+def is_text_config_line(line: str) -> bool:
+    if not line:
+        return False
+    if line.startswith(("[", "{", "#")):
+        return False
+    if re.fullmatch(r"(Scalar time|RVV time|Speedup)\s*:.*", line):
+        return False
+    if re.fullmatch(r"Test\s+.+:\s+(PASSED|FAILED)", line):
+        return False
+    if re.search(r"(ERROR|Error|error|FAILED|PASSED)", line):
+        return False
+    return any(marker in line for marker in ("=", ":", ","))
 
 
 def run_command(args: list[str], timeout_s: int, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:

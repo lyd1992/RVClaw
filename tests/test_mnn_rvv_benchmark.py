@@ -142,6 +142,26 @@ class MnnRvvBenchmarkTest(unittest.TestCase):
         self.assertEqual(rows[1]["speedup"], 2.0)
         self.assertTrue(rows[1]["passed"])
 
+    def test_parse_generic_config_text_output(self):
+        spec = resolve_test_spec("MNNMatrixProd")
+        rows = parse_text_results(
+            "\n".join(
+                [
+                    "M=16,N=32,K=64",
+                    "Scalar time: 0.0010 sec",
+                    "RVV time   : 0.0005 sec",
+                    "Speedup    : 2.00x",
+                    "Test M=16,N=32,K=64: PASSED",
+                ]
+            ),
+            spec,
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["test"], "test_matrix_prod")
+        self.assertEqual(rows[0]["config"], "M=16,N=32,K=64")
+        self.assertEqual(rows[0]["speedup"], 2.0)
+        self.assertTrue(rows[0]["passed"])
+
     def test_unsupported_framework_keeps_failed_artifacts(self):
         with tempfile.TemporaryDirectory() as tmp:
             summary = run_demo("测试PyTorchConv优化提升", runs_dir=Path(tmp) / "runs", planner_name="mock")
