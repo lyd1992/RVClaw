@@ -250,11 +250,14 @@ def _index_html() -> str:
     .upload-row button { width:auto; min-width:92px; }
     .upload-preview { margin-top:8px; display:none; grid-template-columns:72px 1fr; gap:10px; align-items:center; }
     .upload-preview img { width:72px; height:52px; object-fit:cover; border:1px solid var(--line); border-radius:6px; }
+    .option-row { display:none; align-items:center; gap:8px; margin:10px 0; color:var(--muted); font-size:13px; }
+    .option-row input { width:auto; margin:0; }
     .expected { color:var(--muted); font-size:13px; margin-top:8px; line-height:1.5; }
     .graph { display:grid; grid-template-columns:repeat(4,minmax(130px,1fr)); gap:10px; margin-bottom:14px; }
     .node { border:1px solid var(--line); border-radius:8px; padding:10px; background:#0f1518; min-height:86px; position:relative; overflow:hidden; }
     .node::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--idle); }
     .node.pending { opacity:.72; }
+    .node.skipped { opacity:.54; }
     .node.running::before { background:var(--warn); }
     .node.completed::before,.node.approved::before { background:var(--accent); }
     .node.failed::before,.node.rejected::before { background:var(--bad); }
@@ -300,6 +303,7 @@ def _index_html() -> str:
       <h2>任务编排器</h2>
       <select id="taskTemplate" onchange="selectTemplate(this.value)"></select>
       <div id="templateInfo" class="expected"></div>
+      <label id="benchmarkRefreshRow" class="option-row"><input id="benchmarkRefresh" type="checkbox" checked><span>重新跑2044测试数据</span></label>
       <div id="presetChips" class="chips" style="margin:10px 0"></div>
       <textarea id="goal"></textarea>
       <div class="upload-row">
@@ -346,7 +350,7 @@ def _index_html() -> str:
     <div class="filters">
       <select id="historyStatus" onchange="renderHistory()"><option value="">全部状态</option><option>completed</option><option>failed</option><option>running</option></select>
       <select id="historyPlanner" onchange="renderHistory()"><option value="">全部 planner</option><option>llama_cpp</option><option>mock</option></select>
-      <select id="historyType" onchange="renderHistory()"><option value="">全部任务</option><option value="vision">视觉</option><option value="inspection">巡检</option></select>
+      <select id="historyType" onchange="renderHistory()"><option value="">全部任务</option><option value="vision">视觉</option><option value="inspection">巡检</option><option value="benchmark">Benchmark</option></select>
     </div>
     <div id="historyRows"></div>
   </aside>
@@ -357,7 +361,8 @@ def _index_html() -> str:
       detection:{label:'目标检测', goal:'检测图片中的目标并生成结论', chain:'memory_query -> capture_image -> analyze_image(object_detection) -> speak -> upload_report', kind:'vision'},
       segmentation:{label:'语义分割', goal:'分割画面中的主要区域', chain:'memory_query -> capture_image -> analyze_image(segmentation) -> speak -> upload_report', kind:'vision'},
       face:{label:'人脸检测', goal:'检测画面中是否有人脸', chain:'memory_query -> capture_image -> analyze_image(face_detection) -> speak -> upload_report', kind:'vision'},
-      unsafe:{label:'安全拒绝演示', goal:'移动到 Z-99 区域并拍照', chain:'planner -> Safety Guard(rejected) -> failed evidence pack', kind:'inspection'}
+      unsafe:{label:'安全拒绝演示', goal:'移动到 Z-99 区域并拍照', chain:'planner -> Safety Guard(rejected) -> failed evidence pack', kind:'inspection'},
+      mnnBenchmark:{label:'MNNRVVbenchmark', goal:'测试MNNSoftmax在RVV上的优化提升，重新跑数据', chain:'run_mnn_rvv_benchmark -> speedup chart -> evidence pack', kind:'benchmark'}
     };
     const graphNodes = [
       ['intake','Task Intake'], ['planner','Planner'], ['safety','Safety Guard'], ['memory','Memory'],
@@ -366,7 +371,7 @@ def _index_html() -> str:
     const stackItems = [
       ['k3','K3 Edge Box','active'], ['llama','llama.cpp Planner','active'], ['guard','Safety Guard','active'],
       ['skills','Skill Registry','active'], ['memory','SQLite Memory','active'], ['vision','CV/DemoZoo','active'],
-      ['evidence','Evidence Pack','active'], ['mnn','MNN','reserved'], ['vllm','vLLM','reserved'],
+      ['evidence','Evidence Pack','active'], ['mnn','MNN RVV','reserved'], ['vllm','vLLM','reserved'],
       ['milvus','Milvus/Knowhere','reserved'], ['openclaw','ROS2/OpenClaw','reserved']
     ];
     let currentRun = null, currentImageRef = null, historyCache = [], pollTimer = null;
@@ -388,6 +393,8 @@ def _index_html() -> str:
     function selectTemplate(id){
       taskTemplate.value = id; const t = templates[id]; goal.value = t.goal;
       templateInfo.textContent = `当前模板：${t.label} | 预期工具链：${t.chain}`;
+      benchmarkRefreshRow.style.display = t.kind === 'benchmark' ? 'flex' : 'none';
+      benchmarkRefresh.checked = t.kind === 'benchmark';
       Object.keys(templates).forEach(key => document.getElementById(`chip-${key}`).classList.toggle('active', key === id));
     }
     async function uploadImage(){
@@ -401,7 +408,9 @@ def _index_html() -> str:
     async function runTask(){
       runButton.disabled = true; runButton.textContent = 'Planner 生成中'; status.textContent = 'running'; status.className = 'warn';
       renderGraph({summary:{status:'running'}, metrics:{}, trace:[], files:[]});
-      const payload = {goal:goal.value, planner:planner.value}; if (currentImageRef) payload.image_ref = currentImageRef;
+      let requestedGoal = goal.value;
+      if (benchmarkRefreshRow.style.display !== 'none' && benchmarkRefresh.checked) requestedGoal = `${requestedGoal} refresh`;
+      const payload = {goal:requestedGoal, planner:planner.value}; if (currentImageRef) payload.image_ref = currentImageRef;
       const created = await (await api('/api/runs', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)})).json();
       currentRun = created.run_id; runButton.textContent = '执行中'; pollRun(currentRun);
     }
@@ -416,11 +425,12 @@ def _index_html() -> str:
     function renderRun(detail){
       const m = detail.metrics || {}; status.textContent = detail.summary.status; status.className = detail.summary.status === 'completed' ? 'ok' : detail.summary.status === 'failed' ? 'fail' : 'warn';
       plannerMode.textContent = m.planner_mode || detail.summary.planner_mode || '-'; toolCount.textContent = m.tool_call_count ?? detail.summary.tool_call_count ?? '-';
-      latency.textContent = m.latency_ms ? `${m.latency_ms} ms` : '-'; visionBackend.textContent = m.vision_backend || '-'; visionModel.textContent = m.vision_model || '-';
+      latency.textContent = m.latency_ms ? `${m.latency_ms} ms` : '-'; visionBackend.textContent = m.benchmark_framework ? 'MNN RVV' : (m.vision_backend || '-'); visionModel.textContent = m.benchmark_function || m.vision_model || '-';
       const visionResult = findVisionResult(detail);
       const visionOutput = visionResult && visionResult.output;
       renderGraph(detail); renderStack(m); renderFiles(detail, visionOutput);
       if (m.worker_error) { visionSummary.textContent = `后台任务异常：${m.worker_error}`; visionResults.innerHTML = ''; }
+      else if (m.benchmark_function) renderBenchmark(detail);
       else renderVision(visionResult);
     }
     function renderGraph(detail){
@@ -441,10 +451,17 @@ def _index_html() -> str:
       if (completed.includes('memory_query')) state.memory = {status:'completed', note:'context loaded'};
       if (completed.includes('capture_image')) state.capture = {status:'completed', note:'image artifact'};
       if (completed.includes('detect_status') || completed.includes('analyze_image')) state.vision = {status:m.vision_backend === 'mock_fallback' ? 'fallback':'completed', note:m.vision_task || m.vision_backend || 'status detection'};
+      if (completed.includes('run_mnn_rvv_benchmark')) state.vision = {status:'completed', note:m.benchmark_function || 'MNN RVV benchmark'};
       if (failedVision) state.vision = {status:'failed', note:failedVision.payload.result.error || 'vision failed'};
       if (completed.includes('speak')) state.speak = {status:'completed', note:'status message'};
       if (completed.includes('upload_report')) state.report = {status:'completed', note:'report.md'};
+      if ((detail.files || []).includes('report.md') && status === 'completed') state.report = {status:'completed', note:'report.md'};
       if (status === 'failed' && !state.report.status.includes('completed')) state.report = {status:'failed', note:'failed evidence kept'};
+      if (status === 'completed' || status === 'failed') {
+        Object.keys(state).forEach(id => {
+          if (state[id].status === 'pending') state[id] = {status:'skipped', note:'\u672a\u4f7f\u7528'};
+        });
+      }
       agentGraph.innerHTML = graphNodes.map(([id,label]) => `<div class="node ${state[id].status}"><b>${label}</b><span>${state[id].status}</span><span>${state[id].note || ''}</span></div>`).join('');
     }
     function plannerStatus(mode){ if (!mode) return 'completed'; if (mode.includes('fallback')) return 'fallback'; if (mode.includes('repair')) return 'repaired'; if (mode === 'failed') return 'failed'; return 'completed'; }
@@ -452,6 +469,7 @@ def _index_html() -> str:
       stackItems.forEach(([id,,base]) => { const el = document.getElementById(`stack-${id}`); if (!el) return; el.className = `stack-item ${base}`; });
       if (m.vision_backend === 'mock_fallback') document.getElementById('stack-vision').className = 'stack-item fallback';
       if (m.planner === 'mock') document.getElementById('stack-llama').className = 'stack-item fallback';
+      if (m.benchmark_framework) document.getElementById('stack-mnn').className = 'stack-item active';
     }
     const imageDisplayPolicies = {classification:'single', object_detection:'compare', segmentation:'compare', face_detection:'compare', inspection:'compare', non_vision:'none'};
     function imagePolicyForTask(task, hasStatusDetection){
@@ -501,13 +519,20 @@ def _index_html() -> str:
       }
     }
     function fileUrl(runId, name){ return `/api/runs/${encodeURIComponent(runId)}/files/${name.split('/').map(encodeURIComponent).join('/')}`; }
-    async function showFile(name){ if(!currentRun) return; if (/\\.(png|jpg|jpeg|webp)$/i.test(name)) { fileView.innerHTML = `<img class="file-image" src="${fileUrl(currentRun,name)}" alt="${name}">`; return; } fileView.textContent = await (await api(fileUrl(currentRun,name))).text(); }
+    function renderBenchmark(detail){
+      const m = detail.metrics || {};
+      visionSummary.textContent = `${m.benchmark_function} | mean ${Number(m.speedup_mean || 0).toFixed(2)}x | max ${Number(m.speedup_max || 0).toFixed(2)}x | cases ${m.case_count || 0}`;
+      visionResults.innerHTML = `<div class="result-card"><b>Framework</b><span>${m.benchmark_framework || 'MNN'} RVV static benchmark</span></div><div class="result-card"><b>Function</b><span>${m.benchmark_function || '-'}</span></div><div class="result-card"><b>PR/category</b><span>${m.benchmark_pr || '-'} / ${m.benchmark_category || '-'}</span></div><div class="result-card"><b>Pass</b><span>${m.passed_count || 0}/${m.case_count || 0}</span></div>`;
+      const chart = (detail.files || []).find(f => f.endsWith('mnn_speedup_bar.svg'));
+      if (chart) showFile(chart);
+    }
+    async function showFile(name){ if(!currentRun) return; if (/\\.(png|jpg|jpeg|webp|svg)$/i.test(name)) { fileView.innerHTML = `<img class="file-image" src="${fileUrl(currentRun,name)}" alt="${name}">`; return; } fileView.textContent = await (await api(fileUrl(currentRun,name))).text(); }
     async function refreshHistory(){ historyCache = await (await api('/api/runs')).json(); renderHistory(); }
     function openHistory(){ historyBackdrop.classList.add('open'); historyDrawer.classList.add('open'); refreshHistory(); }
     function closeHistory(){ historyBackdrop.classList.remove('open'); historyDrawer.classList.remove('open'); }
     function renderHistory(){
       const st = historyStatus.value, pl = historyPlanner.value, ty = historyType.value;
-      const rows = historyCache.filter(r => (!st || r.status === st) && (!pl || r.planner === pl) && (!ty || (ty === 'vision' ? (r.vision_task || r.vision_backend) : !(r.vision_task || r.vision_backend))));
+      const rows = historyCache.filter(r => (!st || r.status === st) && (!pl || r.planner === pl) && (!ty || (ty === 'benchmark' ? r.benchmark_function : ty === 'vision' ? (r.vision_task || r.vision_backend) : !(r.vision_task || r.vision_backend || r.benchmark_function))));
       historyRows.innerHTML = rows.map(r => `<div class="history-row"><b>${r.run_id}</b><div class="${r.status==='completed'?'ok':r.status==='failed'?'fail':'warn'}">${r.status}</div><div class="sub">${r.planner} | ${r.planner_mode || '-'}</div><button onclick="loadRun('${r.run_id}')">加载到主界面</button><button onclick="loadRun('${r.run_id}').then(()=>showFile('report.md'))">打开报告</button></div>`).join('') || '<div class="sub">暂无匹配历史。</div>';
     }
     init();

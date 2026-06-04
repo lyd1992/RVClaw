@@ -97,6 +97,7 @@ class AgentCore:
         }
         metrics.update(self.run_metadata)
         metrics.update(_vision_metrics_from_results(results))
+        metrics.update(_benchmark_metrics_from_results(results))
         if planner_error:
             metrics["planner_error"] = planner_error
         self.recorder.write_metrics(metrics)
@@ -142,6 +143,8 @@ class AgentCore:
             if result.get("error"):
                 lines.append(f"   - Error: {result['error']}")
             output = result.get("output") or {}
+            if output.get("support_hint"):
+                lines.append(f"   - Support: {output['support_hint']}")
             if "status" in output:
                 lines.append(f"   - Status: {output['status']}")
             if "risk_level" in output:
@@ -150,6 +153,15 @@ class AgentCore:
                 lines.append(f"   - Upload: {output['remote_uri']}")
             if "summary" in output:
                 lines.append(f"   - Vision: {output['summary']}")
+            if call["name"] == "run_mnn_rvv_benchmark":
+                if output.get("benchmark_function"):
+                    lines.append(f"   - Benchmark: {output['benchmark_function']} ({output.get('benchmark_test_binary')})")
+                if "speedup_mean" in output:
+                    lines.append(f"   - Mean speedup: {output['speedup_mean']}x")
+                if "speedup_max" in output:
+                    lines.append(f"   - Max speedup: {output['speedup_max']}x")
+                if output.get("benchmark_chart"):
+                    lines.append(f"   - Chart: {output['benchmark_chart']}")
             if output.get("visual_result_only"):
                 lines.append("   - Visual result: annotated image generated")
                 lines.append("   - Structured result: unavailable")
@@ -191,4 +203,36 @@ def _vision_metrics_from_results(results: list[dict]) -> dict:
                 "faces_count": len(output.get("faces") or []),
             }
             return {key: value for key, value in metrics.items() if value is not None}
+    return {}
+
+
+def _benchmark_metrics_from_results(results: list[dict]) -> dict:
+    for item in reversed(results):
+        call = item.get("call", {})
+        result = item.get("result", {}) or {}
+        output = result.get("output", {}) or {}
+        if call.get("name") == "run_mnn_rvv_benchmark":
+            keys = {
+                "benchmark_framework",
+                "benchmark_mode",
+                "benchmark_source",
+                "benchmark_function",
+                "benchmark_test_binary",
+                "benchmark_category",
+                "benchmark_pr",
+                "benchmark_chart",
+                "benchmark_results_jsonl",
+                "case_count",
+                "passed_count",
+                "failed_count",
+                "speedup_mean",
+                "speedup_max",
+                "speedup_min",
+                "vlen",
+                "isa",
+                "remote_host",
+                "remote_workdir",
+                "refresh",
+            }
+            return {key: output.get(key) for key in keys if output.get(key) is not None}
     return {}

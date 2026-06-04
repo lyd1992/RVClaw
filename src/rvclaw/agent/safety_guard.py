@@ -67,6 +67,8 @@ class SafetyGuard:
                 raise TypeError(f"Skill {call.name} argument {key} must be string")
             if prop.get("type") == "integer" and not isinstance(value, int):
                 raise TypeError(f"Skill {call.name} argument {key} must be integer")
+            if prop.get("type") == "boolean" and not isinstance(value, bool):
+                raise TypeError(f"Skill {call.name} argument {key} must be boolean")
             if "max_length" in prop and isinstance(value, str) and len(value) > int(prop["max_length"]):
                 raise ValueError(f"Skill {call.name} argument {key} exceeds max_length")
             if "minimum" in prop and isinstance(value, int) and value < int(prop["minimum"]):

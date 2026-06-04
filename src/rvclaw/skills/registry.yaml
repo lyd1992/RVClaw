@@ -75,6 +75,22 @@
       }
     },
     {
+      "name": "run_mnn_rvv_benchmark",
+      "description": "Run or import a single-function MNN RVV static benchmark on SG2044 and emit speedup artifacts.",
+      "safety_level": "remote_benchmark",
+      "timeout_s": 900,
+      "requires_confirmation": false,
+      "parameters": {
+        "required": ["framework", "function", "mode", "refresh"],
+        "properties": {
+          "framework": {"type": "string"},
+          "function": {"type": "string", "max_length": 120},
+          "mode": {"type": "string", "enum": ["single"]},
+          "refresh": {"type": "boolean"}
+        }
+      }
+    },
+    {
       "name": "speak",
       "description": "Speak a short status message through the mock device.",
       "safety_level": "output",

@@ -8,11 +8,13 @@ from typing import Protocol
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 
+from rvclaw.benchmark.mnn_rvv import extract_framework, extract_function_from_goal, is_mnn_rvv_goal
 from rvclaw.models import Task, ToolCall
 from rvclaw.utils import detect_zone
 
 INSPECTION_WORKFLOW = ("memory_query", "move_to", "capture_image", "detect_status", "speak", "upload_report")
 VISION_WORKFLOW = ("memory_query", "capture_image", "analyze_image", "speak", "upload_report")
+BENCHMARK_WORKFLOW = ("run_mnn_rvv_benchmark",)
 
 
 class PlannerBackend(Protocol):
@@ -27,6 +29,8 @@ class MockPlannerBackend:
     last_mode = "mock"
 
     def plan(self, task: Task, memory_context: list[dict]) -> list[ToolCall]:
+        if _is_benchmark_task(task.goal):
+            return _benchmark_workflow_for_goal(task.goal)
         if _is_return_to_base_task(task.goal):
             return [
                 ToolCall("memory_query", {"query": task.goal, "limit": 5}),
@@ -77,6 +81,7 @@ class ClaudeCliPlannerBackend:
             "capture_image",
             "detect_status",
             "analyze_image",
+            "run_mnn_rvv_benchmark",
             "speak",
             "upload_report",
             "stop",
@@ -171,6 +176,7 @@ class LlamaCppPlannerBackend:
             "capture_image",
             "detect_status",
             "analyze_image",
+            "run_mnn_rvv_benchmark",
             "speak",
             "upload_report",
             "stop",
@@ -181,6 +187,7 @@ class LlamaCppPlannerBackend:
             f"Allowed skills: {allowed}. "
             "Schema: {\"tool_calls\":[{\"name\":\"skill\",\"arguments\":{...}}]}. "
             "For visual analysis tasks, use memory_query, capture_image, analyze_image, speak, upload_report. "
+            "For MNN RVV benchmark or speedup tasks, use exactly run_mnn_rvv_benchmark with framework, function, mode=single, refresh=false. "
             "analyze_image.task must be one of classification, object_detection, segmentation, face_detection. "
             "For any inspection, device-status, or report task, you must output exactly these skills in order: "
             "memory_query, move_to, capture_image, detect_status, speak, upload_report. "
@@ -268,6 +275,7 @@ WORKFLOW_SCHEMAS = {
     "capture_image": ({"target"}, {"target", "mode"}),
     "detect_status": ({"target"}, {"target", "image_ref"}),
     "analyze_image": ({"task"}, {"image_ref", "task", "model"}),
+    "run_mnn_rvv_benchmark": ({"framework", "function", "mode", "refresh"}, {"framework", "function", "mode", "refresh"}),
     "speak": ({"text"}, {"text"}),
     "upload_report": ({"title"}, {"title"}),
     "stop": (set(), {"reason"}),
@@ -275,6 +283,13 @@ WORKFLOW_SCHEMAS = {
 
 
 def _repair_plan(task: Task, calls: list[ToolCall]) -> tuple[list[ToolCall], str | None]:
+    if _is_benchmark_task(task.goal):
+        names = [call.name for call in calls]
+        if all(name in names for name in BENCHMARK_WORKFLOW):
+            if _has_schema_issues(calls):
+                return _benchmark_workflow_for_goal(task.goal), "repaired_schema"
+            return calls, None
+        return _benchmark_workflow_for_goal(task.goal), "repaired_incomplete"
     if _is_vision_analysis_task(task.goal):
         names = [call.name for call in calls]
         if all(name in names for name in VISION_WORKFLOW):
@@ -320,6 +335,32 @@ def _vision_workflow_for_goal(goal: str) -> list[ToolCall]:
         ToolCall("speak", {"text": _vision_speech(task)}),
         ToolCall("upload_report", {"title": f"RVClaw {task} vision report"}),
     ]
+
+
+def _benchmark_workflow_for_goal(goal: str) -> list[ToolCall]:
+    return [
+        ToolCall(
+            "run_mnn_rvv_benchmark",
+            {
+                "framework": extract_framework(goal),
+                "function": extract_function_from_goal(goal),
+                "mode": "single",
+                "refresh": _benchmark_refresh_from_goal(goal),
+            },
+        )
+    ]
+
+
+def _benchmark_refresh_from_goal(goal: str) -> bool:
+    normalized = goal.lower()
+    return any(marker in normalized for marker in ("refresh", "rerun", "重新跑", "重跑", "刷新", "重新测试"))
+
+
+def _is_benchmark_task(goal: str) -> bool:
+    normalized = goal.lower()
+    unsupported_framework = any(name in normalized for name in ("pytorch", "torch", "tensorflow", "tensorrt", "onnx"))
+    benchmark_verb = any(marker in normalized for marker in ("benchmark", "speedup", "加速比", "优化提升", "测试", "测一下", "跑一下"))
+    return is_mnn_rvv_goal(goal) or (unsupported_framework and benchmark_verb)
 
 
 def _is_inspection_task(goal: str) -> bool:
