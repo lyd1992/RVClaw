@@ -1,39 +1,27 @@
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-.Python
-.venv/
-venv/
-env/
-build/
-dist/
-*.egg-info/
-.ccache/
-
-# Runtime artifacts
-runs/*
-!runs/.gitkeep
-third_party/
-deps/
-deploy/sg2044/*.generated.sh
-*.tar
-*.tar.gz
-*.tar.xz
-*.sqlite3
-*.db
-*.jsonl.tmp
-
-# Local tools
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.venv/
+venv/
+
+# Node / frontend
+node_modules/
+
+# ROS2 build artifacts
+build/
+install/
+log/
+
+# Coverage / reports
 .coverage
+coverage/
 htmlcov/
 
-# Editors and OS
-.idea/
-.vscode/
-.DS_Store
-Thumbs.db
+# Local artifacts
+artifacts/
+runs/
+tmp/
+*.log

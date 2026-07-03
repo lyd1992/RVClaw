@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RVClaw Task State",
+  "type": "object",
+  "required": ["task_id", "status", "timestamp"],
+  "properties": {
+    "task_id": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": [
+        "idle",
+        "starting",
+        "moving",
+        "arrived",
+        "stabilizing",
+        "capturing",
+        "recognizing",
+        "completed",
+        "aborted",
+        "manual_override",
+        "estop"
+      ]
+    },
+    "current_point": { "type": ["string", "null"] },
+    "manual_override": { "type": "boolean" },
+    "estop": { "type": "boolean" },
+    "reason": { "type": ["string", "null"] },
+    "timestamp": { "type": "string", "format": "date-time" }
+  }
+}

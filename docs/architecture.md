@@ -1,98 +1,33 @@
-# RVClaw Architecture
+# RVClaw EdgeOne Architecture
 
-RVClaw follows a "close the loop first, optimize later" architecture. The
-current K3 path is a demo-grade edge Agent Runtime: RVClaw owns task intake,
-planning, safety, skills, evidence, and Web visualization; local model services
-such as llama.cpp or DemoZoo are sidecars behind stable interfaces.
+## 目标
 
-## Eight-Layer View
+围绕 `K3 CoM260 Kit + V550 ROS2` 的首发产品，建立一个以产品域为边界的主仓结构，让底盘控制、感知、识别、Studio 和报告输出能够并行开发、逐步联调。
 
-1. RISC-V Hardware + OS: K3 Pico-ITX, SG2044, Bianbu/Ubuntu/openEuler.
-2. RVV Kernel Layer: attention, GEMM, quantization, distance, reorder.
-3. AI Runtime: llama.cpp baseline, later MNN, ONNX Runtime, vLLM.
-4. RAG + Memory: SQLite/JSONL/flat baseline, later Knowhere/Milvus.
-5. Device Adapter: mock, cv_sample, DemoZoo sidecar, future ROS2/OpenClaw.
-6. Agent Orchestrator: Planner, Agent Core, Tool Router, Task Context.
-7. Safety + Observability: Skill whitelist, guard, trace, replay, metrics.
-8. Robot / Fleet Apps: inspection, lab operations, AMR, security, diagnostics.
+## 分层方式
 
-## v0.1 Core Loop
+本仓库不再围绕旧的单体 demo app 展开，而是按产品域拆成 4 个核心执行面：
+
+1. `robot/`：真实机器人侧运行能力
+2. `services/`：本地服务层和报告生成
+3. `studio/`：可视化界面与任务编排
+4. `contracts/`：模块间稳定契约
+
+## 模块关系
 
 ```text
-CLI/API task
-  -> Task Intake
-  -> PlannerBackend(auto/mock/claude/llama_cpp)
-  -> Agent Core
-  -> Safety Guard
-  -> Tool Router
-  -> Skills(memory_query/move_to/capture_image/detect_status/speak/upload_report/stop)
-  -> Mock/CV sample Device + SQLite Memory
-  -> Observability(task/trace/metrics/report/raw log)
+M2 底盘控制
+  -> 输出 task state / device status
+M3 感知接入
+  -> 输出 capture trigger / sensor status / snapshots
+M4 识别算法
+  -> 输出 inspection result / anomaly result
+M5 Studio 与报告
+  -> 消费 M2/M3/M4 输出，完成展示、控制与导出
 ```
 
-## v0.1.1 K3 Web + CV Loop
+## 当前设计原则
 
-```text
-Web console
-  -> POST /api/runs
-  -> run_demo()
-  -> llama.cpp Planner or deterministic repair
-  -> configurable zone Safety Guard
-  -> cv_sample capture/detect
-  -> artifacts/a03_capture.png + artifacts/a03_annotated.png
-  -> Web timeline + artifact viewer
-```
-
-## v0.1.2 Multi-Vision Loop
-
-```text
-Web preset or natural-language vision task
-  -> Planner / deterministic vision workflow
-  -> analyze_image
-  -> DemoZoo HTTP sidecar
-  -> classification / object_detection / segmentation / face_detection
-  -> normalized vision_result.json
-  -> annotated image + result cards + metrics + report
-```
-
-If DemoZoo is unavailable, `analyze_image` can fall back to `cv_sample` only for
-offline smoke validation. Real visual demos should set
-`RVCLAW_REQUIRE_REAL_VISION=1`, which makes the run fail clearly instead of
-showing heuristic fallback output. Face support is detection-only in v0.1.2;
-RVClaw does not perform identity recognition, face matching, or face-library
-management.
-
-## v0.1.3 Agent Command Center Loop
-
-```text
-Web task template / uploaded image
-  -> local upload:image_ref validation
-  -> async POST /api/runs
-  -> Agent graph polling trace.jsonl
-  -> Planner + Safety Guard nodes
-  -> Skill execution nodes
-  -> Runtime Stack Map + evidence file viewer
-```
-
-The main Web screen focuses on the current run. Historical runs are loaded from
-a drawer so roadshow demos can keep the story on the active Agent workflow.
-
-## Stable Interfaces
-
-- `PlannerBackend`: converts task context into JSON `tool_calls`. Current local
-  K3 path uses OpenAI-compatible `llama-server` plus deterministic repair.
-- `Skill Registry`: defines allowed skill names, schemas, enums, timeouts, and
-  safety levels.
-- `Device Adapter`: hides mock, CV sample, DemoZoo, and future ROS2/OpenClaw
-  implementations behind the same skill functions.
-- `Memory Manager`: handles SQLite/JSONL memory and is the future expansion
-  point for Knowhere/Milvus.
-- `Observability`: every run must leave `task.yaml`, `trace.jsonl`,
-  `metrics.json`, `report.md`, `raw.log`, and task-specific artifacts.
-
-## Main Verification Documents
-
-- First K3 setup and verification: `docs/k3_start_here.md`.
-- Agent Command Center + CV demo: `docs/k3_web_cv_demo.md`.
-- Optional v0.1.2 DemoZoo sidecar: `docs/k3_demozoo_bridge.md`.
-- Current checkpoint and known gaps: `docs/development_status.md`.
+1. `main` 只保留新主线，不把旧 Demo Claw 代码搬回当前目录。
+2. 契约先行，接口在 `contracts/` 中预留。
+3. 真实实现逐步补入对应产品域，不混放到一个通用 `src/` 目录下。

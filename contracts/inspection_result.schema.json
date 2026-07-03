@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RVClaw Inspection Result",
+  "type": "object",
+  "required": ["task_id", "point_id", "category", "is_anomaly", "timestamp"],
+  "properties": {
+    "task_id": { "type": "string" },
+    "point_id": { "type": "string" },
+    "category": {
+      "type": "string",
+      "enum": [
+        "meter_reading",
+        "indicator_status",
+        "switch_status",
+        "personnel_safety",
+        "restricted_area"
+      ]
+    },
+    "value": { "type": ["string", "number", "null"] },
+    "confidence": { "type": ["number", "null"] },
+    "is_anomaly": { "type": "boolean" },
+    "anomaly_reason": { "type": ["string", "null"] },
+    "evidence_uri": { "type": ["string", "null"] },
+    "timestamp": { "type": "string", "format": "date-time" }
+  }
+}
