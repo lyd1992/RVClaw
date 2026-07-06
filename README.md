@@ -56,6 +56,7 @@ scripts/                      # 项目辅助脚本
 - `contracts/task_state.schema.json`
 - `contracts/device_status.schema.json`
 - `contracts/inspection_result.schema.json`
+- `contracts/person_tracking.schema.json`
 
 后续所有 `M2 -> M3 -> M4 -> M5` 的联调，都优先围绕这些契约对齐。
 

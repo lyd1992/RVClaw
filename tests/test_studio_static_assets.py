@@ -22,6 +22,11 @@ class StudioStaticAssetsTest(unittest.TestCase):
         self.assertIn("RVBench Report", page)
         self.assertIn("performance-chart", page)
         self.assertIn("log-stream", page)
+        self.assertIn("/api/person-tracking", page)
+        self.assertIn("person-video", page)
+        self.assertIn("person-overlay", page)
+        self.assertIn("Person Tracking", page)
+        self.assertIn("person-count", page)
 
 
 if __name__ == "__main__":

@@ -394,11 +394,79 @@
       background: #0b1220;
     }
 
-    .feed img {
+    .feed img,
+    .feed video,
+    .feed canvas {
       width: 100%;
       height: 100%;
       object-fit: contain;
       display: block;
+    }
+
+    .video-layer {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background: #0b1220;
+    }
+
+    .video-layer video,
+    .video-layer canvas,
+    .person-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .video-layer video,
+    .video-layer canvas {
+      object-fit: cover;
+    }
+
+    .video-layer video {
+      z-index: 1;
+    }
+
+    .video-layer canvas {
+      z-index: 0;
+    }
+
+    .person-overlay {
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .tracking-hud {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(148,163,184,0.24);
+      border-radius: 8px;
+      background: rgba(8,13,20,0.76);
+      backdrop-filter: blur(8px);
+      color: #e2e8f0;
+      font-size: 13px;
+    }
+
+    .tracking-hud strong {
+      color: #ffffff;
+      font-size: 16px;
+    }
+
+    .source-pill {
+      color: #67e8f9;
+      font-family: Consolas, "Cascadia Mono", monospace;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .feed::before {
@@ -858,7 +926,16 @@
             </div>
             <div class="camera-grid">
               <div class="feed main-feed" data-camera="CAM 01">
-                <img id="annotated-image" alt="Annotated RVClaw inspection result">
+                <div class="video-layer">
+                  <video id="person-video" muted loop playsinline></video>
+                  <canvas id="person-demo-canvas" width="960" height="540" aria-hidden="true"></canvas>
+                  <svg id="person-overlay" class="person-overlay" viewBox="0 0 960 540" preserveAspectRatio="none" aria-label="Person tracking overlay"></svg>
+                  <div class="tracking-hud">
+                    <span><strong id="person-count">0</strong> persons tracked</span>
+                    <span class="source-pill" id="video-source-label">Video Source: demo-video -> /camera/color/image_raw</span>
+                  </div>
+                  <img id="annotated-image" alt="Annotated RVClaw inspection result" hidden>
+                </div>
               </div>
               <div class="feed" data-camera="CAM 02"><div class="synthetic-feed"><div class="belt"></div><div class="box b1"></div><div class="box b2"></div><div class="box b3"></div></div></div>
               <div class="feed" data-camera="CAM 03"><div class="synthetic-feed"><div class="belt"></div><div class="robot-arm"></div><div class="box b2"></div><div class="box b3"></div></div></div>
@@ -1003,6 +1080,13 @@
     const annotatedImage = document.getElementById('annotated-image');
     const jsonOutput = document.getElementById('json-output');
     const reportLink = document.getElementById('report-link');
+    const personVideo = document.getElementById('person-video');
+    const personCanvas = document.getElementById('person-demo-canvas');
+    const personOverlay = document.getElementById('person-overlay');
+    const personCount = document.getElementById('person-count');
+    const videoSourceLabel = document.getElementById('video-source-label');
+    let trackingPayload = null;
+    let demoStartTime = performance.now();
 
     function setLoading(isLoading) {
       runButton.disabled = isLoading;
@@ -1037,6 +1121,160 @@
       appendLog(`Inspection ${inspection.point_id} completed with ${inspection.runtime.backend}`);
     }
 
+    function interpolateBox(keyframes, progress) {
+      let left = keyframes[0];
+      let right = keyframes[keyframes.length - 1];
+      for (let index = 0; index < keyframes.length - 1; index += 1) {
+        if (progress >= keyframes[index].t && progress <= keyframes[index + 1].t) {
+          left = keyframes[index];
+          right = keyframes[index + 1];
+          break;
+        }
+      }
+      const span = Math.max(right.t - left.t, 0.001);
+      const local = Math.min(Math.max((progress - left.t) / span, 0), 1);
+      const box = {};
+      for (const key of ['x', 'y', 'width', 'height']) {
+        box[key] = left.bbox[key] + (right.bbox[key] - left.bbox[key]) * local;
+      }
+      return box;
+    }
+
+    function drawDemoFrame(now) {
+      const context = personCanvas.getContext('2d');
+      const width = personCanvas.width;
+      const height = personCanvas.height;
+      const progress = ((now - demoStartTime) % 12000) / 12000;
+      context.clearRect(0, 0, width, height);
+
+      const gradient = context.createLinearGradient(0, 0, width, height);
+      gradient.addColorStop(0, '#263241');
+      gradient.addColorStop(0.5, '#111827');
+      gradient.addColorStop(1, '#0b1220');
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, width, height);
+
+      context.strokeStyle = 'rgba(148, 163, 184, 0.22)';
+      context.lineWidth = 2;
+      for (let i = 0; i < 10; i += 1) {
+        const x = i * 108 - (progress * 108);
+        context.beginPath();
+        context.moveTo(x, 0);
+        context.lineTo(x - 210, height);
+        context.stroke();
+      }
+
+      context.fillStyle = '#1f2937';
+      context.fillRect(0, height * 0.68, width, height * 0.32);
+      context.fillStyle = '#334155';
+      context.fillRect(0, height * 0.64, width, 22);
+      context.fillStyle = '#475569';
+      for (let i = 0; i < 12; i += 1) {
+        context.fillRect(i * 92 - progress * 92, height * 0.66, 64, 34);
+      }
+
+      context.fillStyle = 'rgba(32, 199, 201, 0.12)';
+      context.fillRect(width * 0.58, 78, 190, 338);
+      context.strokeStyle = 'rgba(32, 199, 201, 0.34)';
+      context.strokeRect(width * 0.58, 78, 190, 338);
+    }
+
+    function renderPersonOverlay(now) {
+      if (!trackingPayload) {
+        return;
+      }
+      const progress = ((now - demoStartTime) % (trackingPayload.stream.duration_sec * 1000)) / (trackingPayload.stream.duration_sec * 1000);
+      personOverlay.innerHTML = '';
+      const namespace = 'http://www.w3.org/2000/svg';
+      trackingPayload.tracks.forEach((track) => {
+        const box = interpolateBox(track.keyframes, progress);
+        const color = track.safety_state === 'normal' ? '#22c55e' : '#f97316';
+        const rect = document.createElementNS(namespace, 'rect');
+        rect.setAttribute('x', box.x);
+        rect.setAttribute('y', box.y);
+        rect.setAttribute('width', box.width);
+        rect.setAttribute('height', box.height);
+        rect.setAttribute('fill', 'transparent');
+        rect.setAttribute('stroke', color);
+        rect.setAttribute('stroke-width', '4');
+        rect.setAttribute('rx', '6');
+        personOverlay.appendChild(rect);
+
+        const labelBg = document.createElementNS(namespace, 'rect');
+        labelBg.setAttribute('x', box.x);
+        labelBg.setAttribute('y', Math.max(box.y - 34, 8));
+        labelBg.setAttribute('width', '170');
+        labelBg.setAttribute('height', '28');
+        labelBg.setAttribute('rx', '5');
+        labelBg.setAttribute('fill', color);
+        personOverlay.appendChild(labelBg);
+
+        const label = document.createElementNS(namespace, 'text');
+        label.setAttribute('x', box.x + 10);
+        label.setAttribute('y', Math.max(box.y - 14, 28));
+        label.setAttribute('fill', '#ffffff');
+        label.setAttribute('font-family', 'Consolas, monospace');
+        label.setAttribute('font-size', '16');
+        label.textContent = `${track.track_id} person ${(track.confidence * 100).toFixed(0)}%`;
+        personOverlay.appendChild(label);
+
+        const points = track.keyframes.map((frame) => {
+          const centerX = frame.bbox.x + frame.bbox.width / 2;
+          const centerY = frame.bbox.y + frame.bbox.height;
+          return `${centerX},${centerY}`;
+        }).join(' ');
+        const polyline = document.createElementNS(namespace, 'polyline');
+        polyline.setAttribute('points', points);
+        polyline.setAttribute('fill', 'none');
+        polyline.setAttribute('stroke', color);
+        polyline.setAttribute('stroke-width', '2');
+        polyline.setAttribute('stroke-dasharray', '8 7');
+        polyline.setAttribute('opacity', '0.7');
+        personOverlay.appendChild(polyline);
+      });
+    }
+
+    function animatePersonDemo(now) {
+      drawDemoFrame(now);
+      renderPersonOverlay(now);
+      requestAnimationFrame(animatePersonDemo);
+    }
+
+    async function setupGeneratedVideoSource() {
+      if (!personCanvas.captureStream) {
+        personVideo.hidden = true;
+        personCanvas.hidden = false;
+        appendLog('Browser canvas stream unsupported; using canvas video fallback', 'WARN');
+        return;
+      }
+      personVideo.srcObject = personCanvas.captureStream(15);
+      personVideo.hidden = false;
+      personCanvas.hidden = true;
+      try {
+        await personVideo.play();
+      } catch (error) {
+        personVideo.hidden = true;
+        personCanvas.hidden = false;
+        appendLog(`Video autoplay fallback: ${error.message}`, 'WARN');
+      }
+    }
+
+    async function loadPersonTracking() {
+      try {
+        const response = await fetch('/api/person-tracking');
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        trackingPayload = await response.json();
+        personCount.textContent = trackingPayload.tracks.length;
+        videoSourceLabel.textContent = `Video Source: ${trackingPayload.source.type} -> ${trackingPayload.source.topic}`;
+        appendLog(`Person Tracking source ${trackingPayload.source.type} mapped to ${trackingPayload.source.topic}`);
+      } catch (error) {
+        videoSourceLabel.textContent = `Person Tracking unavailable: ${error.message}`;
+        appendLog(`Person Tracking unavailable: ${error.message}`, 'WARN');
+      }
+    }
+
     async function runSampleFlow() {
       setLoading(true);
       try {
@@ -1054,6 +1292,9 @@
     }
 
     runButton.addEventListener('click', runSampleFlow);
+    setupGeneratedVideoSource();
+    loadPersonTracking();
+    requestAnimationFrame(animatePersonDemo);
     runSampleFlow();
   </script>
 </body>

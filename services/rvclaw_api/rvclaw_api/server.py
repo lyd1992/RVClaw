@@ -5,6 +5,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 
+from .person_tracking import get_person_tracking_payload
 from .sample_flow import run_sample_flow
 
 
@@ -19,6 +20,9 @@ class RVClawRequestHandler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         if parsed.path == "/api/sample-flow":
             self._write_json(self._run_sample_flow())
+            return
+        if parsed.path == "/api/person-tracking":
+            self._write_json(get_person_tracking_payload())
             return
         if parsed.path.startswith("/artifacts/"):
             self._serve_artifact(parsed.path.removeprefix("/artifacts/"))
