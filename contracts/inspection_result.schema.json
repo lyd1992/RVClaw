@@ -21,6 +21,38 @@
     "is_anomaly": { "type": "boolean" },
     "anomaly_reason": { "type": ["string", "null"] },
     "evidence_uri": { "type": ["string", "null"] },
-    "timestamp": { "type": "string", "format": "date-time" }
+    "timestamp": { "type": "string", "format": "date-time" },
+    "runtime": {
+      "type": "object",
+      "required": ["target", "backend", "model", "offline"],
+      "properties": {
+        "target": { "type": "string" },
+        "backend": { "type": "string" },
+        "model": { "type": "string" },
+        "offline": { "type": "boolean" }
+      }
+    },
+    "detections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "value", "confidence", "bbox"],
+        "properties": {
+          "label": { "type": "string" },
+          "value": { "type": ["string", "number", "null"] },
+          "confidence": { "type": ["number", "null"] },
+          "bbox": {
+            "type": "object",
+            "required": ["x", "y", "width", "height"],
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "width": { "type": "number" },
+              "height": { "type": "number" }
+            }
+          }
+        }
+      }
+    }
   }
 }
