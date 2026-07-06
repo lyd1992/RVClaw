@@ -14,6 +14,14 @@ class StudioStaticAssetsTest(unittest.TestCase):
         self.assertIn("json-output", page)
         self.assertIn("report-link", page)
         self.assertIn("RVClaw EdgeOne Studio", page)
+        self.assertIn("EdgeOne-01", page)
+        self.assertIn("Run RVBench", page)
+        self.assertIn("Camera Streams", page)
+        self.assertIn("Model Runtime", page)
+        self.assertIn("Device Health", page)
+        self.assertIn("RVBench Report", page)
+        self.assertIn("performance-chart", page)
+        self.assertIn("log-stream", page)
 
 
 if __name__ == "__main__":

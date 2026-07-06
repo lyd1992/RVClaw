@@ -6,15 +6,23 @@
   <title>RVClaw EdgeOne Studio</title>
   <style>
     :root {
-      color-scheme: light;
-      --ink: #111827;
-      --muted: #64748b;
-      --line: #d7dde6;
-      --panel: #ffffff;
-      --bg: #eef2f6;
-      --accent: #b91c1c;
-      --ok: #15803d;
-      --warn: #ca8a04;
+      color-scheme: dark;
+      --bg: #080c12;
+      --shell: #0d131b;
+      --panel: #141b24;
+      --panel-2: #101720;
+      --line: rgba(148, 163, 184, 0.22);
+      --line-strong: rgba(148, 163, 184, 0.34);
+      --text: #f8fafc;
+      --muted: #9aa7b7;
+      --soft: #cbd5e1;
+      --purple: #9d4edd;
+      --purple-2: #6d28d9;
+      --cyan: #20c7c9;
+      --green: #22c55e;
+      --orange: #f97316;
+      --red: #ef4444;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.46);
     }
 
     * {
@@ -24,133 +32,680 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: var(--bg);
-      color: var(--ink);
+      background:
+        radial-gradient(circle at 16% 8%, rgba(157, 78, 221, 0.14), transparent 26%),
+        radial-gradient(circle at 78% 0%, rgba(32, 199, 201, 0.10), transparent 24%),
+        var(--bg);
+      color: var(--text);
       font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-      padding: 20px 28px;
-      border-bottom: 1px solid var(--line);
-      background: #f8fafc;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 22px;
-      letter-spacing: 0;
-    }
-
-    .status {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--warn);
-    }
-
-    .dot.ok {
-      background: var(--ok);
-    }
-
-    main {
-      display: grid;
-      grid-template-columns: minmax(0, 1.45fr) minmax(360px, 0.75fr);
-      gap: 18px;
-      padding: 18px;
-    }
-
-    section {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .section-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      min-height: 52px;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .section-title h2 {
-      margin: 0;
-      font-size: 15px;
       letter-spacing: 0;
     }
 
     button,
-    .report-button {
-      border: 1px solid #991b1b;
-      border-radius: 6px;
-      background: var(--accent);
-      color: #fff;
-      padding: 9px 12px;
-      font-size: 14px;
-      cursor: pointer;
-      text-decoration: none;
+    a {
+      font: inherit;
     }
 
-    button:disabled,
-    .report-button[aria-disabled="true"] {
-      cursor: not-allowed;
-      opacity: 0.5;
+    .app-shell {
+      min-height: 100vh;
+      padding: 10px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 42px 42px;
     }
 
-    .image-stage {
-      min-height: 560px;
+    .console {
+      min-height: calc(100vh - 20px);
+      display: grid;
+      grid-template-columns: 286px minmax(0, 1fr);
+      border: 1px solid var(--line-strong);
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.98), rgba(8, 13, 20, 0.98));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .sidebar {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      border-right: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(17,24,39,0.94), rgba(9,13,20,0.98));
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 26px 24px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .mark {
+      width: 46px;
+      height: 46px;
       display: grid;
       place-items: center;
-      padding: 18px;
-      background: #0f172a;
+      border-radius: 12px;
+      background: linear-gradient(145deg, rgba(157,78,221,0.26), rgba(32,199,201,0.08));
+      border: 1px solid rgba(157,78,221,0.42);
+      color: var(--purple);
+      font-size: 27px;
+      font-weight: 900;
     }
 
-    .image-stage img {
-      width: 100%;
-      max-height: 560px;
-      object-fit: contain;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      background: #111827;
+    .brand-title {
+      font-size: 25px;
+      font-weight: 800;
+      line-height: 1;
     }
 
-    .side {
+    .brand-title span {
+      color: var(--purple);
+    }
+
+    nav {
+      padding: 18px 12px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      height: 56px;
+      padding: 0 18px;
+      border-radius: 8px;
+      color: var(--soft);
+      font-size: 17px;
+      position: relative;
+    }
+
+    .nav-item.active {
+      color: #d9b8ff;
+      background: linear-gradient(90deg, rgba(157,78,221,0.28), rgba(15,23,42,0.18));
+    }
+
+    .nav-item.active::before {
+      content: "";
+      position: absolute;
+      left: -12px;
+      width: 3px;
+      height: 56px;
+      background: var(--purple);
+    }
+
+    .nav-icon {
+      width: 24px;
+      height: 24px;
       display: grid;
-      gap: 18px;
+      place-items: center;
+      color: #f8fafc;
+      opacity: 0.92;
+      font-size: 20px;
     }
 
-    .summary {
+    .device-card {
+      margin: 0 16px 22px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(155deg, rgba(31,41,55,0.92), rgba(15,23,42,0.82));
+    }
+
+    .device-unit {
+      height: 82px;
+      margin-bottom: 16px;
+      border-radius: 9px;
+      border: 1px solid rgba(148,163,184,0.18);
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.12), transparent 32%),
+        linear-gradient(145deg, #2b3038, #151a22);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .device-unit::before {
+      content: "";
+      position: absolute;
+      left: 20px;
+      top: 22px;
+      width: 126px;
+      height: 34px;
+      border-radius: 7px;
+      background: repeating-linear-gradient(90deg, #090d13 0 5px, #303947 5px 9px);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14);
+    }
+
+    .device-unit::after {
+      content: "";
+      position: absolute;
+      right: 28px;
+      top: 31px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 14px rgba(34,197,94,0.75);
+    }
+
+    .device-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 750;
+    }
+
+    .online-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 12px rgba(34,197,94,0.8);
+    }
+
+    .device-spec {
+      margin-top: 10px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    .version {
+      display: flex;
+      justify-content: space-between;
+      margin: 0 22px 22px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .main {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .topbar {
+      height: 106px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 0 26px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(19,27,37,0.94), rgba(13,19,27,0.88));
+    }
+
+    .device-heading {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .hamburger {
+      color: var(--muted);
+      font-size: 24px;
+      padding: 0 10px;
+      border-right: 1px solid var(--line);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    h1 .online {
+      color: var(--green);
+      font-size: 22px;
+      margin-left: 6px;
+    }
+
+    .top-meta {
+      display: flex;
+      gap: 26px;
+      color: var(--muted);
+      font-size: 16px;
+      white-space: nowrap;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .primary-action,
+    .report-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 52px;
+      padding: 0 24px;
+      border-radius: 8px;
+      border: 1px solid rgba(196, 181, 253, 0.38);
+      background: linear-gradient(180deg, #7c3aed, #5727a8);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 760;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: inset 0 1px rgba(255,255,255,0.26), 0 12px 30px rgba(109,40,217,0.24);
+    }
+
+    .report-button {
+      width: 52px;
+      padding: 0;
+      background: rgba(15,23,42,0.8);
+      color: var(--soft);
+      font-size: 20px;
+      box-shadow: none;
+    }
+
+    .report-button[aria-disabled="true"] {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .icon-button {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      color: var(--soft);
+      font-size: 20px;
+    }
+
+    .dashboard {
+      min-width: 0;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: minmax(640px, 1.2fr) minmax(360px, 0.8fr);
+      grid-template-rows: auto auto minmax(255px, 1fr);
+      gap: 12px;
+    }
+
+    .panel {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(155deg, rgba(24,33,44,0.96), rgba(15,22,31,0.94));
+      overflow: hidden;
+    }
+
+    .panel-header {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 18px;
+      font-weight: 760;
+    }
+
+    .panel-tools {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 19px;
+    }
+
+    .camera-panel {
+      grid-row: span 2;
+    }
+
+    .camera-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
       padding: 16px;
     }
 
-    .metric {
+    .feed {
+      min-height: 190px;
+      border: 1px solid rgba(148,163,184,0.2);
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      background:
+        linear-gradient(135deg, rgba(148,163,184,0.14), transparent),
+        #111827;
+    }
+
+    .feed.main-feed {
+      min-height: 396px;
+      grid-column: span 2;
+      display: grid;
+      place-items: center;
+      background: #0b1220;
+    }
+
+    .feed img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .feed::before {
+      content: attr(data-camera);
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      z-index: 2;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.8);
+      border: 1px solid rgba(148,163,184,0.28);
+      color: #fff;
+      font-size: 13px;
+    }
+
+    .feed::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      top: 20px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px rgba(34,197,94,0.9);
+      transform: translateX(-2px);
+    }
+
+    .synthetic-feed {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      background:
+        linear-gradient(120deg, rgba(32,199,201,0.10), transparent 44%),
+        linear-gradient(0deg, rgba(15,23,42,0.72), rgba(15,23,42,0.2)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 58px),
+        linear-gradient(135deg, #2e3741, #101720);
+    }
+
+    .belt {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      bottom: 34%;
+      height: 42px;
+      transform: skewX(-18deg);
+      background: linear-gradient(180deg, #334155, #1f2937);
+      border: 1px solid rgba(148,163,184,0.32);
+    }
+
+    .box {
+      position: absolute;
+      width: 54px;
+      height: 38px;
+      border: 2px solid #40c463;
+      background: rgba(180,126,55,0.58);
+    }
+
+    .b1 { left: 24%; bottom: 43%; }
+    .b2 { left: 41%; bottom: 45%; }
+    .b3 { left: 61%; bottom: 41%; }
+    .robot-arm {
+      position: absolute;
+      left: 47%;
+      top: 17%;
+      width: 72px;
+      height: 118px;
+      border-left: 12px solid #d97706;
+      border-top: 12px solid #f59e0b;
+      transform: rotate(-20deg);
+      opacity: 0.82;
+    }
+
+    .runtime-content,
+    .health-content {
+      padding: 18px;
+    }
+
+    .field {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 12px;
+      margin: 11px 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .field strong {
+      color: var(--text);
+      font-weight: 560;
+    }
+
+    .select-like {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      padding: 12px 14px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 12px;
-      min-height: 82px;
+      background: rgba(15,23,42,0.78);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 58px;
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 6px;
+      color: #86efac;
+      background: rgba(34,197,94,0.14);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .outline-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .outline-actions button {
+      height: 44px;
+      border: 1px solid rgba(32,199,201,0.55);
+      border-radius: 7px;
+      background: transparent;
+      color: var(--cyan);
+      font-size: 15px;
+    }
+
+    .outline-actions button:last-child {
+      background: linear-gradient(180deg, rgba(32,199,201,0.8), rgba(14,116,144,0.9));
+      color: white;
+    }
+
+    .health-row {
+      display: grid;
+      grid-template-columns: 46px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .health-row:last-child {
+      border-bottom: 0;
+    }
+
+    .health-icon {
+      color: white;
+      font-size: 28px;
+      opacity: 0.95;
+    }
+
+    .spark {
+      height: 30px;
+      background:
+        linear-gradient(90deg, transparent 0 8%, rgba(32,199,201,0.3) 8% 9%, transparent 9% 18%, rgba(32,199,201,0.7) 18% 19%, transparent 19% 28%, rgba(32,199,201,0.45) 28% 29%, transparent 29%),
+        linear-gradient(180deg, transparent 43%, rgba(32,199,201,0.4) 43% 49%, transparent 49%);
+      background-size: 54px 30px, 100% 30px;
+      border-radius: 6px;
+    }
+
+    .health-value {
+      min-width: 76px;
+      text-align: right;
+      font-size: 21px;
+      font-weight: 760;
+    }
+
+    .health-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .performance {
+      grid-column: span 1;
+    }
+
+    .chart-wrap {
+      height: 262px;
+      padding: 16px 22px 20px;
+      position: relative;
+    }
+
+    .legend {
+      display: flex;
+      gap: 26px;
+      color: var(--soft);
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .legend span::before {
+      content: "";
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+      background: var(--cyan);
+    }
+
+    .legend span:nth-child(2)::before { background: var(--purple); }
+    .legend span:nth-child(3)::before { background: var(--orange); }
+
+    .performance-chart {
+      width: 100%;
+      height: 205px;
+      display: block;
+    }
+
+    .logs {
+      grid-column: span 1;
+    }
+
+    .log-stream {
+      max-height: 294px;
+      overflow: auto;
+      padding: 12px 16px 18px;
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 14px;
+      color: #dbe5f2;
+    }
+
+    .log-line {
+      display: grid;
+      grid-template-columns: 168px 1fr 58px;
+      gap: 12px;
+      align-items: center;
+      min-height: 31px;
+      border-bottom: 1px solid rgba(148,163,184,0.08);
+    }
+
+    .badge {
+      justify-self: end;
+      min-width: 48px;
+      text-align: center;
+      border-radius: 6px;
+      padding: 4px 7px;
+      color: #86efac;
+      background: rgba(34,197,94,0.14);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .badge.warn {
+      color: #fdba74;
+      background: rgba(249,115,22,0.16);
+    }
+
+    .report-preview {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr 0.9fr;
+      gap: 12px;
+    }
+
+    .report-card {
       background: #f8fafc;
+      color: #111827;
+      border-color: rgba(148,163,184,0.34);
+    }
+
+    .report-card .panel-header {
+      border-bottom-color: #d8dfe9;
+    }
+
+    .report-card .panel-title {
+      color: #4c1d95;
+    }
+
+    .report-lines {
+      padding: 16px 18px;
+      color: #334155;
+      font-size: 14px;
+      line-height: 1.72;
+    }
+
+    .report-lines strong {
+      color: #0f172a;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .metric {
+      min-height: 74px;
+      border: 1px solid rgba(148,163,184,0.22);
+      border-radius: 7px;
+      padding: 10px 12px;
+      background: rgba(15,23,42,0.58);
     }
 
     .metric span {
-      display: block;
       color: var(--muted);
       font-size: 12px;
+      display: block;
       margin-bottom: 8px;
     }
 
@@ -159,84 +714,291 @@
       overflow-wrap: anywhere;
     }
 
+    .json-panel {
+      max-height: 240px;
+    }
+
     pre {
       margin: 0;
-      padding: 16px;
-      max-height: 380px;
+      padding: 15px;
+      max-height: 180px;
       overflow: auto;
-      background: #111827;
-      color: #e5e7eb;
+      background: #0b1220;
+      color: #dbeafe;
       font-size: 12px;
       line-height: 1.45;
     }
 
-    .actions {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      justify-content: flex-end;
+    .status-text {
+      color: var(--muted);
+      font-size: 14px;
     }
 
-    @media (max-width: 980px) {
-      main {
+    #run-id {
+      color: var(--muted);
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 13px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 420px;
+    }
+
+    @media (max-width: 1380px) {
+      .dashboard {
         grid-template-columns: 1fr;
       }
 
-      header {
+      .camera-panel,
+      .report-preview,
+      .performance,
+      .logs {
+        grid-column: span 1;
+      }
+
+      .report-preview {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .console {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .topbar {
+        height: auto;
         align-items: flex-start;
         flex-direction: column;
+        padding: 18px;
+      }
+
+      .top-meta {
+        flex-wrap: wrap;
+      }
+
+      .camera-grid,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .feed.main-feed {
+        grid-column: span 1;
       }
     }
   </style>
 </head>
 <body>
-  <header>
-    <div>
-      <h1>RVClaw EdgeOne Studio</h1>
-      <div class="status"><span id="status-dot" class="dot"></span><span id="status-text">Waiting for local K3 sample flow</span></div>
-    </div>
-    <div class="actions">
-      <button id="run-button" type="button">Run Sample Flow</button>
-      <a id="report-link" class="report-button" aria-disabled="true" href="#">Open Report</a>
-    </div>
-  </header>
-
-  <main>
-    <section>
-      <div class="section-title">
-        <h2>Annotated Image</h2>
-        <span id="run-id">No run yet</span>
-      </div>
-      <div class="image-stage">
-        <img id="annotated-image" alt="Annotated RVClaw inspection result">
-      </div>
-    </section>
-
-    <div class="side">
-      <section>
-        <div class="section-title">
-          <h2>Inspection Summary</h2>
+  <div class="app-shell">
+    <div class="console">
+      <aside class="sidebar">
+        <div>
+          <div class="brand">
+            <div class="mark">◇</div>
+            <div class="brand-title"><span>RVClaw</span> Studio</div>
+          </div>
+          <nav aria-label="Studio sections">
+            <div class="nav-item active"><span class="nav-icon">▦</span>Dashboard</div>
+            <div class="nav-item"><span class="nav-icon">▣</span>Devices</div>
+            <div class="nav-item"><span class="nav-icon">⬡</span>Models</div>
+            <div class="nav-item"><span class="nav-icon">✥</span>Deployments</div>
+            <div class="nav-item"><span class="nav-icon">▧</span>RVBench</div>
+            <div class="nav-item"><span class="nav-icon">⌁</span>Alerts</div>
+            <div class="nav-item"><span class="nav-icon">≣</span>Logs</div>
+            <div class="nav-item"><span class="nav-icon">⚙</span>Settings</div>
+          </nav>
         </div>
-        <div class="summary">
-          <div class="metric"><span>Point</span><strong id="point-id">--</strong></div>
-          <div class="metric"><span>Category</span><strong id="category">--</strong></div>
-          <div class="metric"><span>Value</span><strong id="value">--</strong></div>
-          <div class="metric"><span>Status</span><strong id="result-status">--</strong></div>
+        <div></div>
+        <div>
+          <div class="device-card">
+            <div class="device-unit" aria-hidden="true"></div>
+            <div class="device-name"><span class="online-dot"></span>EdgeOne-01</div>
+            <div class="device-spec">
+              RISC-V AI Box<br>
+              8 Cores · 16 GB RAM<br>
+              K3 CoM260 · Local Runtime
+            </div>
+          </div>
+          <div class="version"><span>v1.2.3</span><span>‹</span></div>
         </div>
-      </section>
+      </aside>
 
-      <section>
-        <div class="section-title">
-          <h2>Structured JSON</h2>
-        </div>
-        <pre id="json-output">{}</pre>
-      </section>
+      <main class="main">
+        <header class="topbar">
+          <div class="device-heading">
+            <div class="hamburger">☰</div>
+            <div>
+              <h1><span class="online-dot"></span> EdgeOne-01 <span class="online">Online</span></h1>
+              <div class="status-text" id="status-text">Waiting for local K3 sample flow</div>
+            </div>
+          </div>
+          <div class="top-meta">
+            <span>RISC-V AI Box</span>
+            <span>IP: 192.168.11.93</span>
+            <span>Uptime: 2d 14h 32m</span>
+            <span>FW: v1.2.3</span>
+          </div>
+          <div class="top-actions">
+            <button class="primary-action" id="run-button" type="button">▶ Run RVBench</button>
+            <a id="report-link" class="report-button" aria-disabled="true" href="#" title="Open report">▤</a>
+            <span class="icon-button">⌁</span>
+            <span class="icon-button">⚙</span>
+          </div>
+        </header>
+
+        <section class="dashboard">
+          <section class="panel camera-panel">
+            <div class="panel-header">
+              <div class="panel-title">▣ Camera Streams</div>
+              <div class="panel-tools"><span>⚙</span><span>⛶</span></div>
+            </div>
+            <div class="camera-grid">
+              <div class="feed main-feed" data-camera="CAM 01">
+                <img id="annotated-image" alt="Annotated RVClaw inspection result">
+              </div>
+              <div class="feed" data-camera="CAM 02"><div class="synthetic-feed"><div class="belt"></div><div class="box b1"></div><div class="box b2"></div><div class="box b3"></div></div></div>
+              <div class="feed" data-camera="CAM 03"><div class="synthetic-feed"><div class="belt"></div><div class="robot-arm"></div><div class="box b2"></div><div class="box b3"></div></div></div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div class="panel-title">⬡ Model Runtime</div>
+            </div>
+            <div class="runtime-content">
+              <div class="select-like"><span id="active-model">sample-rule-v0</span><span class="pill">Running</span></div>
+              <div class="field"><span>Framework</span><strong>RVClaw Local</strong></div>
+              <div class="field"><span>Precision</span><strong>Rule Baseline</strong></div>
+              <div class="field"><span>Input</span><strong>SVG / Camera Frame</strong></div>
+              <div class="field"><span>Status</span><strong id="runtime-status">Running</strong></div>
+              <div class="field"><span>Inferences</span><strong id="inference-count">1,248,532</strong></div>
+              <div class="outline-actions">
+                <button type="button">Manage Models</button>
+                <button type="button">Redeploy</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div class="panel-title">⌁ Device Health</div>
+            </div>
+            <div class="health-content">
+              <div class="health-row">
+                <div class="health-icon">◷</div>
+                <div>
+                  <strong>Latency</strong>
+                  <div class="spark"></div>
+                </div>
+                <div class="health-value">23.6<span class="health-label"> ms<br>P50</span></div>
+              </div>
+              <div class="health-row">
+                <div class="health-icon">ϟ</div>
+                <div>
+                  <strong>Power</strong>
+                  <div class="spark"></div>
+                </div>
+                <div class="health-value">12.4<span class="health-label"> W<br>Avg</span></div>
+              </div>
+              <div class="health-row">
+                <div class="health-icon">♨</div>
+                <div>
+                  <strong>Temperature</strong>
+                  <div class="spark"></div>
+                </div>
+                <div class="health-value">58.3<span class="health-label"> °C<br>CPU</span></div>
+              </div>
+              <div class="field"><span>Status</span><strong><span class="pill">Healthy</span></strong></div>
+            </div>
+          </section>
+
+          <section class="panel performance">
+            <div class="panel-header">
+              <div class="panel-title">▥ Performance</div>
+              <div class="panel-tools"><span>1H</span><span>6H</span><span class="pill">24H</span><span>7D</span></div>
+            </div>
+            <div class="chart-wrap">
+              <div class="legend"><span>Latency (ms)</span><span>CPU (%)</span><span>Memory (%)</span></div>
+              <svg id="performance-chart" class="performance-chart" viewBox="0 0 640 210" preserveAspectRatio="none" aria-label="Performance chart">
+                <defs>
+                  <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#20c7c9" stop-opacity=".28"/>
+                    <stop offset="1" stop-color="#20c7c9" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <g stroke="rgba(148,163,184,.16)" stroke-width="1">
+                  <line x1="36" y1="22" x2="625" y2="22"/><line x1="36" y1="68" x2="625" y2="68"/><line x1="36" y1="114" x2="625" y2="114"/><line x1="36" y1="160" x2="625" y2="160"/>
+                </g>
+                <path d="M36 152 L70 146 L108 148 L134 102 L166 96 L204 108 L240 103 L280 116 L320 109 L362 112 L402 106 L442 118 L480 104 L522 111 L565 96 L625 104" fill="none" stroke="#9d4edd" stroke-width="3"/>
+                <path d="M36 168 L70 161 L108 164 L134 132 L166 139 L204 146 L240 141 L280 149 L320 143 L362 147 L402 140 L442 151 L480 145 L522 148 L565 139 L625 145" fill="none" stroke="#20c7c9" stroke-width="3"/>
+                <path d="M36 128 L70 123 L108 126 L134 120 L166 122 L204 124 L240 121 L280 126 L320 125 L362 123 L402 124 L442 126 L480 121 L522 124 L565 122 L625 126" fill="none" stroke="#f97316" stroke-width="3"/>
+                <g fill="#9aa7b7" font-size="13">
+                  <text x="0" y="26">100</text><text x="9" y="72">75</text><text x="9" y="118">50</text><text x="9" y="164">25</text>
+                  <text x="36" y="200">18:00</text><text x="196" y="200">00:00</text><text x="350" y="200">06:00</text><text x="506" y="200">12:00</text><text x="604" y="200">18:00</text>
+                </g>
+              </svg>
+            </div>
+          </section>
+
+          <section class="panel logs">
+            <div class="panel-header">
+              <div class="panel-title">▤ Logs</div>
+              <div class="panel-tools"><span>All Levels⌄</span><span>Ⅱ</span><span>⌫</span></div>
+            </div>
+            <div class="log-stream" id="log-stream">
+              <div class="log-line"><span>2026-07-06 15:20:45</span><span>RVClaw Studio API listening on 0.0.0.0:8017</span><span class="badge">INFO</span></div>
+              <div class="log-line"><span>2026-07-06 15:25:00</span><span>sample-rule-v0 loaded successfully</span><span class="badge">INFO</span></div>
+              <div class="log-line"><span>2026-07-06 15:32:15</span><span>CAM 01 sample image processed</span><span class="badge">INFO</span></div>
+              <div class="log-line"><span>2026-07-06 15:32:16</span><span>Inspection result persisted to runs directory</span><span class="badge">INFO</span></div>
+              <div class="log-line"><span>2026-07-06 15:32:16</span><span>Report markdown generated</span><span class="badge">INFO</span></div>
+              <div class="log-line"><span>2026-07-06 15:32:17</span><span>K3 local browser client connected</span><span class="badge warn">WARN</span></div>
+            </div>
+          </section>
+
+          <section class="report-preview">
+            <section class="panel report-card">
+              <div class="panel-header">
+                <div class="panel-title">RVBench Report</div>
+                <span class="pill">PASS</span>
+              </div>
+              <div class="report-lines">
+                <div><strong>Report ID:</strong> <span id="run-id">No run yet</span></div>
+                <div><strong>Date:</strong> <span id="report-date">2026-07-06</span></div>
+                <div><strong>Version:</strong> v0.1 Sample</div>
+                <div><strong>Status:</strong> <span id="result-status">--</span></div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div class="panel-title">Inspection Summary</div>
+              </div>
+              <div class="summary-grid">
+                <div class="metric"><span>Point</span><strong id="point-id">--</strong></div>
+                <div class="metric"><span>Category</span><strong id="category">--</strong></div>
+                <div class="metric"><span>Value</span><strong id="value">--</strong></div>
+                <div class="metric"><span>Confidence</span><strong id="confidence">--</strong></div>
+              </div>
+            </section>
+
+            <section class="panel json-panel">
+              <div class="panel-header">
+                <div class="panel-title">Structured JSON</div>
+              </div>
+              <pre id="json-output">{}</pre>
+            </section>
+          </section>
+        </section>
+      </main>
     </div>
-  </main>
+  </div>
 
   <script>
     const runButton = document.getElementById('run-button');
-    const statusDot = document.getElementById('status-dot');
     const statusText = document.getElementById('status-text');
     const annotatedImage = document.getElementById('annotated-image');
     const jsonOutput = document.getElementById('json-output');
@@ -244,22 +1006,35 @@
 
     function setLoading(isLoading) {
       runButton.disabled = isLoading;
+      runButton.textContent = isLoading ? '▶ Running...' : '▶ Run RVBench';
       statusText.textContent = isLoading ? 'Running local K3 sample flow' : 'Ready';
+    }
+
+    function appendLog(message, level = 'INFO') {
+      const logStream = document.getElementById('log-stream');
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      line.innerHTML = `<span>${now}</span><span>${message}</span><span class="badge${level === 'WARN' ? ' warn' : ''}">${level}</span>`;
+      logStream.prepend(line);
     }
 
     function renderPayload(payload) {
       const inspection = payload.inspection;
       document.getElementById('run-id').textContent = payload.run.run_id;
+      document.getElementById('report-date').textContent = payload.run.created_at.slice(0, 10);
       document.getElementById('point-id').textContent = inspection.point_id;
       document.getElementById('category').textContent = inspection.category;
       document.getElementById('value').textContent = inspection.value;
-      document.getElementById('result-status').textContent = inspection.is_anomaly ? 'ANOMALY' : 'OK';
+      document.getElementById('confidence').textContent = inspection.confidence;
+      document.getElementById('result-status').textContent = inspection.is_anomaly ? 'ANOMALY' : 'PASS';
+      document.getElementById('active-model').textContent = inspection.runtime.model;
       annotatedImage.src = payload.artifacts.annotated_image_url;
       jsonOutput.textContent = JSON.stringify(payload, null, 2);
       reportLink.href = payload.artifacts.report_url;
       reportLink.removeAttribute('aria-disabled');
-      statusDot.classList.add('ok');
       statusText.textContent = 'Sample flow completed';
+      appendLog(`Inspection ${inspection.point_id} completed with ${inspection.runtime.backend}`);
     }
 
     async function runSampleFlow() {
@@ -271,8 +1046,8 @@
         }
         renderPayload(await response.json());
       } catch (error) {
-        statusDot.classList.remove('ok');
         statusText.textContent = `Sample flow failed: ${error.message}`;
+        appendLog(`Sample flow failed: ${error.message}`, 'WARN');
       } finally {
         setLoading(false);
       }
