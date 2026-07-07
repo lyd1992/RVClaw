@@ -413,7 +413,6 @@
     }
 
     .video-layer video,
-    .video-layer canvas,
     .person-overlay {
       position: absolute;
       inset: 0;
@@ -421,17 +420,12 @@
       height: 100%;
     }
 
-    .video-layer video,
-    .video-layer canvas {
+    .video-layer video {
       object-fit: contain;
     }
 
     .video-layer video {
       z-index: 1;
-    }
-
-    .video-layer canvas {
-      z-index: 0;
     }
 
     .person-overlay {
@@ -930,11 +924,10 @@
               <div class="feed main-feed" data-camera="CAM 01">
                 <div class="video-layer">
                   <video id="person-video" muted loop playsinline></video>
-                  <canvas id="person-demo-canvas" width="960" height="540" aria-hidden="true"></canvas>
                   <svg id="person-overlay" class="person-overlay" viewBox="0 0 960 540" preserveAspectRatio="xMidYMid meet" aria-label="Person tracking overlay"></svg>
                   <div class="tracking-hud">
                     <span><strong id="person-count">0</strong> persons tracked</span>
-                    <span class="source-pill" id="video-source-label">Video Source: demo-video -> /camera/color/image_raw</span>
+                    <span class="source-pill" id="video-source-label">Video Source: MP4 file -> /camera/color/image_raw</span>
                   </div>
                   <img id="annotated-image" alt="Annotated RVClaw inspection result" hidden>
                 </div>
@@ -1086,7 +1079,6 @@
     const jsonOutput = document.getElementById('json-output');
     const reportLink = document.getElementById('report-link');
     const personVideo = document.getElementById('person-video');
-    const personCanvas = document.getElementById('person-demo-canvas');
     const personOverlay = document.getElementById('person-overlay');
     const personCount = document.getElementById('person-count');
     const videoSourceLabel = document.getElementById('video-source-label');
@@ -1170,45 +1162,6 @@
       return box;
     }
 
-    function drawDemoFrame(now) {
-      const context = personCanvas.getContext('2d');
-      const width = personCanvas.width;
-      const height = personCanvas.height;
-      const progress = ((now - demoStartTime) % 12000) / 12000;
-      context.clearRect(0, 0, width, height);
-
-      const gradient = context.createLinearGradient(0, 0, width, height);
-      gradient.addColorStop(0, '#263241');
-      gradient.addColorStop(0.5, '#111827');
-      gradient.addColorStop(1, '#0b1220');
-      context.fillStyle = gradient;
-      context.fillRect(0, 0, width, height);
-
-      context.strokeStyle = 'rgba(148, 163, 184, 0.22)';
-      context.lineWidth = 2;
-      for (let i = 0; i < 10; i += 1) {
-        const x = i * 108 - (progress * 108);
-        context.beginPath();
-        context.moveTo(x, 0);
-        context.lineTo(x - 210, height);
-        context.stroke();
-      }
-
-      context.fillStyle = '#1f2937';
-      context.fillRect(0, height * 0.68, width, height * 0.32);
-      context.fillStyle = '#334155';
-      context.fillRect(0, height * 0.64, width, 22);
-      context.fillStyle = '#475569';
-      for (let i = 0; i < 12; i += 1) {
-        context.fillRect(i * 92 - progress * 92, height * 0.66, 64, 34);
-      }
-
-      context.fillStyle = 'rgba(32, 199, 201, 0.12)';
-      context.fillRect(width * 0.58, 78, 190, 338);
-      context.strokeStyle = 'rgba(32, 199, 201, 0.34)';
-      context.strokeRect(width * 0.58, 78, 190, 338);
-    }
-
     function renderPersonOverlay(now) {
       personOverlay.innerHTML = '';
       const namespace = 'http://www.w3.org/2000/svg';
@@ -1228,7 +1181,10 @@
       if (!trackingPayload) {
         return;
       }
-      const progress = ((now - demoStartTime) % (trackingPayload.stream.duration_sec * 1000)) / (trackingPayload.stream.duration_sec * 1000);
+      const duration = personVideo.duration || trackingPayload.stream.duration_sec;
+      const progress = duration > 0
+        ? (personVideo.currentTime % duration) / duration
+        : ((now - demoStartTime) % (trackingPayload.stream.duration_sec * 1000)) / (trackingPayload.stream.duration_sec * 1000);
       const detections = (visionState && visionState.detections.length)
         ? visionState.detections
         : (trackingPayload.detections || []);
@@ -1342,17 +1298,15 @@
     }
 
     function animatePersonDemo(now) {
-      drawDemoFrame(now);
       renderPersonOverlay(now);
       requestAnimationFrame(animatePersonDemo);
     }
 
-    async function setupGeneratedVideoSource() {
+    async function setupVideoSource() {
       if (videoDetectionPayload && videoDetectionPayload.source.url) {
-        personVideo.srcObject = null;
-        personVideo.src = videoDetectionPayload.source.url;
-        personVideo.hidden = false;
-        personCanvas.hidden = true;
+        if (personVideo.getAttribute('src') !== videoDetectionPayload.source.url) {
+          personVideo.src = videoDetectionPayload.source.url;
+        }
         personVideo.muted = true;
         personVideo.loop = true;
         try {
@@ -1363,21 +1317,10 @@
           appendLog(`Sample video autoplay fallback: ${error.message}`, 'WARN');
         }
       }
-      if (!personCanvas.captureStream) {
-        personVideo.hidden = true;
-        personCanvas.hidden = false;
-        appendLog('Browser canvas stream unsupported; using canvas video fallback', 'WARN');
-        return;
-      }
-      personVideo.srcObject = personCanvas.captureStream(15);
-      personVideo.hidden = false;
-      personCanvas.hidden = true;
       try {
         await personVideo.play();
       } catch (error) {
-        personVideo.hidden = true;
-        personCanvas.hidden = false;
-        appendLog(`Video autoplay fallback: ${error.message}`, 'WARN');
+        appendLog(`Video autoplay paused: ${error.message}`, 'WARN');
       }
     }
 
@@ -1410,6 +1353,10 @@
         }
         trackingPayload = await response.json();
         if (!videoDetectionPayload) {
+          if (trackingPayload.source.uri && personVideo.getAttribute('src') !== trackingPayload.source.uri) {
+            personVideo.src = trackingPayload.source.uri;
+            setupVideoSource();
+          }
           personCount.textContent = (trackingPayload.detections || trackingPayload.tracks).length;
           videoSourceLabel.textContent = `YOLOv8n ${trackingPayload.source.type} -> ${trackingPayload.source.topic}`;
         }
@@ -1451,7 +1398,7 @@
     }
 
     runButton.addEventListener('click', runSampleFlow);
-    loadVideoDetections().finally(setupGeneratedVideoSource);
+    loadVideoDetections().finally(setupVideoSource);
     loadVisionState();
     loadPersonTracking();
     requestAnimationFrame(animatePersonDemo);

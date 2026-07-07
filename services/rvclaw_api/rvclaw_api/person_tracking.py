@@ -10,11 +10,12 @@ def get_person_tracking_payload():
     return {
         "source": {
             "type": "demo-video",
-            "name": "factory-aisle-person-demo",
+            "name": "people-detection-sample",
             "replaceable_with": "ros2_camera_topic",
             "topic": "/camera/color/image_raw",
             "adapter": "rvclaw_perception.camera_stream",
-            "transport": "browser-canvas",
+            "transport": "mp4-file",
+            "uri": "/assets/videos/people-detection.mp4",
         },
         "stream": {
             "width": 960,

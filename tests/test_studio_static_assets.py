@@ -37,6 +37,14 @@ class StudioStaticAssetsTest(unittest.TestCase):
         self.assertIn("f7-alert-count", page)
         self.assertIn("yolo-detection-count", page)
         self.assertIn("videoDetectionPayload.runtime.flow", page)
+        self.assertNotIn("person-demo-canvas", page)
+        self.assertNotIn("captureStream", page)
+
+    def test_studio_contains_real_person_tracking_video_asset(self):
+        video = REPO_ROOT / "studio" / "web" / "assets" / "videos" / "people-detection.mp4"
+
+        self.assertTrue(video.exists())
+        self.assertGreater(video.stat().st_size, 1_000_000)
 
 
 if __name__ == "__main__":
