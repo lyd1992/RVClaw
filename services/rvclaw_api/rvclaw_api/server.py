@@ -7,6 +7,8 @@ from urllib.parse import urlparse
 
 from .person_tracking import get_person_tracking_payload
 from .sample_flow import run_sample_flow
+from .video_detection import get_video_detection_payload
+from .vision_state import get_vision_state
 
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -24,8 +26,17 @@ class RVClawRequestHandler(BaseHTTPRequestHandler):
         if parsed.path == "/api/person-tracking":
             self._write_json(get_person_tracking_payload())
             return
+        if parsed.path == "/api/vision-state":
+            self._write_json(get_vision_state())
+            return
+        if parsed.path == "/api/video-detections":
+            self._write_json(get_video_detection_payload())
+            return
         if parsed.path.startswith("/artifacts/"):
             self._serve_artifact(parsed.path.removeprefix("/artifacts/"))
+            return
+        if parsed.path.startswith("/samples/"):
+            self._serve_sample(parsed.path.removeprefix("/samples/"))
             return
         self._serve_studio(parsed.path)
 
@@ -42,6 +53,14 @@ class RVClawRequestHandler(BaseHTTPRequestHandler):
         target = (DEFAULT_RUNS / relative_path).resolve()
         runs_root = DEFAULT_RUNS.resolve()
         if not str(target).startswith(str(runs_root)) or not target.exists() or target.is_dir():
+            self.send_error(404)
+            return
+        self._write_bytes(target.read_bytes(), _content_type(target))
+
+    def _serve_sample(self, relative_path):
+        samples_root = (REPO_ROOT / "samples").resolve()
+        target = (samples_root / relative_path).resolve()
+        if not str(target).startswith(str(samples_root)) or not target.exists() or target.is_dir():
             self.send_error(404)
             return
         self._write_bytes(target.read_bytes(), _content_type(target))

@@ -1,7 +1,12 @@
 from datetime import datetime, timezone
 
+from rvclaw_algo import YoloV8nDetector
+
 
 def get_person_tracking_payload():
+    detector = YoloV8nDetector()
+    yolo_runtime = detector.runtime()
+    yolo_detections = detector.detect_image("samples/sample_meter.svg")
     return {
         "source": {
             "type": "demo-video",
@@ -23,10 +28,14 @@ def get_person_tracking_payload():
         },
         "runtime": {
             "target": "K3 CoM260 local",
-            "backend": "browser-overlay-demo",
-            "model": "person-track-demo-v0",
+            "backend": yolo_runtime["backend"],
+            "model": "yolov8n",
             "offline": True,
+            "available": yolo_runtime["available"],
+            "status": yolo_runtime["status"],
+            "message": yolo_runtime["message"],
         },
+        "detections": yolo_detections,
         "tracks": [
             {
                 "track_id": "P-01",

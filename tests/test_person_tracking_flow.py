@@ -26,6 +26,11 @@ class PersonTrackingFlowTest(unittest.TestCase):
         self.assertEqual(payload["stream"]["frame_id"], "camera_color_optical_frame")
         self.assertEqual(payload["stream"]["encoding"], "rgb8")
         self.assertGreaterEqual(payload["stream"]["fps"], 12)
+        self.assertEqual(payload["runtime"]["model"], "yolov8n")
+        self.assertIn("available", payload["runtime"])
+        self.assertIn("detections", payload)
+        for detection in payload["detections"]:
+            self.assertEqual(detection["model"], "yolov8n")
 
         tracks = payload["tracks"]
         self.assertGreaterEqual(len(tracks), 2)
@@ -48,6 +53,7 @@ class PersonTrackingFlowTest(unittest.TestCase):
         self.assertIn("uri", schema["properties"]["source"]["properties"])
         self.assertIn("frame_id", schema["properties"]["stream"]["properties"])
         self.assertIn("encoding", schema["properties"]["stream"]["properties"])
+        self.assertIn("detections", schema["properties"])
 
 
 if __name__ == "__main__":
