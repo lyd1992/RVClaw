@@ -36,7 +36,36 @@
         "target": { "type": "string" },
         "backend": { "type": "string" },
         "model": { "type": "string" },
-        "offline": { "type": "boolean" }
+        "offline": { "type": "boolean" },
+        "available": { "type": "boolean" },
+        "status": { "type": "string" },
+        "message": { "type": ["string", "null"] }
+      }
+    },
+    "detections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["track_id", "label", "confidence", "safety_state", "bbox", "model"],
+        "properties": {
+          "track_id": { "type": "string" },
+          "label": { "type": "string" },
+          "value": { "type": ["string", "number", "null"] },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "safety_state": { "type": "string" },
+          "model": { "type": "string", "enum": ["yolov8n"] },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "bbox": {
+            "type": "object",
+            "required": ["x", "y", "width", "height"],
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "width": { "type": "number", "minimum": 1 },
+              "height": { "type": "number", "minimum": 1 }
+            }
+          }
+        }
       }
     },
     "tracks": {

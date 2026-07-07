@@ -25,3 +25,5 @@ artifacts/
 runs/
 tmp/
 *.log
+models/*.pt
+samples/*.yolov8n.json

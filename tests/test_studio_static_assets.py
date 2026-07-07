@@ -23,10 +23,20 @@ class StudioStaticAssetsTest(unittest.TestCase):
         self.assertIn("performance-chart", page)
         self.assertIn("log-stream", page)
         self.assertIn("/api/person-tracking", page)
+        self.assertIn("/api/vision-state", page)
+        self.assertIn("/api/video-detections", page)
         self.assertIn("person-video", page)
         self.assertIn("person-overlay", page)
         self.assertIn("Person Tracking", page)
         self.assertIn("person-count", page)
+        self.assertIn("YOLOv8n", page)
+        self.assertIn("Accuracy", page)
+        self.assertIn("model-accuracy", page)
+        self.assertNotIn("model-precision", page)
+        self.assertIn("f5-video-status", page)
+        self.assertIn("f7-alert-count", page)
+        self.assertIn("yolo-detection-count", page)
+        self.assertIn("videoDetectionPayload.runtime.flow", page)
 
 
 if __name__ == "__main__":

@@ -405,7 +405,9 @@
 
     .video-layer {
       width: 100%;
-      height: 100%;
+      height: auto;
+      max-height: 100%;
+      aspect-ratio: 16 / 9;
       position: relative;
       background: #0b1220;
     }
@@ -421,7 +423,7 @@
 
     .video-layer video,
     .video-layer canvas {
-      object-fit: cover;
+      object-fit: contain;
     }
 
     .video-layer video {
@@ -929,7 +931,7 @@
                 <div class="video-layer">
                   <video id="person-video" muted loop playsinline></video>
                   <canvas id="person-demo-canvas" width="960" height="540" aria-hidden="true"></canvas>
-                  <svg id="person-overlay" class="person-overlay" viewBox="0 0 960 540" preserveAspectRatio="none" aria-label="Person tracking overlay"></svg>
+                  <svg id="person-overlay" class="person-overlay" viewBox="0 0 960 540" preserveAspectRatio="xMidYMid meet" aria-label="Person tracking overlay"></svg>
                   <div class="tracking-hud">
                     <span><strong id="person-count">0</strong> persons tracked</span>
                     <span class="source-pill" id="video-source-label">Video Source: demo-video -> /camera/color/image_raw</span>
@@ -949,9 +951,12 @@
             <div class="runtime-content">
               <div class="select-like"><span id="active-model">sample-rule-v0</span><span class="pill">Running</span></div>
               <div class="field"><span>Framework</span><strong>RVClaw Local</strong></div>
-              <div class="field"><span>Precision</span><strong>Rule Baseline</strong></div>
-              <div class="field"><span>Input</span><strong>SVG / Camera Frame</strong></div>
+              <div class="field"><span>Accuracy</span><strong id="model-accuracy">Pending K3 eval</strong></div>
+              <div class="field"><span>Input</span><strong id="model-input">C70 RGB / Camera Frame</strong></div>
               <div class="field"><span>Status</span><strong id="runtime-status">Running</strong></div>
+              <div class="field"><span>F5 Video</span><strong id="f5-video-status">Waiting</strong></div>
+              <div class="field"><span>F7 Alerts</span><strong id="f7-alert-count">0</strong></div>
+              <div class="field"><span>Detections</span><strong id="yolo-detection-count">0</strong></div>
               <div class="field"><span>Inferences</span><strong id="inference-count">1,248,532</strong></div>
               <div class="outline-actions">
                 <button type="button">Manage Models</button>
@@ -1085,7 +1090,13 @@
     const personOverlay = document.getElementById('person-overlay');
     const personCount = document.getElementById('person-count');
     const videoSourceLabel = document.getElementById('video-source-label');
+    const runtimeStatus = document.getElementById('runtime-status');
+    const f5VideoStatus = document.getElementById('f5-video-status');
+    const f7AlertCount = document.getElementById('f7-alert-count');
+    const yoloDetectionCount = document.getElementById('yolo-detection-count');
     let trackingPayload = null;
+    let visionState = null;
+    let videoDetectionPayload = null;
     let demoStartTime = performance.now();
 
     function setLoading(isLoading) {
@@ -1112,13 +1123,32 @@
       document.getElementById('value').textContent = inspection.value;
       document.getElementById('confidence').textContent = inspection.confidence;
       document.getElementById('result-status').textContent = inspection.is_anomaly ? 'ANOMALY' : 'PASS';
-      document.getElementById('active-model').textContent = inspection.runtime.model;
+      if (!visionState) {
+        document.getElementById('active-model').textContent = inspection.runtime.model;
+      }
       annotatedImage.src = payload.artifacts.annotated_image_url;
       jsonOutput.textContent = JSON.stringify(payload, null, 2);
       reportLink.href = payload.artifacts.report_url;
       reportLink.removeAttribute('aria-disabled');
       statusText.textContent = 'Sample flow completed';
       appendLog(`Inspection ${inspection.point_id} completed with ${inspection.runtime.backend}`);
+    }
+
+    function renderVisionState(payload) {
+      visionState = payload;
+      document.getElementById('active-model').textContent = payload.model.model;
+      document.getElementById('model-accuracy').textContent = payload.model.accuracy || 'Pending K3 eval';
+      document.getElementById('model-input').textContent = `${payload.video.camera} / ${payload.video.source.topic}`;
+      runtimeStatus.textContent = payload.model.available ? 'YOLOv8n Ready' : 'YOLOv8n Adapter Fallback';
+      f7AlertCount.textContent = payload.alerts.length;
+      if (!videoDetectionPayload) {
+        f5VideoStatus.textContent = `${payload.video.status} (${payload.video.stream.width}x${payload.video.stream.height}@${payload.video.stream.fps})`;
+        yoloDetectionCount.textContent = payload.detections.length;
+        videoSourceLabel.textContent = `F5 ${payload.video.camera}: ${payload.video.source.type} -> ${payload.video.source.topic}`;
+      }
+      jsonOutput.textContent = JSON.stringify(payload, null, 2);
+      appendLog(`F5/F7 loaded with ${payload.model.model} via ${payload.model.backend}`, payload.model.available ? 'INFO' : 'WARN');
+      payload.alerts.forEach((alert) => appendLog(alert.message, 'WARN'));
     }
 
     function interpolateBox(keyframes, progress) {
@@ -1180,12 +1210,37 @@
     }
 
     function renderPersonOverlay(now) {
+      personOverlay.innerHTML = '';
+      const namespace = 'http://www.w3.org/2000/svg';
+
+      if (videoDetectionPayload) {
+        const frame = currentVideoDetectionFrame(now);
+        const detections = frame ? frame.detections : [];
+        yoloDetectionCount.textContent = detections.length;
+        personCount.textContent = detections.filter((detection) => detection.label === 'person').length;
+        detections.forEach((detection) => {
+          const color = detection.safety_state === 'normal' ? '#20c7c9' : '#f97316';
+          drawDetection(namespace, detection.bbox, color, `YOLOv8n ${detection.label} ${(detection.confidence * 100).toFixed(0)}%`);
+        });
+        return;
+      }
+
       if (!trackingPayload) {
         return;
       }
       const progress = ((now - demoStartTime) % (trackingPayload.stream.duration_sec * 1000)) / (trackingPayload.stream.duration_sec * 1000);
-      personOverlay.innerHTML = '';
-      const namespace = 'http://www.w3.org/2000/svg';
+      const detections = (visionState && visionState.detections.length)
+        ? visionState.detections
+        : (trackingPayload.detections || []);
+      if (detections.length) {
+        detections.forEach((detection) => {
+          const box = detection.bbox;
+          const color = detection.safety_state === 'normal' ? '#20c7c9' : '#f97316';
+          drawDetection(namespace, box, color, `YOLOv8n ${detection.label} ${(detection.confidence * 100).toFixed(0)}%`);
+        });
+        return;
+      }
+
       trackingPayload.tracks.forEach((track) => {
         const box = interpolateBox(track.keyframes, progress);
         const color = track.safety_state === 'normal' ? '#22c55e' : '#f97316';
@@ -1234,6 +1289,58 @@
       });
     }
 
+    function currentVideoDetectionFrame(now) {
+      const frames = videoDetectionPayload.frames || [];
+      if (!frames.length) {
+        return null;
+      }
+      const duration = videoDetectionPayload.stream.duration_sec || 12;
+      const sourceTime = personVideo.duration && !personVideo.paused
+        ? personVideo.currentTime % duration
+        : ((now - demoStartTime) % (duration * 1000)) / 1000;
+      let nearest = frames[0];
+      let bestDistance = Math.abs(sourceTime - nearest.time_sec);
+      frames.forEach((frame) => {
+        const distance = Math.abs(sourceTime - frame.time_sec);
+        if (distance < bestDistance) {
+          nearest = frame;
+          bestDistance = distance;
+        }
+      });
+      return nearest;
+    }
+
+    function drawDetection(namespace, box, color, text) {
+      const rect = document.createElementNS(namespace, 'rect');
+      rect.setAttribute('x', box.x);
+      rect.setAttribute('y', box.y);
+      rect.setAttribute('width', box.width);
+      rect.setAttribute('height', box.height);
+      rect.setAttribute('fill', 'transparent');
+      rect.setAttribute('stroke', color);
+      rect.setAttribute('stroke-width', '4');
+      rect.setAttribute('rx', '6');
+      personOverlay.appendChild(rect);
+
+      const labelBg = document.createElementNS(namespace, 'rect');
+      labelBg.setAttribute('x', box.x);
+      labelBg.setAttribute('y', Math.max(box.y - 34, 8));
+      labelBg.setAttribute('width', '190');
+      labelBg.setAttribute('height', '28');
+      labelBg.setAttribute('rx', '5');
+      labelBg.setAttribute('fill', color);
+      personOverlay.appendChild(labelBg);
+
+      const label = document.createElementNS(namespace, 'text');
+      label.setAttribute('x', box.x + 10);
+      label.setAttribute('y', Math.max(box.y - 14, 28));
+      label.setAttribute('fill', '#ffffff');
+      label.setAttribute('font-family', 'Consolas, monospace');
+      label.setAttribute('font-size', '15');
+      label.textContent = text;
+      personOverlay.appendChild(label);
+    }
+
     function animatePersonDemo(now) {
       drawDemoFrame(now);
       renderPersonOverlay(now);
@@ -1241,6 +1348,21 @@
     }
 
     async function setupGeneratedVideoSource() {
+      if (videoDetectionPayload && videoDetectionPayload.source.url) {
+        personVideo.srcObject = null;
+        personVideo.src = videoDetectionPayload.source.url;
+        personVideo.hidden = false;
+        personCanvas.hidden = true;
+        personVideo.muted = true;
+        personVideo.loop = true;
+        try {
+          await personVideo.play();
+          appendLog(`CAM 01 sample video playing from ${videoDetectionPayload.source.url}`);
+          return;
+        } catch (error) {
+          appendLog(`Sample video autoplay fallback: ${error.message}`, 'WARN');
+        }
+      }
       if (!personCanvas.captureStream) {
         personVideo.hidden = true;
         personCanvas.hidden = false;
@@ -1259,6 +1381,27 @@
       }
     }
 
+    async function loadVideoDetections() {
+      try {
+        const response = await fetch('/api/video-detections');
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        videoDetectionPayload = await response.json();
+        const firstDetections = videoDetectionPayload.detections || [];
+        personCount.textContent = firstDetections.filter((detection) => detection.label === 'person').length;
+        yoloDetectionCount.textContent = firstDetections.length;
+        const overlayMode = videoDetectionPayload.runtime.overlay_mode === 'model-output' ? 'model output' : 'model unavailable';
+        personOverlay.setAttribute('viewBox', `0 0 ${videoDetectionPayload.stream.width} ${videoDetectionPayload.stream.height}`);
+        f5VideoStatus.textContent = `${videoDetectionPayload.source.type} (${videoDetectionPayload.stream.width}x${videoDetectionPayload.stream.height}@${videoDetectionPayload.stream.fps}, ${overlayMode})`;
+        videoSourceLabel.textContent = `YOLOv8n ${overlayMode} -> ${videoDetectionPayload.source.topic}`;
+        runtimeStatus.textContent = videoDetectionPayload.runtime.available ? 'YOLOv8n Ready' : 'YOLOv8n Adapter Fallback';
+        appendLog(`CAM 01 ${videoDetectionPayload.runtime.flow}`);
+      } catch (error) {
+        appendLog(`Video detection timeline unavailable: ${error.message}`, 'WARN');
+      }
+    }
+
     async function loadPersonTracking() {
       try {
         const response = await fetch('/api/person-tracking');
@@ -1266,12 +1409,28 @@
           throw new Error(`HTTP ${response.status}`);
         }
         trackingPayload = await response.json();
-        personCount.textContent = trackingPayload.tracks.length;
-        videoSourceLabel.textContent = `Video Source: ${trackingPayload.source.type} -> ${trackingPayload.source.topic}`;
-        appendLog(`Person Tracking source ${trackingPayload.source.type} mapped to ${trackingPayload.source.topic}`);
+        if (!videoDetectionPayload) {
+          personCount.textContent = (trackingPayload.detections || trackingPayload.tracks).length;
+          videoSourceLabel.textContent = `YOLOv8n ${trackingPayload.source.type} -> ${trackingPayload.source.topic}`;
+        }
+        appendLog(`Person Tracking source ${trackingPayload.source.type} mapped to ${trackingPayload.source.topic} with ${trackingPayload.runtime.model}`);
       } catch (error) {
         videoSourceLabel.textContent = `Person Tracking unavailable: ${error.message}`;
         appendLog(`Person Tracking unavailable: ${error.message}`, 'WARN');
+      }
+    }
+
+    async function loadVisionState() {
+      try {
+        const response = await fetch('/api/vision-state');
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        renderVisionState(await response.json());
+      } catch (error) {
+        f5VideoStatus.textContent = `Unavailable: ${error.message}`;
+        runtimeStatus.textContent = 'YOLOv8n unavailable';
+        appendLog(`F5/F7 vision state unavailable: ${error.message}`, 'WARN');
       }
     }
 
@@ -1292,7 +1451,8 @@
     }
 
     runButton.addEventListener('click', runSampleFlow);
-    setupGeneratedVideoSource();
+    loadVideoDetections().finally(setupGeneratedVideoSource);
+    loadVisionState();
     loadPersonTracking();
     requestAnimationFrame(animatePersonDemo);
     runSampleFlow();

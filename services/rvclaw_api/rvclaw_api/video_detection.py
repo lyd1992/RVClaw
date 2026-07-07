@@ -1,0 +1,147 @@
+import json
+import os
+from datetime import datetime, timezone
+from pathlib import Path
+
+from rvclaw_algo import YoloV8nDetector
+
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+DEFAULT_VIDEO = REPO_ROOT / "samples" / "factory_people_demo.mp4"
+SAMPLE_INTERVAL_SEC = float(os.getenv("RVCLAW_VIDEO_SAMPLE_SEC", "0.25"))
+MAX_SAMPLED_FRAMES = int(os.getenv("RVCLAW_VIDEO_MAX_FRAMES", "320"))
+
+
+def get_video_detection_payload(video_path=DEFAULT_VIDEO):
+    video_path = Path(video_path)
+    detector = YoloV8nDetector()
+    runtime = detector.runtime()
+    has_video = video_path.exists()
+    stream = _video_stream(video_path) if has_video else _fallback_stream()
+    frames = []
+
+    if has_video and runtime.get("available"):
+        try:
+            frames = _load_or_build_frame_detections(video_path, detector, runtime, stream)
+        except Exception as exc:
+            runtime = {**runtime, "video_inference_error": str(exc)}
+
+    overlay_mode = "model-output" if runtime.get("available") else "model-unavailable"
+    detections = _nearest_non_empty_detections(frames)
+    return {
+        "source": {
+            "type": "sample-video" if has_video else "browser-canvas",
+            "name": video_path.name if has_video else "factory-aisle-canvas-demo",
+            "url": f"/samples/{video_path.name}" if has_video else None,
+            "replaceable_with": "ros2_camera_topic",
+            "topic": "/camera/color/image_raw",
+            "adapter": "rvclaw_perception.camera_stream",
+            "transport": "mp4-file" if has_video else "browser-canvas",
+        },
+        "stream": {
+            **stream,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "frame_id": "camera_color_optical_frame",
+            "encoding": "rgb8",
+        },
+        "runtime": {
+            **runtime,
+            "flow": "video-frame -> yolov8n -> per-frame-boxes -> studio-overlay",
+            "overlay_mode": overlay_mode,
+            "sample_interval_sec": SAMPLE_INTERVAL_SEC,
+        },
+        "detections": detections,
+        "frames": frames,
+        "tracks": [],
+    }
+
+
+def _load_or_build_frame_detections(video_path, detector, runtime, stream):
+    cache_path = video_path.with_suffix(".yolov8n.json")
+    cache_key = {
+        "video": str(video_path),
+        "video_mtime": video_path.stat().st_mtime,
+        "model_path": runtime.get("model_path"),
+        "confidence": runtime.get("confidence"),
+        "sample_interval_sec": SAMPLE_INTERVAL_SEC,
+        "max_sampled_frames": MAX_SAMPLED_FRAMES,
+    }
+    if cache_path.exists():
+        with cache_path.open("r", encoding="utf-8") as handle:
+            cached = json.load(handle)
+        if cached.get("cache_key") == cache_key:
+            return cached.get("frames", [])
+
+    frames = _build_frame_detections(video_path, detector, stream)
+    with cache_path.open("w", encoding="utf-8") as handle:
+        json.dump({"cache_key": cache_key, "frames": frames}, handle, indent=2)
+    return frames
+
+
+def _build_frame_detections(video_path, detector, stream):
+    import cv2
+
+    capture = cv2.VideoCapture(str(video_path))
+    if not capture.isOpened():
+        raise RuntimeError(f"Unable to open video: {video_path}")
+
+    fps = max(float(stream["fps"]), 1.0)
+    sample_step = max(int(round(fps * SAMPLE_INTERVAL_SEC)), 1)
+    frames = []
+    frame_index = 0
+    sampled = 0
+    try:
+        while sampled < MAX_SAMPLED_FRAMES:
+            ok, frame = capture.read()
+            if not ok:
+                break
+            if frame_index % sample_step == 0:
+                detections = detector.detect_frame(frame)
+                frames.append(
+                    {
+                        "time_sec": round(frame_index / fps, 3),
+                        "frame_index": frame_index,
+                        "detections": detections,
+                    }
+                )
+                sampled += 1
+            frame_index += 1
+    finally:
+        capture.release()
+    return frames
+
+
+def _video_stream(video_path):
+    try:
+        import cv2
+
+        capture = cv2.VideoCapture(str(video_path))
+        if not capture.isOpened():
+            return _fallback_stream()
+        try:
+            fps = capture.get(cv2.CAP_PROP_FPS) or 15
+            width = int(capture.get(cv2.CAP_PROP_FRAME_WIDTH) or 960)
+            height = int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT) or 540)
+            frame_count = capture.get(cv2.CAP_PROP_FRAME_COUNT) or 0
+            duration = frame_count / fps if fps else 12
+            return {
+                "width": width,
+                "height": height,
+                "fps": round(float(fps), 2),
+                "duration_sec": round(float(duration), 2),
+            }
+        finally:
+            capture.release()
+    except Exception:
+        return _fallback_stream()
+
+
+def _fallback_stream():
+    return {"width": 960, "height": 540, "fps": 15, "duration_sec": 12}
+
+
+def _nearest_non_empty_detections(frames):
+    for frame in frames:
+        if frame.get("detections"):
+            return frame["detections"]
+    return []

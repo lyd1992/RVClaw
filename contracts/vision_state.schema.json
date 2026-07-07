@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RVClaw F5/F7 Vision State",
+  "type": "object",
+  "required": ["features", "video", "model", "detections", "alerts", "device", "studio"],
+  "properties": {
+    "features": {
+      "type": "object",
+      "required": ["F5", "F7"],
+      "properties": {
+        "F5": { "type": "string", "enum": ["video_capture"] },
+        "F7": { "type": "string", "enum": ["studio_task_display"] }
+      }
+    },
+    "video": {
+      "type": "object",
+      "required": ["camera", "source", "stream", "status"],
+      "properties": {
+        "camera": { "type": "string" },
+        "status": { "type": "string" },
+        "source": {
+          "type": "object",
+          "required": ["type", "topic", "adapter", "transport"],
+          "properties": {
+            "type": { "type": "string", "enum": ["demo-video", "ros2-camera"] },
+            "topic": { "type": "string" },
+            "adapter": { "type": "string" },
+            "transport": { "type": "string", "enum": ["browser-canvas", "ros2-image-topic"] }
+          }
+        },
+        "stream": {
+          "type": "object",
+          "required": ["width", "height", "fps", "frame_id", "encoding", "timestamp"],
+          "properties": {
+            "width": { "type": "integer", "minimum": 1 },
+            "height": { "type": "integer", "minimum": 1 },
+            "fps": { "type": "number", "minimum": 1 },
+            "frame_id": { "type": "string" },
+            "encoding": { "type": "string" },
+            "timestamp": { "type": "string", "format": "date-time" }
+          }
+        }
+      }
+    },
+    "model": {
+      "type": "object",
+      "required": ["target", "backend", "model", "model_path", "offline", "available", "status"],
+      "properties": {
+        "target": { "type": "string" },
+        "backend": { "type": "string" },
+        "model": { "type": "string", "enum": ["yolov8n"] },
+        "model_path": { "type": "string" },
+        "confidence": { "type": "number" },
+        "offline": { "type": "boolean" },
+        "available": { "type": "boolean" },
+        "status": { "type": "string" },
+        "message": { "type": ["string", "null"] }
+      }
+    },
+    "detections": { "type": "array" },
+    "alerts": { "type": "array" },
+    "device": { "type": "object" },
+    "studio": { "type": "object" }
+  }
+}
