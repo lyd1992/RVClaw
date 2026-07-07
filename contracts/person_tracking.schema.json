@@ -13,7 +13,8 @@
         "replaceable_with": { "type": "string", "enum": ["ros2_camera_topic"] },
         "topic": { "type": "string" },
         "adapter": { "type": "string" },
-        "transport": { "type": "string", "enum": ["browser-canvas", "ros2-image-topic"] }
+        "transport": { "type": "string", "enum": ["mp4-file", "ros2-image-topic"] },
+        "uri": { "type": "string" }
       }
     },
     "stream": {

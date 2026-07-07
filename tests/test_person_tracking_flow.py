@@ -19,7 +19,8 @@ class PersonTrackingFlowTest(unittest.TestCase):
         self.assertEqual(payload["source"]["type"], "demo-video")
         self.assertEqual(payload["source"]["replaceable_with"], "ros2_camera_topic")
         self.assertEqual(payload["source"]["topic"], "/camera/color/image_raw")
-        self.assertEqual(payload["source"]["transport"], "browser-canvas")
+        self.assertEqual(payload["source"]["transport"], "mp4-file")
+        self.assertEqual(payload["source"]["uri"], "/assets/videos/people-detection.mp4")
         self.assertEqual(payload["stream"]["width"], 960)
         self.assertEqual(payload["stream"]["height"], 540)
         self.assertEqual(payload["stream"]["frame_id"], "camera_color_optical_frame")
@@ -43,6 +44,8 @@ class PersonTrackingFlowTest(unittest.TestCase):
         self.assertIn("demo-video", schema["properties"]["source"]["properties"]["type"]["enum"])
         self.assertIn("ros2-camera", schema["properties"]["source"]["properties"]["type"]["enum"])
         self.assertIn("transport", schema["properties"]["source"]["properties"])
+        self.assertIn("mp4-file", schema["properties"]["source"]["properties"]["transport"]["enum"])
+        self.assertIn("uri", schema["properties"]["source"]["properties"])
         self.assertIn("frame_id", schema["properties"]["stream"]["properties"])
         self.assertIn("encoding", schema["properties"]["stream"]["properties"])
 
