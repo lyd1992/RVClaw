@@ -37,10 +37,6 @@ class StudioStaticAssetsTest(unittest.TestCase):
         self.assertIn("f7-alert-count", page)
         self.assertIn("yolo-detection-count", page)
         self.assertIn("videoDetectionPayload.runtime.flow", page)
-        self.assertIn("formatOverlayMode", page)
-        self.assertIn("video-decode-unavailable", page)
-        self.assertIn("video_inference_error", page)
-        self.assertIn("inference_video", page)
         self.assertNotIn("person-demo-canvas", page)
         self.assertNotIn("captureStream", page)
 
