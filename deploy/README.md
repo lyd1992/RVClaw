@@ -41,12 +41,12 @@ fallback status instead of failing to boot.
 ## 3. K3 video sidecar
 
 Studio plays `samples/factory_people_demo.mp4` in the browser. Keep this file
-browser-friendly, for example H.264. K3 OpenCV may not decode the same H.264
-file, so the API automatically uses `samples/factory_people_demo_cv2.mp4` for
-YOLO frame sampling when that sidecar exists.
+browser-friendly, for example H.264. The API automatically uses
+`samples/factory_people_demo_cv2.mp4` for YOLO frame sampling when that sidecar
+exists. If K3 OpenCV still cannot open the inference video, the API falls back
+to `ffmpeg` frame extraction and runs YOLO on the extracted JPEG frames.
 
-Create the sidecar on K3 when OpenCV cannot open the display video:
-
+Create the sidecar on K3 when you want a smaller inference video:
 ```bash
 cd /data/RVClaw
 ffmpeg -y -i samples/factory_people_demo.mp4 \

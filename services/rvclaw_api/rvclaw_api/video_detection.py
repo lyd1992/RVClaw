@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -84,6 +85,7 @@ def _load_or_build_frame_detections(video_path, detector, runtime, stream):
         "confidence": runtime.get("confidence"),
         "sample_interval_sec": SAMPLE_INTERVAL_SEC,
         "max_sampled_frames": MAX_SAMPLED_FRAMES,
+        "decoder": "cv2-or-ffmpeg-v2",
     }
     if cache_path.exists():
         with cache_path.open("r", encoding="utf-8") as handle:
@@ -99,11 +101,18 @@ def _load_or_build_frame_detections(video_path, detector, runtime, stream):
 
 
 def _build_frame_detections(video_path, detector, stream):
+    try:
+        return _build_frame_detections_with_cv2(video_path, detector, stream)
+    except RuntimeError as cv2_error:
+        return _build_frame_detections_with_ffmpeg(video_path, detector, stream, cv2_error)
+
+
+def _build_frame_detections_with_cv2(video_path, detector, stream):
     import cv2
 
     capture = cv2.VideoCapture(str(video_path))
     if not capture.isOpened():
-        raise RuntimeError(f"Unable to open video: {video_path}")
+        raise RuntimeError(f"Unable to open video with cv2: {video_path}")
 
     fps = max(float(stream["fps"]), 1.0)
     sample_step = max(int(round(fps * SAMPLE_INTERVAL_SEC)), 1)
@@ -121,6 +130,7 @@ def _build_frame_detections(video_path, detector, stream):
                     {
                         "time_sec": round(frame_index / fps, 3),
                         "frame_index": frame_index,
+                        "decode_backend": "cv2",
                         "detections": detections,
                     }
                 )
@@ -129,7 +139,59 @@ def _build_frame_detections(video_path, detector, stream):
     finally:
         capture.release()
     if not frames:
-        raise RuntimeError(f"No frames decoded from video: {video_path}")
+        raise RuntimeError(f"No frames decoded with cv2 from video: {video_path}")
+    return frames
+
+
+def _build_frame_detections_with_ffmpeg(video_path, detector, stream, cv2_error):
+    frame_dir = video_path.with_suffix(".ffmpeg_frames")
+    frame_dir.mkdir(parents=True, exist_ok=True)
+    for old_frame in frame_dir.glob("frame_*.jpg"):
+        old_frame.unlink()
+
+    frame_rate = 1.0 / max(SAMPLE_INTERVAL_SEC, 0.001)
+    output_pattern = frame_dir / "frame_%06d.jpg"
+    command = [
+        "ffmpeg",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-y",
+        "-i",
+        str(video_path),
+        "-vf",
+        f"fps={frame_rate:.6f}",
+        "-frames:v",
+        str(MAX_SAMPLED_FRAMES),
+        "-q:v",
+        "3",
+        str(output_pattern),
+    ]
+    try:
+        completed = subprocess.run(command, capture_output=True, text=True)
+    except FileNotFoundError as exc:
+        raise RuntimeError(f"{cv2_error}; ffmpeg not found") from exc
+
+    if completed.returncode != 0:
+        detail = (completed.stderr or "ffmpeg returned a non-zero exit code").strip()
+        raise RuntimeError(f"{cv2_error}; ffmpeg fallback failed: {detail}")
+
+    image_paths = sorted(frame_dir.glob("frame_*.jpg"))
+    if not image_paths:
+        raise RuntimeError(f"{cv2_error}; ffmpeg fallback produced no frames: {video_path}")
+
+    fps = max(float(stream.get("fps", 15)), 1.0)
+    frames = []
+    for index, image_path in enumerate(image_paths[:MAX_SAMPLED_FRAMES]):
+        time_sec = round(index * SAMPLE_INTERVAL_SEC, 3)
+        frames.append(
+            {
+                "time_sec": time_sec,
+                "frame_index": int(round(time_sec * fps)),
+                "decode_backend": "ffmpeg",
+                "detections": detector.detect_image(image_path),
+            }
+        )
     return frames
 
 

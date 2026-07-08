@@ -1,5 +1,6 @@
 import sys
 import tempfile
+import types
 import unittest
 from pathlib import Path
 
@@ -101,5 +102,66 @@ class VideoDetectionPathTest(unittest.TestCase):
             video_detection.YoloV8nDetector = previous_detector
             video_detection._video_stream = previous_stream
 
+    def test_ffmpeg_fallback_samples_frames_when_cv2_video_capture_cannot_open(self):
+        previous_cv2 = sys.modules.get("cv2")
+        previous_run = video_detection.subprocess.run
+        cv2_stub = types.ModuleType("cv2")
+
+        class ClosedCapture:
+            def __init__(self, path):
+                self.path = path
+
+            def isOpened(self):
+                return False
+
+            def release(self):
+                return None
+
+        class FakeCompletedProcess:
+            returncode = 0
+            stderr = ""
+
+        class FakeDetector:
+            def detect_image(self, image_path):
+                return [
+                    {
+                        "track_id": "Y8N-01",
+                        "label": "person",
+                        "confidence": 0.88,
+                        "bbox": {"x": 10, "y": 12, "width": 40, "height": 80},
+                    }
+                ]
+
+        def fake_run(command, capture_output, text):
+            output_pattern = Path(command[-1])
+            output_pattern.parent.mkdir(parents=True, exist_ok=True)
+            (output_pattern.parent / "frame_000001.jpg").write_bytes(b"jpg-1")
+            (output_pattern.parent / "frame_000002.jpg").write_bytes(b"jpg-2")
+            return FakeCompletedProcess()
+
+        try:
+            cv2_stub.VideoCapture = ClosedCapture
+            sys.modules["cv2"] = cv2_stub
+            video_detection.subprocess.run = fake_run
+
+            with tempfile.TemporaryDirectory() as tmpdir:
+                video_path = Path(tmpdir) / "factory_people_demo_cv2.mp4"
+                video_path.write_bytes(b"video")
+
+                frames = video_detection._build_frame_detections(
+                    video_path,
+                    FakeDetector(),
+                    {"fps": 15, "width": 960, "height": 540, "duration_sec": 3},
+                )
+
+            self.assertEqual(len(frames), 2)
+            self.assertEqual(frames[0]["decode_backend"], "ffmpeg")
+            self.assertEqual(frames[0]["detections"][0]["label"], "person")
+        finally:
+            video_detection.subprocess.run = previous_run
+            if previous_cv2 is None:
+                sys.modules.pop("cv2", None)
+            else:
+                sys.modules["cv2"] = previous_cv2
 if __name__ == "__main__":
     unittest.main()
