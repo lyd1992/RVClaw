@@ -19,7 +19,7 @@ class VideoDetectionFlowTest(unittest.TestCase):
         self.assertEqual(payload["runtime"]["flow"], "video-frame -> yolov8n -> per-frame-boxes -> studio-overlay")
         self.assertEqual(payload["source"]["topic"], "/camera/color/image_raw")
         self.assertIn(payload["source"]["type"], {"sample-video", "browser-canvas"})
-        self.assertIn(payload["runtime"]["overlay_mode"], {"model-output", "model-unavailable"})
+        self.assertIn(payload["runtime"]["overlay_mode"], {"model-output", "model-unavailable", "video-decode-unavailable"})
         self.assertIn("frames", payload)
         self.assertIn("detections", payload)
         if payload["frames"]:

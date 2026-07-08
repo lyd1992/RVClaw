@@ -12,21 +12,25 @@ SAMPLE_INTERVAL_SEC = float(os.getenv("RVCLAW_VIDEO_SAMPLE_SEC", "0.25"))
 MAX_SAMPLED_FRAMES = int(os.getenv("RVCLAW_VIDEO_MAX_FRAMES", "320"))
 
 
-def get_video_detection_payload(video_path=DEFAULT_VIDEO):
-    video_path = Path(video_path)
+def get_video_detection_payload(video_path=None, inference_video_path=None):
+    video_path = Path(video_path or os.getenv("RVCLAW_VIDEO_DISPLAY_PATH", DEFAULT_VIDEO))
+    inference_video_path = _resolve_inference_video_path(video_path, inference_video_path)
     detector = YoloV8nDetector()
     runtime = detector.runtime()
     has_video = video_path.exists()
-    stream = _video_stream(video_path) if has_video else _fallback_stream()
+    has_inference_video = inference_video_path.exists()
+    stream = _video_stream(inference_video_path) if has_inference_video else _fallback_stream()
     frames = []
 
-    if has_video and runtime.get("available"):
+    if runtime.get("available") and not has_inference_video:
+        runtime = {**runtime, "video_inference_error": f"Inference video not found: {inference_video_path}"}
+    elif has_inference_video and runtime.get("available"):
         try:
-            frames = _load_or_build_frame_detections(video_path, detector, runtime, stream)
+            frames = _load_or_build_frame_detections(inference_video_path, detector, runtime, stream)
         except Exception as exc:
             runtime = {**runtime, "video_inference_error": str(exc)}
 
-    overlay_mode = "model-output" if runtime.get("available") else "model-unavailable"
+    overlay_mode = _overlay_mode(runtime)
     detections = _nearest_non_empty_detections(frames)
     return {
         "source": {
@@ -49,11 +53,26 @@ def get_video_detection_payload(video_path=DEFAULT_VIDEO):
             "flow": "video-frame -> yolov8n -> per-frame-boxes -> studio-overlay",
             "overlay_mode": overlay_mode,
             "sample_interval_sec": SAMPLE_INTERVAL_SEC,
+            "display_video": str(video_path),
+            "inference_video": str(inference_video_path),
+            "inference_video_exists": has_inference_video,
         },
         "detections": detections,
         "frames": frames,
         "tracks": [],
     }
+
+
+def _resolve_inference_video_path(video_path, inference_video_path=None):
+    if inference_video_path:
+        return Path(inference_video_path)
+    configured = os.getenv("RVCLAW_VIDEO_INFERENCE_PATH")
+    if configured:
+        return Path(configured)
+    sidecar = video_path.with_name(f"{video_path.stem}_cv2{video_path.suffix}")
+    if sidecar.exists():
+        return sidecar
+    return video_path
 
 
 def _load_or_build_frame_detections(video_path, detector, runtime, stream):
@@ -69,8 +88,9 @@ def _load_or_build_frame_detections(video_path, detector, runtime, stream):
     if cache_path.exists():
         with cache_path.open("r", encoding="utf-8") as handle:
             cached = json.load(handle)
-        if cached.get("cache_key") == cache_key:
-            return cached.get("frames", [])
+        cached_frames = cached.get("frames", [])
+        if cached.get("cache_key") == cache_key and cached_frames:
+            return cached_frames
 
     frames = _build_frame_detections(video_path, detector, stream)
     with cache_path.open("w", encoding="utf-8") as handle:
@@ -108,6 +128,8 @@ def _build_frame_detections(video_path, detector, stream):
             frame_index += 1
     finally:
         capture.release()
+    if not frames:
+        raise RuntimeError(f"No frames decoded from video: {video_path}")
     return frames
 
 
@@ -138,6 +160,14 @@ def _video_stream(video_path):
 
 def _fallback_stream():
     return {"width": 960, "height": 540, "fps": 15, "duration_sec": 12}
+
+
+def _overlay_mode(runtime):
+    if not runtime.get("available"):
+        return "model-unavailable"
+    if runtime.get("video_inference_error"):
+        return "video-decode-unavailable"
+    return "model-output"
 
 
 def _nearest_non_empty_detections(frames):

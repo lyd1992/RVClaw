@@ -56,8 +56,8 @@ class YoloV8nDetector:
         if self._model is not None:
             return True
         try:
+            _prepare_headless_cv2()
             from ultralytics import YOLO
-
             if self.model_path.exists():
                 self._model = YOLO(str(self.model_path))
             elif self.model_path.name == "yolov8n.pt":
@@ -117,3 +117,17 @@ def _safety_state(label):
     if normalized in {"person", "no_helmet", "helmet", "hardhat"}:
         return "restricted-zone-watch" if normalized in {"person", "no_helmet"} else "normal"
     return "normal"
+
+
+def _prepare_headless_cv2():
+    try:
+        import cv2
+    except Exception:
+        return
+
+    if not hasattr(cv2, "imshow"):
+        cv2.imshow = lambda *args, **kwargs: None
+    if not hasattr(cv2, "waitKey"):
+        cv2.waitKey = lambda *args, **kwargs: -1
+    if not hasattr(cv2, "destroyAllWindows"):
+        cv2.destroyAllWindows = lambda *args, **kwargs: None
