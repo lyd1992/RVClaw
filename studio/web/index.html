@@ -1324,6 +1324,23 @@
       }
     }
 
+    function formatOverlayMode(runtime) {
+      const mode = runtime?.overlay_mode || 'unknown';
+      if (mode === 'model-output') {
+        return 'model output';
+      }
+      if (mode === 'video-decode-unavailable') {
+        return 'video decode unavailable';
+      }
+      if (mode === 'model-unavailable') {
+        return 'model unavailable';
+      }
+      return mode.replaceAll('-', ' ');
+    }
+
+    function videoRuntimeIssue(runtime) {
+      return runtime?.video_inference_error || runtime?.message || '';
+    }
     async function loadVideoDetections() {
       try {
         const response = await fetch('/api/video-detections');
@@ -1334,12 +1351,19 @@
         const firstDetections = videoDetectionPayload.detections || [];
         personCount.textContent = firstDetections.filter((detection) => detection.label === 'person').length;
         yoloDetectionCount.textContent = firstDetections.length;
-        const overlayMode = videoDetectionPayload.runtime.overlay_mode === 'model-output' ? 'model output' : 'model unavailable';
+        const overlayMode = formatOverlayMode(videoDetectionPayload.runtime);
+        const runtimeIssue = videoRuntimeIssue(videoDetectionPayload.runtime);
         personOverlay.setAttribute('viewBox', `0 0 ${videoDetectionPayload.stream.width} ${videoDetectionPayload.stream.height}`);
         f5VideoStatus.textContent = `${videoDetectionPayload.source.type} (${videoDetectionPayload.stream.width}x${videoDetectionPayload.stream.height}@${videoDetectionPayload.stream.fps}, ${overlayMode})`;
         videoSourceLabel.textContent = `YOLOv8n ${overlayMode} -> ${videoDetectionPayload.source.topic}`;
         runtimeStatus.textContent = videoDetectionPayload.runtime.available ? 'YOLOv8n Ready' : 'YOLOv8n Adapter Fallback';
         appendLog(`CAM 01 ${videoDetectionPayload.runtime.flow}`);
+        if (videoDetectionPayload.runtime.inference_video) {
+          appendLog(`CAM 01 inference video ${videoDetectionPayload.runtime.inference_video}`);
+        }
+        if (runtimeIssue) {
+          appendLog(`CAM 01 ${runtimeIssue}`, 'WARN');
+        }
       } catch (error) {
         appendLog(`Video detection timeline unavailable: ${error.message}`, 'WARN');
       }
