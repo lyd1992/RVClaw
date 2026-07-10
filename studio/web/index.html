@@ -118,6 +118,23 @@
       color: var(--soft);
       font-size: 17px;
       position: relative;
+      transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+    }
+
+    .nav-item[data-view] {
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .nav-item[data-view]:hover {
+      color: #ffffff;
+      background: linear-gradient(90deg, rgba(32,199,201,0.16), rgba(157,78,221,0.18));
+      border-color: rgba(32,199,201,0.42);
+    }
+
+    .nav-item[data-view]:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 2px;
     }
 
     .nav-item.active {
@@ -808,6 +825,334 @@
       max-width: 420px;
     }
 
+    .rvbench-view {
+      min-width: 0;
+      padding: 16px;
+      overflow: auto;
+      align-content: start;
+    }
+
+    .rvbench-sheet {
+      min-width: 920px;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #1f2937;
+      border: 1px solid rgba(148,163,184,0.32);
+      box-shadow: 0 24px 70px rgba(0,0,0,0.34);
+      padding: 28px 32px 24px;
+    }
+
+    .rvbench-report-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: start;
+      padding-bottom: 18px;
+      border-bottom: 2px solid #a855f7;
+    }
+
+    .rvbench-title h2 {
+      margin: 0;
+      color: #111827;
+      font-size: 34px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .rvbench-title span {
+      display: block;
+      margin-top: 10px;
+      color: #6d28d9;
+      font-size: 18px;
+      font-weight: 760;
+    }
+
+    .rvbench-meta {
+      display: grid;
+      grid-template-columns: auto auto;
+      gap: 6px 14px;
+      color: #6b7280;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .rvbench-meta strong {
+      color: #6d28d9;
+      font-weight: 800;
+    }
+
+    .pass-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 52px;
+      height: 22px;
+      border-radius: 5px;
+      color: #15803d;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .rvbench-grid {
+      display: grid;
+      grid-template-columns: 280px repeat(6, minmax(112px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .rvbench-box {
+      border: 1px solid #d8dfe9;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 8px 18px rgba(15,23,42,0.04);
+    }
+
+    .rvbench-config {
+      padding: 14px;
+      grid-row: span 1;
+    }
+
+    .rvbench-box-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: #6d28d9;
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .config-line {
+      display: grid;
+      grid-template-columns: 122px 1fr;
+      gap: 8px;
+      min-height: 19px;
+      align-items: center;
+      font-size: 11px;
+      color: #4b5563;
+    }
+
+    .config-line span:first-child {
+      color: #6d28d9;
+      font-weight: 750;
+    }
+
+    .benchmark-metric {
+      min-height: 166px;
+      padding: 14px 13px;
+      display: grid;
+      align-content: start;
+      gap: 10px;
+    }
+
+    .metric-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #374151;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .metric-symbol {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border: 2px solid #14b8a6;
+      border-radius: 50%;
+      color: #0f766e;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .metric-reading {
+      color: #111827;
+      font-size: 29px;
+      line-height: 1;
+      font-weight: 850;
+    }
+
+    .metric-reading small {
+      color: #4b5563;
+      font-size: 13px;
+      font-weight: 760;
+    }
+
+    .metric-target {
+      color: #6b7280;
+      font-size: 11px;
+      min-height: 28px;
+    }
+
+    .rvbench-charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.2fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .chart-card {
+      min-height: 150px;
+      padding: 12px 14px;
+    }
+
+    .chart-title {
+      color: #6d28d9;
+      font-size: 12px;
+      font-weight: 850;
+      margin-bottom: 4px;
+    }
+
+    .mini-chart {
+      width: 100%;
+      height: 112px;
+      display: block;
+    }
+
+    .rvbench-bottom {
+      display: grid;
+      grid-template-columns: 1.25fr 0.78fr 0.58fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .timeline-card,
+    .summary-table-card,
+    .overall-card {
+      padding: 14px;
+    }
+
+    .timeline-track {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      align-items: center;
+      gap: 0;
+      height: 72px;
+      padding: 0 16px;
+      border-radius: 7px;
+      background: #ecfdf5;
+      position: relative;
+    }
+
+    .timeline-track::before {
+      content: "";
+      position: absolute;
+      left: 30px;
+      right: 30px;
+      top: 34px;
+      height: 3px;
+      background: #14b8a6;
+    }
+
+    .timeline-dot {
+      display: grid;
+      justify-items: center;
+      gap: 18px;
+      color: #4b5563;
+      font-size: 10px;
+      z-index: 1;
+    }
+
+    .timeline-dot::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #0f766e;
+      box-shadow: 0 0 0 3px #ccfbf1;
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      color: #374151;
+      font-size: 11px;
+    }
+
+    .summary-table th,
+    .summary-table td {
+      padding: 5px 6px;
+      border: 1px solid #e5e7eb;
+      text-align: left;
+    }
+
+    .summary-table th {
+      color: #6d28d9;
+      background: #faf5ff;
+      font-weight: 850;
+    }
+
+    .overall-result {
+      display: grid;
+      gap: 10px;
+    }
+
+    .overall-pass {
+      min-height: 74px;
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border-radius: 8px;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      color: #15803d;
+    }
+
+    .overall-pass .check {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      border: 3px solid #16a34a;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .overall-pass strong {
+      display: block;
+      font-size: 27px;
+      line-height: 1;
+    }
+
+    .follow-up {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: center;
+      min-height: 54px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #e9d5ff;
+      color: #7c2d12;
+      background: #fff7ed;
+      font-size: 11px;
+    }
+
+    .follow-up strong {
+      display: block;
+      color: #6d28d9;
+      font-size: 12px;
+    }
+
+    .rvbench-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+      color: #6b7280;
+      font-size: 11px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
     @media (max-width: 1380px) {
       .dashboard {
         grid-template-columns: 1fr;
@@ -821,6 +1166,19 @@
       }
 
       .report-preview {
+        grid-template-columns: 1fr;
+      }
+
+      .rvbench-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .rvbench-config {
+        grid-column: 1 / -1;
+      }
+
+      .rvbench-charts,
+      .rvbench-bottom {
         grid-template-columns: 1fr;
       }
     }
@@ -853,6 +1211,20 @@
       .feed.main-feed {
         grid-column: span 1;
       }
+
+      .rvbench-view {
+        padding: 10px;
+      }
+
+      .rvbench-sheet {
+        min-width: 0;
+        padding: 18px;
+      }
+
+      .rvbench-report-header,
+      .rvbench-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -866,11 +1238,11 @@
             <div class="brand-title"><span>RVClaw</span> Studio</div>
           </div>
           <nav aria-label="Studio sections">
-            <div class="nav-item active"><span class="nav-icon">▦</span>Dashboard</div>
+            <div class="nav-item active" data-view="dashboard" role="button" tabindex="0"><span class="nav-icon">▦</span>Dashboard</div>
             <div class="nav-item"><span class="nav-icon">▣</span>Devices</div>
             <div class="nav-item"><span class="nav-icon">⬡</span>Models</div>
             <div class="nav-item"><span class="nav-icon">✥</span>Deployments</div>
-            <div class="nav-item"><span class="nav-icon">▧</span>RVBench</div>
+            <div class="nav-item" data-view="rvbench" role="button" tabindex="0"><span class="nav-icon">▧</span>RVBench</div>
             <div class="nav-item"><span class="nav-icon">⌁</span>Alerts</div>
             <div class="nav-item"><span class="nav-icon">≣</span>Logs</div>
             <div class="nav-item"><span class="nav-icon">⚙</span>Settings</div>
@@ -914,7 +1286,7 @@
           </div>
         </header>
 
-        <section class="dashboard">
+        <section class="dashboard" id="dashboard-view">
           <section class="panel camera-panel">
             <div class="panel-header">
               <div class="panel-title">▣ Camera Streams</div>
@@ -1068,6 +1440,149 @@
             </section>
           </section>
         </section>
+
+        <section class="rvbench-view" id="rvbench-view" hidden>
+          <div class="rvbench-sheet" aria-label="RVBench Report">
+            <header class="rvbench-report-header">
+              <div class="rvbench-title">
+                <h2>RVBench Report</h2>
+                <span>EdgeOne Prototype</span>
+              </div>
+              <div class="rvbench-meta">
+                <strong>Report ID:</strong><span>RVB-2026-07-10-001</span>
+                <strong>Date:</strong><span>2026-07-10</span>
+                <strong>Version:</strong><span>v1.0</span>
+                <strong>Status:</strong><span><span class="pass-chip">PASS</span></span>
+              </div>
+            </header>
+
+            <section class="rvbench-grid">
+              <div class="rvbench-box rvbench-config">
+                <div class="rvbench-box-title"><span>Test Configuration</span><span>⚙</span></div>
+                <div class="config-line"><span>Device Under Test</span><strong>RVClaw EdgeOne Prototype</strong></div>
+                <div class="config-line"><span>CPU</span><strong>RISC-V RV64GC @ 1.5 GHz</strong></div>
+                <div class="config-line"><span>Memory</span><strong>LPDDR4 4GB</strong></div>
+                <div class="config-line"><span>OS / Kernel</span><strong>Linux 6.6.20</strong></div>
+                <div class="config-line"><span>Toolchain</span><strong>GCC 13.2.0</strong></div>
+                <div class="config-line"><span>RVBench Suite</span><strong>RVBench 1.0.0</strong></div>
+                <div class="config-line"><span>Test Duration</span><strong>30 min per workload</strong></div>
+                <div class="config-line"><span>Ambient Temp</span><strong>25°C ± 1°C</strong></div>
+                <div class="config-line"><span>Power Supply</span><strong>5.0V / 3.0A DC</strong></div>
+              </div>
+
+              <article class="rvbench-box benchmark-metric">
+                <div class="metric-head"><span class="metric-symbol">◷</span><span>Latency</span></div>
+                <div class="metric-reading">23.4 <small>µs</small></div>
+                <div class="metric-target">Target: ≤ 30 µs</div>
+                <span class="pass-chip">PASS</span>
+              </article>
+              <article class="rvbench-box benchmark-metric">
+                <div class="metric-head"><span class="metric-symbol">⌁</span><span>Throughput</span></div>
+                <div class="metric-reading">1.82 <small>Mops/s</small></div>
+                <div class="metric-target">Target: ≥ 1.50 Mops/s</div>
+                <span class="pass-chip">PASS</span>
+              </article>
+              <article class="rvbench-box benchmark-metric">
+                <div class="metric-head"><span class="metric-symbol">ϟ</span><span>Power</span></div>
+                <div class="metric-reading">1.26 <small>W</small></div>
+                <div class="metric-target">Target: ≤ 1.50 W</div>
+                <span class="pass-chip">PASS</span>
+              </article>
+              <article class="rvbench-box benchmark-metric">
+                <div class="metric-head"><span class="metric-symbol">♨</span><span>Temperature</span></div>
+                <div class="metric-reading">52.1 <small>°C</small></div>
+                <div class="metric-target">Limit: ≤ 60°C</div>
+                <span class="pass-chip">PASS</span>
+              </article>
+              <article class="rvbench-box benchmark-metric">
+                <div class="metric-head"><span class="metric-symbol">⬡</span><span>Stability</span></div>
+                <div class="metric-reading">99.6 <small>%</small></div>
+                <div class="metric-target">Target: ≥ 98%</div>
+                <span class="pass-chip">PASS</span>
+              </article>
+              <article class="rvbench-box benchmark-metric">
+                <div class="metric-head"><span class="metric-symbol">↻</span><span>Reproducibility</span></div>
+                <div class="metric-reading">98.7 <small>%</small></div>
+                <div class="metric-target">Target: ≥ 95%</div>
+                <span class="pass-chip">PASS</span>
+              </article>
+            </section>
+
+            <section class="rvbench-charts">
+              <div class="rvbench-box chart-card">
+                <div class="chart-title">Latency Over Time (µs)</div>
+                <svg class="mini-chart" viewBox="0 0 320 112" preserveAspectRatio="none" aria-label="Latency over time">
+                  <g stroke="#e5e7eb" stroke-width="1">
+                    <line x1="25" y1="18" x2="310" y2="18"/><line x1="25" y1="46" x2="310" y2="46"/><line x1="25" y1="74" x2="310" y2="74"/><line x1="25" y1="102" x2="310" y2="102"/>
+                  </g>
+                  <line x1="25" y1="42" x2="310" y2="42" stroke="#fb923c" stroke-dasharray="5 4"/>
+                  <path d="M25 60 L48 58 L72 61 L96 57 L120 60 L144 59 L168 62 L192 58 L216 61 L240 57 L264 60 L288 58 L310 59" fill="none" stroke="#0f766e" stroke-width="3"/>
+                  <g fill="#6b7280" font-size="10"><text x="0" y="21">50</text><text x="0" y="49">30</text><text x="0" y="77">10</text><text x="25" y="111">0</text><text x="286" y="111">30m</text></g>
+                </svg>
+              </div>
+
+              <div class="rvbench-box chart-card">
+                <div class="chart-title">Throughput Over Time (Mops/s)</div>
+                <svg class="mini-chart" viewBox="0 0 320 112" preserveAspectRatio="none" aria-label="Throughput over time">
+                  <g stroke="#e5e7eb" stroke-width="1">
+                    <line x1="25" y1="18" x2="310" y2="18"/><line x1="25" y1="46" x2="310" y2="46"/><line x1="25" y1="74" x2="310" y2="74"/><line x1="25" y1="102" x2="310" y2="102"/>
+                  </g>
+                  <line x1="25" y1="74" x2="310" y2="74" stroke="#fb923c" stroke-dasharray="5 4"/>
+                  <path d="M25 62 L48 59 L72 61 L96 58 L120 60 L144 57 L168 59 L192 56 L216 58 L240 55 L264 57 L288 56 L310 55" fill="none" stroke="#0f766e" stroke-width="3"/>
+                  <g fill="#6b7280" font-size="10"><text x="0" y="21">3.0</text><text x="0" y="77">1.5</text><text x="0" y="105">0</text><text x="25" y="111">0</text><text x="286" y="111">30m</text></g>
+                </svg>
+              </div>
+
+              <div class="rvbench-box chart-card">
+                <div class="chart-title">Power & Temperature Over Time</div>
+                <svg class="mini-chart" viewBox="0 0 380 112" preserveAspectRatio="none" aria-label="Power and temperature over time">
+                  <g stroke="#e5e7eb" stroke-width="1">
+                    <line x1="28" y1="18" x2="350" y2="18"/><line x1="28" y1="46" x2="350" y2="46"/><line x1="28" y1="74" x2="350" y2="74"/><line x1="28" y1="102" x2="350" y2="102"/>
+                  </g>
+                  <line x1="28" y1="34" x2="350" y2="34" stroke="#fb923c" stroke-dasharray="5 4"/>
+                  <path d="M28 64 L58 62 L88 65 L118 63 L148 66 L178 64 L208 65 L238 63 L268 66 L298 64 L328 65 L350 64" fill="none" stroke="#0f766e" stroke-width="3"/>
+                  <path d="M28 50 L58 48 L88 51 L118 49 L148 50 L178 48 L208 51 L238 49 L268 51 L298 50 L328 52 L350 51" fill="none" stroke="#f97316" stroke-width="3"/>
+                  <g fill="#6b7280" font-size="10"><text x="0" y="21">2.5</text><text x="0" y="77">1.0</text><text x="28" y="111">0</text><text x="322" y="111">30m</text><text x="354" y="21">100</text><text x="354" y="77">40</text></g>
+                </svg>
+              </div>
+            </section>
+
+            <section class="rvbench-bottom">
+              <div class="rvbench-box timeline-card">
+                <div class="chart-title">Stability Timeline</div>
+                <div class="timeline-track">
+                  <span class="timeline-dot">0 min</span><span class="timeline-dot">5 min</span><span class="timeline-dot">10 min</span><span class="timeline-dot">15 min</span><span class="timeline-dot">20 min</span><span class="timeline-dot">25 min</span><span class="timeline-dot">30 min</span>
+                </div>
+              </div>
+
+              <div class="rvbench-box summary-table-card">
+                <div class="chart-title">Benchmark Summary</div>
+                <table class="summary-table">
+                  <thead><tr><th>Workload</th><th>Metric</th><th>Measured</th><th>Result</th></tr></thead>
+                  <tbody>
+                    <tr><td>CoreMark</td><td>Score</td><td>2153</td><td><span class="pass-chip">PASS</span></td></tr>
+                    <tr><td>Dhrystone</td><td>MIPS</td><td>1820</td><td><span class="pass-chip">PASS</span></td></tr>
+                    <tr><td>Memory Copy</td><td>MB/s</td><td>2450</td><td><span class="pass-chip">PASS</span></td></tr>
+                    <tr><td>Interrupt Latency</td><td>µs</td><td>23.4</td><td><span class="pass-chip">PASS</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="rvbench-box overall-card">
+                <div class="chart-title">Overall Result</div>
+                <div class="overall-result">
+                  <div class="overall-pass"><span class="check">✓</span><span><strong>PASS</strong>All benchmark criteria met.</span></div>
+                  <div class="follow-up"><span class="metric-symbol">!</span><span><strong>Follow-up</strong>Continue thermal validation under extended load.</span></div>
+                </div>
+              </div>
+            </section>
+
+            <footer class="rvbench-footer">
+              <span>⌁ RVClaw Studio</span>
+              <span>Generated by RVClaw Studio</span>
+            </footer>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -1090,6 +1605,15 @@
     let visionState = null;
     let videoDetectionPayload = null;
     let demoStartTime = performance.now();
+
+    function switchView(viewName) {
+      document.querySelectorAll('.nav-item[data-view]').forEach((item) => {
+        item.classList.toggle('active', item.dataset.view === viewName);
+      });
+      document.getElementById('dashboard-view').hidden = viewName !== 'dashboard';
+      document.getElementById('rvbench-view').hidden = viewName !== 'rvbench';
+      statusText.textContent = viewName === 'rvbench' ? 'RVBench report view ready' : 'Ready';
+    }
 
     function setLoading(isLoading) {
       runButton.disabled = isLoading;
@@ -1397,7 +1921,19 @@
       }
     }
 
-    runButton.addEventListener('click', runSampleFlow);
+    document.querySelectorAll('.nav-item[data-view]').forEach((item) => {
+      item.addEventListener('click', () => switchView(item.dataset.view));
+      item.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          switchView(item.dataset.view);
+        }
+      });
+    });
+    runButton.addEventListener('click', () => {
+      switchView('rvbench');
+      runSampleFlow();
+    });
     loadVideoDetections().finally(setupVideoSource);
     loadVisionState();
     loadPersonTracking();
