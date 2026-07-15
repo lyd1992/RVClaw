@@ -1149,6 +1149,400 @@
       font-size: 11px;
     }
 
+    /*
+      Visual polish layer: keeps the original single-file demo structure intact
+      while making the Studio screens feel like one product surface.
+    */
+    body {
+      background:
+        linear-gradient(135deg, rgba(10, 16, 25, 0.98), rgba(7, 11, 18, 0.98)),
+        repeating-linear-gradient(90deg, rgba(148, 163, 184, 0.035) 0 1px, transparent 1px 68px),
+        repeating-linear-gradient(0deg, rgba(148, 163, 184, 0.025) 0 1px, transparent 1px 68px);
+    }
+
+    .app-shell {
+      padding: 14px;
+      background:
+        linear-gradient(115deg, rgba(32, 199, 201, 0.08), transparent 34%),
+        linear-gradient(290deg, rgba(249, 115, 22, 0.055), transparent 31%),
+        transparent;
+    }
+
+    .console {
+      min-height: calc(100vh - 28px);
+      grid-template-columns: 266px minmax(0, 1fr);
+      border-radius: 18px;
+      background: rgba(8, 13, 20, 0.9);
+      box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.52),
+        inset 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    .sidebar {
+      background:
+        linear-gradient(180deg, rgba(14, 20, 31, 0.98), rgba(8, 12, 19, 0.98)),
+        linear-gradient(90deg, rgba(157, 78, 221, 0.06), transparent 62%);
+    }
+
+    .brand {
+      min-height: 92px;
+      padding: 20px 20px 18px;
+    }
+
+    .mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background:
+        linear-gradient(145deg, rgba(157, 78, 221, 0.22), rgba(32, 199, 201, 0.16)),
+        #121a28;
+      box-shadow: inset 0 1px rgba(255,255,255,0.12), 0 12px 24px rgba(0,0,0,0.22);
+    }
+
+    .brand-title {
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    nav {
+      padding: 14px 10px;
+    }
+
+    .nav-item {
+      height: 50px;
+      margin: 4px 0;
+      padding: 0 14px;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    .nav-item.active {
+      color: #ffffff;
+      background:
+        linear-gradient(90deg, rgba(157,78,221,0.36), rgba(32,199,201,0.12)),
+        rgba(15, 23, 42, 0.74);
+      box-shadow: inset 0 1px rgba(255,255,255,0.07), 0 12px 24px rgba(0,0,0,0.16);
+    }
+
+    .nav-item.active::before {
+      left: -10px;
+      height: 34px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #c084fc, #22d3ee);
+    }
+
+    .nav-item[data-view]:hover {
+      transform: translateX(2px);
+    }
+
+    .device-card {
+      margin: 0 14px 18px;
+      padding: 14px;
+      border-radius: 12px;
+      background:
+        linear-gradient(155deg, rgba(32,199,201,0.10), transparent 46%),
+        rgba(15, 23, 42, 0.76);
+      box-shadow: inset 0 1px rgba(255,255,255,0.05);
+    }
+
+    .device-unit {
+      height: 68px;
+      border-radius: 10px;
+      background:
+        linear-gradient(90deg, rgba(32, 199, 201, 0.12), transparent 38%),
+        linear-gradient(145deg, #303948, #121924);
+    }
+
+    .device-name {
+      font-size: 17px;
+    }
+
+    .device-spec,
+    .version {
+      font-size: 13px;
+    }
+
+    .topbar {
+      height: 92px;
+      padding: 0 22px;
+      background:
+        linear-gradient(180deg, rgba(18, 26, 38, 0.97), rgba(10, 16, 25, 0.94)),
+        linear-gradient(90deg, rgba(32, 199, 201, 0.08), transparent 58%);
+      box-shadow: inset 0 -1px rgba(255,255,255,0.03);
+    }
+
+    .hamburger {
+      border-right-color: rgba(148, 163, 184, 0.18);
+    }
+
+    h1 {
+      font-size: 25px;
+      letter-spacing: 0;
+    }
+
+    h1 .online {
+      margin-left: 10px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.13);
+      border: 1px solid rgba(34, 197, 94, 0.26);
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    .top-meta {
+      gap: 18px;
+      font-size: 13px;
+    }
+
+    .top-meta span {
+      padding: 5px 0;
+    }
+
+    .primary-action,
+    .report-button,
+    .outline-actions button {
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .primary-action:hover,
+    .report-button:hover,
+    .outline-actions button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(32, 199, 201, 0.16);
+    }
+
+    .primary-action {
+      height: 46px;
+      border-radius: 10px;
+      border-color: rgba(34, 211, 238, 0.34);
+      background:
+        linear-gradient(180deg, rgba(147, 51, 234, 0.95), rgba(79, 70, 229, 0.92)),
+        #6d28d9;
+      font-size: 15px;
+    }
+
+    .report-button,
+    .icon-button {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(15, 23, 42, 0.72);
+    }
+
+    .dashboard {
+      padding: 14px;
+      gap: 14px;
+      grid-template-columns: minmax(620px, 1.35fr) minmax(340px, 0.65fr);
+    }
+
+    .panel {
+      border-radius: 12px;
+      background:
+        linear-gradient(180deg, rgba(23, 32, 45, 0.94), rgba(11, 17, 27, 0.94)),
+        #111827;
+      box-shadow:
+        inset 0 1px rgba(255,255,255,0.045),
+        0 14px 32px rgba(0,0,0,0.18);
+    }
+
+    .panel-header {
+      min-height: 54px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.018);
+    }
+
+    .panel-title {
+      font-size: 16px;
+    }
+
+    .panel-tools {
+      font-size: 14px;
+    }
+
+    .camera-grid {
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .feed {
+      border-radius: 12px;
+      border-color: rgba(148, 163, 184, 0.19);
+      background:
+        linear-gradient(135deg, rgba(32,199,201,0.08), transparent 52%),
+        #0b1220;
+      box-shadow: inset 0 1px rgba(255,255,255,0.04);
+    }
+
+    .feed.main-feed {
+      min-height: 384px;
+    }
+
+    .feed::before {
+      left: 12px;
+      top: 12px;
+      padding: 6px 12px 6px 24px;
+      background: rgba(6, 11, 20, 0.78);
+      backdrop-filter: blur(8px);
+    }
+
+    .feed::after {
+      left: 22px;
+      top: 23px;
+      width: 7px;
+      height: 7px;
+    }
+
+    .tracking-hud {
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      min-height: 42px;
+      border-color: rgba(32, 199, 201, 0.25);
+      background: linear-gradient(90deg, rgba(8,13,20,0.86), rgba(15,23,42,0.76));
+      box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+    }
+
+    .runtime-content,
+    .health-content {
+      padding: 16px;
+    }
+
+    .select-like {
+      border-color: rgba(32, 199, 201, 0.22);
+      background:
+        linear-gradient(90deg, rgba(32,199,201,0.08), transparent),
+        rgba(15,23,42,0.78);
+    }
+
+    .field {
+      grid-template-columns: 116px 1fr;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+
+    .field strong {
+      line-height: 1.35;
+    }
+
+    .pill,
+    .badge {
+      border: 1px solid rgba(34,197,94,0.26);
+      box-shadow: inset 0 1px rgba(255,255,255,0.08);
+    }
+
+    .outline-actions button {
+      height: 40px;
+      border-radius: 9px;
+    }
+
+    .health-row {
+      grid-template-columns: 38px 1fr auto;
+      padding: 13px 0;
+    }
+
+    .health-icon {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: rgba(32,199,201,0.11);
+      color: #67e8f9;
+      font-size: 19px;
+    }
+
+    .health-value {
+      font-size: 19px;
+    }
+
+    .chart-wrap {
+      height: 246px;
+      padding: 14px 18px 18px;
+    }
+
+    .legend {
+      font-size: 13px;
+    }
+
+    .log-stream {
+      max-height: 276px;
+      padding: 10px 14px 16px;
+    }
+
+    .log-line {
+      grid-template-columns: 150px 1fr 52px;
+      min-height: 30px;
+      font-size: 12px;
+    }
+
+    .report-preview {
+      gap: 14px;
+    }
+
+    .report-card {
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.96), rgba(241,245,249,0.98));
+    }
+
+    .summary-grid {
+      padding: 12px;
+    }
+
+    .metric {
+      border-radius: 10px;
+      background:
+        linear-gradient(145deg, rgba(32,199,201,0.08), transparent 62%),
+        rgba(15,23,42,0.58);
+    }
+
+    .rvbench-view {
+      padding: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.018), transparent 140px),
+        transparent;
+    }
+
+    .rvbench-sheet {
+      border-radius: 14px;
+      background:
+        linear-gradient(180deg, #ffffff, #f8fafc);
+      box-shadow: 0 26px 76px rgba(0,0,0,0.36);
+    }
+
+    .rvbench-report-header {
+      border-bottom: 2px solid #7c3aed;
+    }
+
+    .rvbench-title h2 {
+      font-size: 32px;
+    }
+
+    .rvbench-box {
+      border-color: #dbe3ef;
+      border-radius: 10px;
+      box-shadow: 0 10px 22px rgba(15,23,42,0.055);
+    }
+
+    .benchmark-metric {
+      min-height: 158px;
+    }
+
+    .metric-symbol {
+      border-color: #14b8a6;
+      background: #ecfeff;
+    }
+
+    .chart-card,
+    .timeline-card,
+    .summary-table-card,
+    .overall-card,
+    .rvbench-config {
+      background:
+        linear-gradient(180deg, #ffffff, #fbfdff);
+    }
+
     [hidden] {
       display: none !important;
     }
@@ -1252,11 +1646,11 @@
         <div>
           <div class="device-card">
             <div class="device-unit" aria-hidden="true"></div>
-            <div class="device-name"><span class="online-dot"></span>EdgeOne-01</div>
+            <div class="device-name"><span class="online-dot"></span><span id="sidebar-device-name">Detecting device...</span></div>
             <div class="device-spec">
-              RISC-V AI Box<br>
-              8 Cores · 16 GB RAM<br>
-              K3 CoM260 · Local Runtime
+              <span id="sidebar-device-platform">Linux device</span><br>
+              <span id="sidebar-device-resources">Reading CPU and memory...</span><br>
+              <span id="sidebar-device-runtime">Local Runtime</span>
             </div>
           </div>
           <div class="version"><span>v1.2.3</span><span>‹</span></div>
@@ -1268,15 +1662,15 @@
           <div class="device-heading">
             <div class="hamburger">☰</div>
             <div>
-              <h1><span class="online-dot"></span> EdgeOne-01 <span class="online">Online</span></h1>
+              <h1><span class="online-dot"></span> <span id="top-device-name">Detecting...</span> <span class="online">Online</span></h1>
               <div class="status-text" id="status-text">Waiting for local K3 sample flow</div>
             </div>
           </div>
           <div class="top-meta">
-            <span>RISC-V AI Box</span>
-            <span>IP: 192.168.11.93</span>
-            <span>Uptime: 2d 14h 32m</span>
-            <span>FW: v1.2.3</span>
+            <span id="top-device-platform">Linux device</span>
+            <span id="top-device-cpu">CPU: --</span>
+            <span id="top-device-uptime">Uptime: --</span>
+            <span id="top-device-kernel">Kernel: --</span>
           </div>
           <div class="top-actions">
             <button class="primary-action" id="run-button" type="button">▶ Run RVBench</button>
@@ -1337,29 +1731,25 @@
             <div class="health-content">
               <div class="health-row">
                 <div class="health-icon">◷</div>
-                <div>
-                  <strong>Latency</strong>
-                  <div class="spark"></div>
-                </div>
-                <div class="health-value">23.6<span class="health-label"> ms<br>P50</span></div>
+                <div><strong>CPU Usage</strong><div class="spark"></div></div>
+                <div class="health-value"><span id="health-cpu">--</span><span class="health-label"> %<br>Live</span></div>
               </div>
               <div class="health-row">
-                <div class="health-icon">ϟ</div>
-                <div>
-                  <strong>Power</strong>
-                  <div class="spark"></div>
-                </div>
-                <div class="health-value">12.4<span class="health-label"> W<br>Avg</span></div>
+                <div class="health-icon">▤</div>
+                <div><strong>Memory</strong><div class="spark"></div></div>
+                <div class="health-value"><span id="health-memory">--</span><span class="health-label"> %<br><span id="health-memory-detail">Used</span></span></div>
               </div>
               <div class="health-row">
                 <div class="health-icon">♨</div>
-                <div>
-                  <strong>Temperature</strong>
-                  <div class="spark"></div>
-                </div>
-                <div class="health-value">58.3<span class="health-label"> °C<br>CPU</span></div>
+                <div><strong>Temperature</strong><div class="spark"></div></div>
+                <div class="health-value"><span id="health-temperature">--</span><span class="health-label"> °C<br><span id="health-temperature-label">Sensor</span></span></div>
               </div>
-              <div class="field"><span>Status</span><strong><span class="pill">Healthy</span></strong></div>
+              <div class="health-row">
+                <div class="health-icon">ϟ</div>
+                <div><strong>Power</strong><div class="spark"></div></div>
+                <div class="health-value"><span id="health-power">--</span><span class="health-label"> <span id="health-power-unit">W</span><br><span id="health-power-label">Unavailable</span></span></div>
+              </div>
+              <div class="field"><span>Status</span><strong><span class="pill" id="health-status">Checking</span></strong></div>
             </div>
           </section>
 
@@ -1369,7 +1759,7 @@
               <div class="panel-tools"><span>1H</span><span>6H</span><span class="pill">24H</span><span>7D</span></div>
             </div>
             <div class="chart-wrap">
-              <div class="legend"><span>Latency (ms)</span><span>CPU (%)</span><span>Memory (%)</span></div>
+              <div class="legend"><span>Temperature (°C)</span><span>CPU (%)</span><span>Memory (%)</span></div>
               <svg id="performance-chart" class="performance-chart" viewBox="0 0 640 210" preserveAspectRatio="none" aria-label="Performance chart">
                 <defs>
                   <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
@@ -1380,12 +1770,12 @@
                 <g stroke="rgba(148,163,184,.16)" stroke-width="1">
                   <line x1="36" y1="22" x2="625" y2="22"/><line x1="36" y1="68" x2="625" y2="68"/><line x1="36" y1="114" x2="625" y2="114"/><line x1="36" y1="160" x2="625" y2="160"/>
                 </g>
-                <path d="M36 152 L70 146 L108 148 L134 102 L166 96 L204 108 L240 103 L280 116 L320 109 L362 112 L402 106 L442 118 L480 104 L522 111 L565 96 L625 104" fill="none" stroke="#9d4edd" stroke-width="3"/>
-                <path d="M36 168 L70 161 L108 164 L134 132 L166 139 L204 146 L240 141 L280 149 L320 143 L362 147 L402 140 L442 151 L480 145 L522 148 L565 139 L625 145" fill="none" stroke="#20c7c9" stroke-width="3"/>
-                <path d="M36 128 L70 123 L108 126 L134 120 L166 122 L204 124 L240 121 L280 126 L320 125 L362 123 L402 124 L442 126 L480 121 L522 124 L565 122 L625 126" fill="none" stroke="#f97316" stroke-width="3"/>
+                <path id="cpu-history" d="" fill="none" stroke="#9d4edd" stroke-width="3"/>
+                <path id="temperature-history" d="" fill="none" stroke="#20c7c9" stroke-width="3"/>
+                <path id="memory-history" d="" fill="none" stroke="#f97316" stroke-width="3"/>
                 <g fill="#9aa7b7" font-size="13">
                   <text x="0" y="26">100</text><text x="9" y="72">75</text><text x="9" y="118">50</text><text x="9" y="164">25</text>
-                  <text x="36" y="200">18:00</text><text x="196" y="200">00:00</text><text x="350" y="200">06:00</text><text x="506" y="200">12:00</text><text x="604" y="200">18:00</text>
+                  <text x="36" y="200">-2m</text><text x="180" y="200">-90s</text><text x="334" y="200">-60s</text><text x="490" y="200">-30s</text><text x="596" y="200">Now</text>
                 </g>
               </svg>
             </div>
@@ -1459,10 +1849,10 @@
             <section class="rvbench-grid">
               <div class="rvbench-box rvbench-config">
                 <div class="rvbench-box-title"><span>Test Configuration</span><span>⚙</span></div>
-                <div class="config-line"><span>Device Under Test</span><strong>RVClaw EdgeOne Prototype</strong></div>
-                <div class="config-line"><span>CPU</span><strong>RISC-V RV64GC @ 1.5 GHz</strong></div>
-                <div class="config-line"><span>Memory</span><strong>LPDDR4 4GB</strong></div>
-                <div class="config-line"><span>OS / Kernel</span><strong>Linux 6.6.20</strong></div>
+                <div class="config-line"><span>Device Under Test</span><strong id="rvbench-device">Detecting...</strong></div>
+                <div class="config-line"><span>CPU</span><strong id="rvbench-cpu">Detecting...</strong></div>
+                <div class="config-line"><span>Memory</span><strong id="rvbench-memory">Detecting...</strong></div>
+                <div class="config-line"><span>OS / Kernel</span><strong id="rvbench-kernel">Detecting...</strong></div>
                 <div class="config-line"><span>Toolchain</span><strong>GCC 13.2.0</strong></div>
                 <div class="config-line"><span>RVBench Suite</span><strong>RVBench 1.0.0</strong></div>
                 <div class="config-line"><span>Test Duration</span><strong>30 min per workload</strong></div>
@@ -1484,14 +1874,14 @@
               </article>
               <article class="rvbench-box benchmark-metric">
                 <div class="metric-head"><span class="metric-symbol">ϟ</span><span>Power</span></div>
-                <div class="metric-reading">1.26 <small>W</small></div>
-                <div class="metric-target">Target: ≤ 1.50 W</div>
+                <div class="metric-reading"><span id="rvbench-power-reading">N/A</span> <small id="rvbench-power-unit">W</small></div>
+                <div class="metric-target" id="rvbench-power-target">Power sensor not exposed</div>
                 <span class="pass-chip">PASS</span>
               </article>
               <article class="rvbench-box benchmark-metric">
                 <div class="metric-head"><span class="metric-symbol">♨</span><span>Temperature</span></div>
-                <div class="metric-reading">52.1 <small>°C</small></div>
-                <div class="metric-target">Limit: ≤ 60°C</div>
+                <div class="metric-reading"><span id="rvbench-temperature-reading">--</span> <small>°C</small></div>
+                <div class="metric-target" id="rvbench-temperature-target">Live highest sensor · Limit: 80°C</div>
                 <span class="pass-chip">PASS</span>
               </article>
               <article class="rvbench-box benchmark-metric">
@@ -1601,6 +1991,8 @@
     const f5VideoStatus = document.getElementById('f5-video-status');
     const f7AlertCount = document.getElementById('f7-alert-count');
     const yoloDetectionCount = document.getElementById('yolo-detection-count');
+    let systemMetricsErrorLogged = false;
+    const metricHistory = [];
     let trackingPayload = null;
     let visionState = null;
     let videoDetectionPayload = null;
@@ -1905,6 +2297,123 @@
       }
     }
 
+    function formatBytes(bytes) {
+      if (bytes === null || bytes === undefined) return '--';
+      const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
+      let value = bytes;
+      let unit = 0;
+      while (value >= 1024 && unit < units.length - 1) {
+        value /= 1024;
+        unit += 1;
+      }
+      return value.toFixed(unit >= 3 ? 1 : 0) + ' ' + units[unit];
+    }
+
+    function formatUptime(seconds) {
+      if (seconds === null || seconds === undefined) return '--';
+      const totalMinutes = Math.floor(seconds / 60);
+      const days = Math.floor(totalMinutes / 1440);
+      const hours = Math.floor((totalMinutes % 1440) / 60);
+      const minutes = totalMinutes % 60;
+      return days + 'd ' + hours + 'h ' + minutes + 'm';
+    }
+
+    function renderMetricHistory() {
+      function buildPath(key) {
+        let hasPoint = false;
+        return metricHistory.map(function(sample, index) {
+          const value = sample[key];
+          if (value === null || value === undefined) {
+            hasPoint = false;
+            return '';
+          }
+          const x = 36 + index / Math.max(metricHistory.length - 1, 1) * 589;
+          const y = 160 - Math.max(0, Math.min(100, value)) / 100 * 138;
+          const command = hasPoint ? 'L' : 'M';
+          hasPoint = true;
+          return command + x.toFixed(1) + ' ' + y.toFixed(1);
+        }).join(' ');
+      }
+      document.getElementById('cpu-history').setAttribute('d', buildPath('cpu'));
+      document.getElementById('memory-history').setAttribute('d', buildPath('memory'));
+      document.getElementById('temperature-history').setAttribute('d', buildPath('temperature'));
+    }
+
+    function renderSystemMetrics(payload, requestMs) {
+      const device = payload.device;
+      const usage = payload.usage;
+      const thermal = payload.thermal;
+      const power = payload.power;
+      const cpuModel = device.cpu_model || device.architecture || 'CPU';
+      const memoryTotal = formatBytes(usage.memory_total_bytes);
+      const frequency = device.cpu_frequency_mhz ? ' @ ' + Math.round(device.cpu_frequency_mhz) + ' MHz' : '';
+
+      document.getElementById('top-device-name').textContent = device.hostname;
+      document.getElementById('top-device-platform').textContent = device.architecture + ' Linux';
+      document.getElementById('top-device-cpu').textContent = 'CPU: ' + device.cpu_count + ' cores';
+      document.getElementById('top-device-uptime').textContent = 'Uptime: ' + formatUptime(device.uptime_seconds);
+      document.getElementById('top-device-kernel').textContent = 'Kernel: ' + device.kernel;
+      document.getElementById('sidebar-device-name').textContent = device.hostname;
+      document.getElementById('sidebar-device-platform').textContent = device.architecture + ' · ' + device.os + ' ' + device.kernel;
+      document.getElementById('sidebar-device-resources').textContent = device.cpu_count + ' Cores · ' + memoryTotal + ' RAM';
+      document.getElementById('sidebar-device-runtime').textContent = cpuModel + frequency;
+
+      document.getElementById('health-cpu').textContent = usage.cpu_percent ?? '--';
+      document.getElementById('health-memory').textContent = usage.memory_percent ?? '--';
+      document.getElementById('health-memory-detail').textContent = formatBytes(usage.memory_used_bytes) + ' used';
+      const hottestSensor = thermal.sensors.reduce(function(hottest, sensor) {
+        return !hottest || sensor.celsius > hottest.celsius ? sensor : hottest;
+      }, null);
+      document.getElementById('health-temperature').textContent = thermal.primary_celsius ?? '--';
+      document.getElementById('health-temperature-label').textContent = hottestSensor ? hottestSensor.label : 'Unavailable';
+      document.getElementById('health-power').textContent = power.available ? power.watts : '--';
+      document.getElementById('health-power-unit').textContent = power.available ? 'W' : '';
+      document.getElementById('health-power-label').textContent = power.available ? (power.sensors[0].label || 'Live') : 'No sensor';
+
+      const healthy = (thermal.primary_celsius === null || thermal.primary_celsius < 80)
+        && (usage.memory_percent === null || usage.memory_percent < 90);
+      const hasHealthData = usage.cpu_percent !== null || usage.memory_percent !== null || thermal.available;
+      document.getElementById('health-status').textContent = hasHealthData
+        ? (healthy ? 'Healthy' : 'Attention')
+        : 'Limited';
+
+      metricHistory.push({
+        cpu: usage.cpu_percent,
+        memory: usage.memory_percent,
+        temperature: thermal.primary_celsius,
+      });
+      if (metricHistory.length > 60) metricHistory.shift();
+      renderMetricHistory();
+
+      document.getElementById('rvbench-temperature-reading').textContent = thermal.primary_celsius ?? '--';
+      document.getElementById('rvbench-power-reading').textContent = power.available ? power.watts : 'N/A';
+      document.getElementById('rvbench-power-unit').textContent = power.available ? 'W' : '';
+      document.getElementById('rvbench-power-target').textContent = power.available
+        ? (power.sensors[0].label || 'Live power sensor')
+        : 'Power sensor not exposed';
+      document.getElementById('rvbench-device').textContent = device.hostname;
+      document.getElementById('rvbench-cpu').textContent = cpuModel + ' · ' + device.cpu_count + ' cores' + frequency;
+      document.getElementById('rvbench-memory').textContent = memoryTotal;
+      document.getElementById('rvbench-kernel').textContent = device.os + ' ' + device.kernel + ' (' + device.architecture + ')';
+      statusText.textContent = 'Live K3 telemetry · ' + requestMs.toFixed(0) + ' ms API';
+    }
+
+    async function loadSystemMetrics() {
+      const started = performance.now();
+      try {
+        const response = await fetch('/api/system-metrics', { cache: 'no-store' });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        renderSystemMetrics(await response.json(), performance.now() - started);
+        systemMetricsErrorLogged = false;
+      } catch (error) {
+        document.getElementById('health-status').textContent = 'Offline';
+        if (!systemMetricsErrorLogged) {
+          appendLog('System telemetry unavailable: ' + error.message, 'WARN');
+          systemMetricsErrorLogged = true;
+        }
+      }
+    }
+
     async function runSampleFlow() {
       setLoading(true);
       try {
@@ -1937,6 +2446,8 @@
     loadVideoDetections().finally(setupVideoSource);
     loadVisionState();
     loadPersonTracking();
+    loadSystemMetrics();
+    window.setInterval(loadSystemMetrics, 2000);
     requestAnimationFrame(animatePersonDemo);
     runSampleFlow();
   </script>
