@@ -118,6 +118,23 @@
       color: var(--soft);
       font-size: 17px;
       position: relative;
+      transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+    }
+
+    .nav-item[data-view] {
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .nav-item[data-view]:hover {
+      color: #ffffff;
+      background: linear-gradient(90deg, rgba(32,199,201,0.16), rgba(157,78,221,0.18));
+      border-color: rgba(32,199,201,0.42);
+    }
+
+    .nav-item[data-view]:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 2px;
     }
 
     .nav-item.active {
@@ -808,6 +825,728 @@
       max-width: 420px;
     }
 
+    .rvbench-view {
+      min-width: 0;
+      padding: 16px;
+      overflow: auto;
+      align-content: start;
+    }
+
+    .rvbench-sheet {
+      min-width: 920px;
+      border-radius: 8px;
+      background: #f8fafc;
+      color: #1f2937;
+      border: 1px solid rgba(148,163,184,0.32);
+      box-shadow: 0 24px 70px rgba(0,0,0,0.34);
+      padding: 28px 32px 24px;
+    }
+
+    .rvbench-report-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: start;
+      padding-bottom: 18px;
+      border-bottom: 2px solid #a855f7;
+    }
+
+    .rvbench-title h2 {
+      margin: 0;
+      color: #111827;
+      font-size: 34px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .rvbench-title span {
+      display: block;
+      margin-top: 10px;
+      color: #6d28d9;
+      font-size: 18px;
+      font-weight: 760;
+    }
+
+    .rvbench-meta {
+      display: grid;
+      grid-template-columns: auto auto;
+      gap: 6px 14px;
+      color: #6b7280;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .rvbench-meta strong {
+      color: #6d28d9;
+      font-weight: 800;
+    }
+
+    .pass-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 52px;
+      height: 22px;
+      border-radius: 5px;
+      color: #15803d;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .rvbench-grid {
+      display: grid;
+      grid-template-columns: 280px repeat(6, minmax(112px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .rvbench-box {
+      border: 1px solid #d8dfe9;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 8px 18px rgba(15,23,42,0.04);
+    }
+
+    .rvbench-config {
+      padding: 14px;
+      grid-row: span 1;
+    }
+
+    .rvbench-box-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: #6d28d9;
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .config-line {
+      display: grid;
+      grid-template-columns: 122px 1fr;
+      gap: 8px;
+      min-height: 19px;
+      align-items: center;
+      font-size: 11px;
+      color: #4b5563;
+    }
+
+    .config-line span:first-child {
+      color: #6d28d9;
+      font-weight: 750;
+    }
+
+    .benchmark-metric {
+      min-height: 166px;
+      padding: 14px 13px;
+      display: grid;
+      align-content: start;
+      gap: 10px;
+    }
+
+    .metric-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #374151;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .metric-symbol {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border: 2px solid #14b8a6;
+      border-radius: 50%;
+      color: #0f766e;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .metric-reading {
+      color: #111827;
+      font-size: 29px;
+      line-height: 1;
+      font-weight: 850;
+    }
+
+    .metric-reading small {
+      color: #4b5563;
+      font-size: 13px;
+      font-weight: 760;
+    }
+
+    .metric-target {
+      color: #6b7280;
+      font-size: 11px;
+      min-height: 28px;
+    }
+
+    .rvbench-charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.2fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .chart-card {
+      min-height: 150px;
+      padding: 12px 14px;
+    }
+
+    .chart-title {
+      color: #6d28d9;
+      font-size: 12px;
+      font-weight: 850;
+      margin-bottom: 4px;
+    }
+
+    .mini-chart {
+      width: 100%;
+      height: 112px;
+      display: block;
+    }
+
+    .rvbench-bottom {
+      display: grid;
+      grid-template-columns: 1.25fr 0.78fr 0.58fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .timeline-card,
+    .summary-table-card,
+    .overall-card {
+      padding: 14px;
+    }
+
+    .timeline-track {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      align-items: center;
+      gap: 0;
+      height: 72px;
+      padding: 0 16px;
+      border-radius: 7px;
+      background: #ecfdf5;
+      position: relative;
+    }
+
+    .timeline-track::before {
+      content: "";
+      position: absolute;
+      left: 30px;
+      right: 30px;
+      top: 34px;
+      height: 3px;
+      background: #14b8a6;
+    }
+
+    .timeline-dot {
+      display: grid;
+      justify-items: center;
+      gap: 18px;
+      color: #4b5563;
+      font-size: 10px;
+      z-index: 1;
+    }
+
+    .timeline-dot::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #0f766e;
+      box-shadow: 0 0 0 3px #ccfbf1;
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      color: #374151;
+      font-size: 11px;
+    }
+
+    .summary-table th,
+    .summary-table td {
+      padding: 5px 6px;
+      border: 1px solid #e5e7eb;
+      text-align: left;
+    }
+
+    .summary-table th {
+      color: #6d28d9;
+      background: #faf5ff;
+      font-weight: 850;
+    }
+
+    .overall-result {
+      display: grid;
+      gap: 10px;
+    }
+
+    .overall-pass {
+      min-height: 74px;
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border-radius: 8px;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      color: #15803d;
+    }
+
+    .overall-pass .check {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      border: 3px solid #16a34a;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .overall-pass strong {
+      display: block;
+      font-size: 27px;
+      line-height: 1;
+    }
+
+    .follow-up {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: center;
+      min-height: 54px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #e9d5ff;
+      color: #7c2d12;
+      background: #fff7ed;
+      font-size: 11px;
+    }
+
+    .follow-up strong {
+      display: block;
+      color: #6d28d9;
+      font-size: 12px;
+    }
+
+    .rvbench-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 16px;
+      color: #6b7280;
+      font-size: 11px;
+    }
+
+    /*
+      Visual polish layer: keeps the original single-file demo structure intact
+      while making the Studio screens feel like one product surface.
+    */
+    body {
+      background:
+        linear-gradient(135deg, rgba(10, 16, 25, 0.98), rgba(7, 11, 18, 0.98)),
+        repeating-linear-gradient(90deg, rgba(148, 163, 184, 0.035) 0 1px, transparent 1px 68px),
+        repeating-linear-gradient(0deg, rgba(148, 163, 184, 0.025) 0 1px, transparent 1px 68px);
+    }
+
+    .app-shell {
+      padding: 14px;
+      background:
+        linear-gradient(115deg, rgba(32, 199, 201, 0.08), transparent 34%),
+        linear-gradient(290deg, rgba(249, 115, 22, 0.055), transparent 31%),
+        transparent;
+    }
+
+    .console {
+      min-height: calc(100vh - 28px);
+      grid-template-columns: 266px minmax(0, 1fr);
+      border-radius: 18px;
+      background: rgba(8, 13, 20, 0.9);
+      box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.52),
+        inset 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    .sidebar {
+      background:
+        linear-gradient(180deg, rgba(14, 20, 31, 0.98), rgba(8, 12, 19, 0.98)),
+        linear-gradient(90deg, rgba(157, 78, 221, 0.06), transparent 62%);
+    }
+
+    .brand {
+      min-height: 92px;
+      padding: 20px 20px 18px;
+    }
+
+    .mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background:
+        linear-gradient(145deg, rgba(157, 78, 221, 0.22), rgba(32, 199, 201, 0.16)),
+        #121a28;
+      box-shadow: inset 0 1px rgba(255,255,255,0.12), 0 12px 24px rgba(0,0,0,0.22);
+    }
+
+    .brand-title {
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    nav {
+      padding: 14px 10px;
+    }
+
+    .nav-item {
+      height: 50px;
+      margin: 4px 0;
+      padding: 0 14px;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    .nav-item.active {
+      color: #ffffff;
+      background:
+        linear-gradient(90deg, rgba(157,78,221,0.36), rgba(32,199,201,0.12)),
+        rgba(15, 23, 42, 0.74);
+      box-shadow: inset 0 1px rgba(255,255,255,0.07), 0 12px 24px rgba(0,0,0,0.16);
+    }
+
+    .nav-item.active::before {
+      left: -10px;
+      height: 34px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #c084fc, #22d3ee);
+    }
+
+    .nav-item[data-view]:hover {
+      transform: translateX(2px);
+    }
+
+    .device-card {
+      margin: 0 14px 18px;
+      padding: 14px;
+      border-radius: 12px;
+      background:
+        linear-gradient(155deg, rgba(32,199,201,0.10), transparent 46%),
+        rgba(15, 23, 42, 0.76);
+      box-shadow: inset 0 1px rgba(255,255,255,0.05);
+    }
+
+    .device-unit {
+      height: 68px;
+      border-radius: 10px;
+      background:
+        linear-gradient(90deg, rgba(32, 199, 201, 0.12), transparent 38%),
+        linear-gradient(145deg, #303948, #121924);
+    }
+
+    .device-name {
+      font-size: 17px;
+    }
+
+    .device-spec,
+    .version {
+      font-size: 13px;
+    }
+
+    .topbar {
+      height: 92px;
+      padding: 0 22px;
+      background:
+        linear-gradient(180deg, rgba(18, 26, 38, 0.97), rgba(10, 16, 25, 0.94)),
+        linear-gradient(90deg, rgba(32, 199, 201, 0.08), transparent 58%);
+      box-shadow: inset 0 -1px rgba(255,255,255,0.03);
+    }
+
+    .hamburger {
+      border-right-color: rgba(148, 163, 184, 0.18);
+    }
+
+    h1 {
+      font-size: 25px;
+      letter-spacing: 0;
+    }
+
+    h1 .online {
+      margin-left: 10px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.13);
+      border: 1px solid rgba(34, 197, 94, 0.26);
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    .top-meta {
+      gap: 18px;
+      font-size: 13px;
+    }
+
+    .top-meta span {
+      padding: 5px 0;
+    }
+
+    .primary-action,
+    .report-button,
+    .outline-actions button {
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .primary-action:hover,
+    .report-button:hover,
+    .outline-actions button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(32, 199, 201, 0.16);
+    }
+
+    .primary-action {
+      height: 46px;
+      border-radius: 10px;
+      border-color: rgba(34, 211, 238, 0.34);
+      background:
+        linear-gradient(180deg, rgba(147, 51, 234, 0.95), rgba(79, 70, 229, 0.92)),
+        #6d28d9;
+      font-size: 15px;
+    }
+
+    .report-button,
+    .icon-button {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(15, 23, 42, 0.72);
+    }
+
+    .dashboard {
+      padding: 14px;
+      gap: 14px;
+      grid-template-columns: minmax(620px, 1.35fr) minmax(340px, 0.65fr);
+    }
+
+    .panel {
+      border-radius: 12px;
+      background:
+        linear-gradient(180deg, rgba(23, 32, 45, 0.94), rgba(11, 17, 27, 0.94)),
+        #111827;
+      box-shadow:
+        inset 0 1px rgba(255,255,255,0.045),
+        0 14px 32px rgba(0,0,0,0.18);
+    }
+
+    .panel-header {
+      min-height: 54px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.018);
+    }
+
+    .panel-title {
+      font-size: 16px;
+    }
+
+    .panel-tools {
+      font-size: 14px;
+    }
+
+    .camera-grid {
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .feed {
+      border-radius: 12px;
+      border-color: rgba(148, 163, 184, 0.19);
+      background:
+        linear-gradient(135deg, rgba(32,199,201,0.08), transparent 52%),
+        #0b1220;
+      box-shadow: inset 0 1px rgba(255,255,255,0.04);
+    }
+
+    .feed.main-feed {
+      min-height: 384px;
+    }
+
+    .feed::before {
+      left: 12px;
+      top: 12px;
+      padding: 6px 12px 6px 24px;
+      background: rgba(6, 11, 20, 0.78);
+      backdrop-filter: blur(8px);
+    }
+
+    .feed::after {
+      left: 22px;
+      top: 23px;
+      width: 7px;
+      height: 7px;
+    }
+
+    .tracking-hud {
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      min-height: 42px;
+      border-color: rgba(32, 199, 201, 0.25);
+      background: linear-gradient(90deg, rgba(8,13,20,0.86), rgba(15,23,42,0.76));
+      box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+    }
+
+    .runtime-content,
+    .health-content {
+      padding: 16px;
+    }
+
+    .select-like {
+      border-color: rgba(32, 199, 201, 0.22);
+      background:
+        linear-gradient(90deg, rgba(32,199,201,0.08), transparent),
+        rgba(15,23,42,0.78);
+    }
+
+    .field {
+      grid-template-columns: 116px 1fr;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+
+    .field strong {
+      line-height: 1.35;
+    }
+
+    .pill,
+    .badge {
+      border: 1px solid rgba(34,197,94,0.26);
+      box-shadow: inset 0 1px rgba(255,255,255,0.08);
+    }
+
+    .outline-actions button {
+      height: 40px;
+      border-radius: 9px;
+    }
+
+    .health-row {
+      grid-template-columns: 38px 1fr auto;
+      padding: 13px 0;
+    }
+
+    .health-icon {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: rgba(32,199,201,0.11);
+      color: #67e8f9;
+      font-size: 19px;
+    }
+
+    .health-value {
+      font-size: 19px;
+    }
+
+    .chart-wrap {
+      height: 246px;
+      padding: 14px 18px 18px;
+    }
+
+    .legend {
+      font-size: 13px;
+    }
+
+    .log-stream {
+      max-height: 276px;
+      padding: 10px 14px 16px;
+    }
+
+    .log-line {
+      grid-template-columns: 150px 1fr 52px;
+      min-height: 30px;
+      font-size: 12px;
+    }
+
+    .report-preview {
+      gap: 14px;
+    }
+
+    .report-card {
+      background:
+        linear-gradient(145deg, rgba(255,255,255,0.96), rgba(241,245,249,0.98));
+    }
+
+    .summary-grid {
+      padding: 12px;
+    }
+
+    .metric {
+      border-radius: 10px;
+      background:
+        linear-gradient(145deg, rgba(32,199,201,0.08), transparent 62%),
+        rgba(15,23,42,0.58);
+    }
+
+    .rvbench-view {
+      padding: 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.018), transparent 140px),
+        transparent;
+    }
+
+    .rvbench-sheet {
+      border-radius: 14px;
+      background:
+        linear-gradient(180deg, #ffffff, #f8fafc);
+      box-shadow: 0 26px 76px rgba(0,0,0,0.36);
+    }
+
+    .rvbench-report-header {
+      border-bottom: 2px solid #7c3aed;
+    }
+
+    .rvbench-title h2 {
+      font-size: 32px;
+    }
+
+    .rvbench-box {
+      border-color: #dbe3ef;
+      border-radius: 10px;
+      box-shadow: 0 10px 22px rgba(15,23,42,0.055);
+    }
+
+    .benchmark-metric {
+      min-height: 158px;
+    }
+
+    .metric-symbol {
+      border-color: #14b8a6;
+      background: #ecfeff;
+    }
+
+    .chart-card,
+    .timeline-card,
+    .summary-table-card,
+    .overall-card,
+    .rvbench-config {
+      background:
+        linear-gradient(180deg, #ffffff, #fbfdff);
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
     @media (max-width: 1380px) {
       .dashboard {
         grid-template-columns: 1fr;
@@ -821,6 +1560,19 @@
       }
 
       .report-preview {
+        grid-template-columns: 1fr;
+      }
+
+      .rvbench-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .rvbench-config {
+        grid-column: 1 / -1;
+      }
+
+      .rvbench-charts,
+      .rvbench-bottom {
         grid-template-columns: 1fr;
       }
     }
@@ -853,6 +1605,20 @@
       .feed.main-feed {
         grid-column: span 1;
       }
+
+      .rvbench-view {
+        padding: 10px;
+      }
+
+      .rvbench-sheet {
+        min-width: 0;
+        padding: 18px;
+      }
+
+      .rvbench-report-header,
+      .rvbench-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -866,11 +1632,11 @@
             <div class="brand-title"><span>RVClaw</span> Studio</div>
           </div>
           <nav aria-label="Studio sections">
-            <div class="nav-item active"><span class="nav-icon">▦</span>Dashboard</div>
+            <div class="nav-item active" data-view="dashboard" role="button" tabindex="0"><span class="nav-icon">▦</span>Dashboard</div>
             <div class="nav-item"><span class="nav-icon">▣</span>Devices</div>
             <div class="nav-item"><span class="nav-icon">⬡</span>Models</div>
             <div class="nav-item"><span class="nav-icon">✥</span>Deployments</div>
-            <div class="nav-item"><span class="nav-icon">▧</span>RVBench</div>
+            <div class="nav-item" data-view="rvbench" role="button" tabindex="0"><span class="nav-icon">▧</span>RVBench</div>
             <div class="nav-item"><span class="nav-icon">⌁</span>Alerts</div>
             <div class="nav-item"><span class="nav-icon">≣</span>Logs</div>
             <div class="nav-item"><span class="nav-icon">⚙</span>Settings</div>
@@ -880,11 +1646,11 @@
         <div>
           <div class="device-card">
             <div class="device-unit" aria-hidden="true"></div>
-            <div class="device-name"><span class="online-dot"></span>EdgeOne-01</div>
+            <div class="device-name"><span class="online-dot"></span><span id="sidebar-device-name">Detecting device...</span></div>
             <div class="device-spec">
-              RISC-V AI Box<br>
-              8 Cores · 16 GB RAM<br>
-              K3 CoM260 · Local Runtime
+              <span id="sidebar-device-platform">Linux device</span><br>
+              <span id="sidebar-device-resources">Reading CPU and memory...</span><br>
+              <span id="sidebar-device-runtime">Local Runtime</span>
             </div>
           </div>
           <div class="version"><span>v1.2.3</span><span>‹</span></div>
@@ -896,15 +1662,15 @@
           <div class="device-heading">
             <div class="hamburger">☰</div>
             <div>
-              <h1><span class="online-dot"></span> EdgeOne-01 <span class="online">Online</span></h1>
+              <h1><span class="online-dot"></span> <span id="top-device-name">Detecting...</span> <span class="online">Online</span></h1>
               <div class="status-text" id="status-text">Waiting for local K3 sample flow</div>
             </div>
           </div>
           <div class="top-meta">
-            <span>RISC-V AI Box</span>
-            <span>IP: 192.168.11.93</span>
-            <span>Uptime: 2d 14h 32m</span>
-            <span>FW: v1.2.3</span>
+            <span id="top-device-platform">Linux device</span>
+            <span id="top-device-cpu">CPU: --</span>
+            <span id="top-device-uptime">Uptime: --</span>
+            <span id="top-device-kernel">Kernel: --</span>
           </div>
           <div class="top-actions">
             <button class="primary-action" id="run-button" type="button">▶ Run RVBench</button>
@@ -914,7 +1680,7 @@
           </div>
         </header>
 
-        <section class="dashboard">
+        <section class="dashboard" id="dashboard-view">
           <section class="panel camera-panel">
             <div class="panel-header">
               <div class="panel-title">▣ Camera Streams</div>
@@ -965,29 +1731,25 @@
             <div class="health-content">
               <div class="health-row">
                 <div class="health-icon">◷</div>
-                <div>
-                  <strong>Latency</strong>
-                  <div class="spark"></div>
-                </div>
-                <div class="health-value">23.6<span class="health-label"> ms<br>P50</span></div>
+                <div><strong>CPU Usage</strong><div class="spark"></div></div>
+                <div class="health-value"><span id="health-cpu">--</span><span class="health-label"> %<br>Live</span></div>
               </div>
               <div class="health-row">
-                <div class="health-icon">ϟ</div>
-                <div>
-                  <strong>Power</strong>
-                  <div class="spark"></div>
-                </div>
-                <div class="health-value">12.4<span class="health-label"> W<br>Avg</span></div>
+                <div class="health-icon">▤</div>
+                <div><strong>Memory</strong><div class="spark"></div></div>
+                <div class="health-value"><span id="health-memory">--</span><span class="health-label"> %<br><span id="health-memory-detail">Used</span></span></div>
               </div>
               <div class="health-row">
                 <div class="health-icon">♨</div>
-                <div>
-                  <strong>Temperature</strong>
-                  <div class="spark"></div>
-                </div>
-                <div class="health-value">58.3<span class="health-label"> °C<br>CPU</span></div>
+                <div><strong>Temperature</strong><div class="spark"></div></div>
+                <div class="health-value"><span id="health-temperature">--</span><span class="health-label"> °C<br><span id="health-temperature-label">Sensor</span></span></div>
               </div>
-              <div class="field"><span>Status</span><strong><span class="pill">Healthy</span></strong></div>
+              <div class="health-row">
+                <div class="health-icon">ϟ</div>
+                <div><strong>Power</strong><div class="spark"></div></div>
+                <div class="health-value"><span id="health-power">--</span><span class="health-label"> <span id="health-power-unit">W</span><br><span id="health-power-label">Unavailable</span></span></div>
+              </div>
+              <div class="field"><span>Status</span><strong><span class="pill" id="health-status">Checking</span></strong></div>
             </div>
           </section>
 
@@ -997,7 +1759,7 @@
               <div class="panel-tools"><span>1H</span><span>6H</span><span class="pill">24H</span><span>7D</span></div>
             </div>
             <div class="chart-wrap">
-              <div class="legend"><span>Latency (ms)</span><span>CPU (%)</span><span>Memory (%)</span></div>
+              <div class="legend"><span>Temperature (°C)</span><span>CPU (%)</span><span>Memory (%)</span></div>
               <svg id="performance-chart" class="performance-chart" viewBox="0 0 640 210" preserveAspectRatio="none" aria-label="Performance chart">
                 <defs>
                   <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
@@ -1008,12 +1770,12 @@
                 <g stroke="rgba(148,163,184,.16)" stroke-width="1">
                   <line x1="36" y1="22" x2="625" y2="22"/><line x1="36" y1="68" x2="625" y2="68"/><line x1="36" y1="114" x2="625" y2="114"/><line x1="36" y1="160" x2="625" y2="160"/>
                 </g>
-                <path d="M36 152 L70 146 L108 148 L134 102 L166 96 L204 108 L240 103 L280 116 L320 109 L362 112 L402 106 L442 118 L480 104 L522 111 L565 96 L625 104" fill="none" stroke="#9d4edd" stroke-width="3"/>
-                <path d="M36 168 L70 161 L108 164 L134 132 L166 139 L204 146 L240 141 L280 149 L320 143 L362 147 L402 140 L442 151 L480 145 L522 148 L565 139 L625 145" fill="none" stroke="#20c7c9" stroke-width="3"/>
-                <path d="M36 128 L70 123 L108 126 L134 120 L166 122 L204 124 L240 121 L280 126 L320 125 L362 123 L402 124 L442 126 L480 121 L522 124 L565 122 L625 126" fill="none" stroke="#f97316" stroke-width="3"/>
+                <path id="cpu-history" d="" fill="none" stroke="#9d4edd" stroke-width="3"/>
+                <path id="temperature-history" d="" fill="none" stroke="#20c7c9" stroke-width="3"/>
+                <path id="memory-history" d="" fill="none" stroke="#f97316" stroke-width="3"/>
                 <g fill="#9aa7b7" font-size="13">
                   <text x="0" y="26">100</text><text x="9" y="72">75</text><text x="9" y="118">50</text><text x="9" y="164">25</text>
-                  <text x="36" y="200">18:00</text><text x="196" y="200">00:00</text><text x="350" y="200">06:00</text><text x="506" y="200">12:00</text><text x="604" y="200">18:00</text>
+                  <text x="36" y="200">-2m</text><text x="180" y="200">-90s</text><text x="334" y="200">-60s</text><text x="490" y="200">-30s</text><text x="596" y="200">Now</text>
                 </g>
               </svg>
             </div>
@@ -1068,6 +1830,149 @@
             </section>
           </section>
         </section>
+
+        <section class="rvbench-view" id="rvbench-view" hidden>
+          <div class="rvbench-sheet" aria-label="RVBench Report">
+            <header class="rvbench-report-header">
+              <div class="rvbench-title">
+                <h2>RVBench Report</h2>
+                <span>EdgeOne Prototype</span>
+              </div>
+              <div class="rvbench-meta">
+                <strong>Report ID:</strong><span>RVB-2026-07-10-001</span>
+                <strong>Date:</strong><span>2026-07-10</span>
+                <strong>Version:</strong><span>v1.0</span>
+                <strong>Status:</strong><span><span class="pass-chip">PASS</span></span>
+              </div>
+            </header>
+
+            <section class="rvbench-grid">
+              <div class="rvbench-box rvbench-config">
+                <div class="rvbench-box-title"><span>Test Configuration</span><span>⚙</span></div>
+                <div class="config-line"><span>Device Under Test</span><strong id="rvbench-device">Detecting...</strong></div>
+                <div class="config-line"><span>CPU</span><strong id="rvbench-cpu">Detecting...</strong></div>
+                <div class="config-line"><span>Memory</span><strong id="rvbench-memory">Detecting...</strong></div>
+                <div class="config-line"><span>OS / Kernel</span><strong id="rvbench-kernel">Detecting...</strong></div>
+                <div class="config-line"><span>Toolchain</span><strong>GCC 13.2.0</strong></div>
+                <div class="config-line"><span>RVBench Suite</span><strong>RVBench 1.0.0</strong></div>
+                <div class="config-line"><span>Test Duration</span><strong>30 min per workload</strong></div>
+                <div class="config-line"><span>Ambient Temp</span><strong>25°C ± 1°C</strong></div>
+                <div class="config-line"><span>Power Supply</span><strong>5.0V / 3.0A DC</strong></div>
+              </div>
+
+              <article class="rvbench-box benchmark-metric">
+                <div class="metric-head"><span class="metric-symbol">◷</span><span>Latency</span></div>
+                <div class="metric-reading">23.4 <small>µs</small></div>
+                <div class="metric-target">Target: ≤ 30 µs</div>
+                <span class="pass-chip">PASS</span>
+              </article>
+              <article class="rvbench-box benchmark-metric">
+                <div class="metric-head"><span class="metric-symbol">⌁</span><span>Throughput</span></div>
+                <div class="metric-reading">1.82 <small>Mops/s</small></div>
+                <div class="metric-target">Target: ≥ 1.50 Mops/s</div>
+                <span class="pass-chip">PASS</span>
+              </article>
+              <article class="rvbench-box benchmark-metric">
+                <div class="metric-head"><span class="metric-symbol">ϟ</span><span>Power</span></div>
+                <div class="metric-reading"><span id="rvbench-power-reading">N/A</span> <small id="rvbench-power-unit">W</small></div>
+                <div class="metric-target" id="rvbench-power-target">Power sensor not exposed</div>
+                <span class="pass-chip">PASS</span>
+              </article>
+              <article class="rvbench-box benchmark-metric">
+                <div class="metric-head"><span class="metric-symbol">♨</span><span>Temperature</span></div>
+                <div class="metric-reading"><span id="rvbench-temperature-reading">--</span> <small>°C</small></div>
+                <div class="metric-target" id="rvbench-temperature-target">Live highest sensor · Limit: 80°C</div>
+                <span class="pass-chip">PASS</span>
+              </article>
+              <article class="rvbench-box benchmark-metric">
+                <div class="metric-head"><span class="metric-symbol">⬡</span><span>Stability</span></div>
+                <div class="metric-reading">99.6 <small>%</small></div>
+                <div class="metric-target">Target: ≥ 98%</div>
+                <span class="pass-chip">PASS</span>
+              </article>
+              <article class="rvbench-box benchmark-metric">
+                <div class="metric-head"><span class="metric-symbol">↻</span><span>Reproducibility</span></div>
+                <div class="metric-reading">98.7 <small>%</small></div>
+                <div class="metric-target">Target: ≥ 95%</div>
+                <span class="pass-chip">PASS</span>
+              </article>
+            </section>
+
+            <section class="rvbench-charts">
+              <div class="rvbench-box chart-card">
+                <div class="chart-title">Latency Over Time (µs)</div>
+                <svg class="mini-chart" viewBox="0 0 320 112" preserveAspectRatio="none" aria-label="Latency over time">
+                  <g stroke="#e5e7eb" stroke-width="1">
+                    <line x1="25" y1="18" x2="310" y2="18"/><line x1="25" y1="46" x2="310" y2="46"/><line x1="25" y1="74" x2="310" y2="74"/><line x1="25" y1="102" x2="310" y2="102"/>
+                  </g>
+                  <line x1="25" y1="42" x2="310" y2="42" stroke="#fb923c" stroke-dasharray="5 4"/>
+                  <path d="M25 60 L48 58 L72 61 L96 57 L120 60 L144 59 L168 62 L192 58 L216 61 L240 57 L264 60 L288 58 L310 59" fill="none" stroke="#0f766e" stroke-width="3"/>
+                  <g fill="#6b7280" font-size="10"><text x="0" y="21">50</text><text x="0" y="49">30</text><text x="0" y="77">10</text><text x="25" y="111">0</text><text x="286" y="111">30m</text></g>
+                </svg>
+              </div>
+
+              <div class="rvbench-box chart-card">
+                <div class="chart-title">Throughput Over Time (Mops/s)</div>
+                <svg class="mini-chart" viewBox="0 0 320 112" preserveAspectRatio="none" aria-label="Throughput over time">
+                  <g stroke="#e5e7eb" stroke-width="1">
+                    <line x1="25" y1="18" x2="310" y2="18"/><line x1="25" y1="46" x2="310" y2="46"/><line x1="25" y1="74" x2="310" y2="74"/><line x1="25" y1="102" x2="310" y2="102"/>
+                  </g>
+                  <line x1="25" y1="74" x2="310" y2="74" stroke="#fb923c" stroke-dasharray="5 4"/>
+                  <path d="M25 62 L48 59 L72 61 L96 58 L120 60 L144 57 L168 59 L192 56 L216 58 L240 55 L264 57 L288 56 L310 55" fill="none" stroke="#0f766e" stroke-width="3"/>
+                  <g fill="#6b7280" font-size="10"><text x="0" y="21">3.0</text><text x="0" y="77">1.5</text><text x="0" y="105">0</text><text x="25" y="111">0</text><text x="286" y="111">30m</text></g>
+                </svg>
+              </div>
+
+              <div class="rvbench-box chart-card">
+                <div class="chart-title">Power & Temperature Over Time</div>
+                <svg class="mini-chart" viewBox="0 0 380 112" preserveAspectRatio="none" aria-label="Power and temperature over time">
+                  <g stroke="#e5e7eb" stroke-width="1">
+                    <line x1="28" y1="18" x2="350" y2="18"/><line x1="28" y1="46" x2="350" y2="46"/><line x1="28" y1="74" x2="350" y2="74"/><line x1="28" y1="102" x2="350" y2="102"/>
+                  </g>
+                  <line x1="28" y1="34" x2="350" y2="34" stroke="#fb923c" stroke-dasharray="5 4"/>
+                  <path d="M28 64 L58 62 L88 65 L118 63 L148 66 L178 64 L208 65 L238 63 L268 66 L298 64 L328 65 L350 64" fill="none" stroke="#0f766e" stroke-width="3"/>
+                  <path d="M28 50 L58 48 L88 51 L118 49 L148 50 L178 48 L208 51 L238 49 L268 51 L298 50 L328 52 L350 51" fill="none" stroke="#f97316" stroke-width="3"/>
+                  <g fill="#6b7280" font-size="10"><text x="0" y="21">2.5</text><text x="0" y="77">1.0</text><text x="28" y="111">0</text><text x="322" y="111">30m</text><text x="354" y="21">100</text><text x="354" y="77">40</text></g>
+                </svg>
+              </div>
+            </section>
+
+            <section class="rvbench-bottom">
+              <div class="rvbench-box timeline-card">
+                <div class="chart-title">Stability Timeline</div>
+                <div class="timeline-track">
+                  <span class="timeline-dot">0 min</span><span class="timeline-dot">5 min</span><span class="timeline-dot">10 min</span><span class="timeline-dot">15 min</span><span class="timeline-dot">20 min</span><span class="timeline-dot">25 min</span><span class="timeline-dot">30 min</span>
+                </div>
+              </div>
+
+              <div class="rvbench-box summary-table-card">
+                <div class="chart-title">Benchmark Summary</div>
+                <table class="summary-table">
+                  <thead><tr><th>Workload</th><th>Metric</th><th>Measured</th><th>Result</th></tr></thead>
+                  <tbody>
+                    <tr><td>CoreMark</td><td>Score</td><td>2153</td><td><span class="pass-chip">PASS</span></td></tr>
+                    <tr><td>Dhrystone</td><td>MIPS</td><td>1820</td><td><span class="pass-chip">PASS</span></td></tr>
+                    <tr><td>Memory Copy</td><td>MB/s</td><td>2450</td><td><span class="pass-chip">PASS</span></td></tr>
+                    <tr><td>Interrupt Latency</td><td>µs</td><td>23.4</td><td><span class="pass-chip">PASS</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="rvbench-box overall-card">
+                <div class="chart-title">Overall Result</div>
+                <div class="overall-result">
+                  <div class="overall-pass"><span class="check">✓</span><span><strong>PASS</strong>All benchmark criteria met.</span></div>
+                  <div class="follow-up"><span class="metric-symbol">!</span><span><strong>Follow-up</strong>Continue thermal validation under extended load.</span></div>
+                </div>
+              </div>
+            </section>
+
+            <footer class="rvbench-footer">
+              <span>⌁ RVClaw Studio</span>
+              <span>Generated by RVClaw Studio</span>
+            </footer>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -1086,10 +1991,21 @@
     const f5VideoStatus = document.getElementById('f5-video-status');
     const f7AlertCount = document.getElementById('f7-alert-count');
     const yoloDetectionCount = document.getElementById('yolo-detection-count');
+    let systemMetricsErrorLogged = false;
+    const metricHistory = [];
     let trackingPayload = null;
     let visionState = null;
     let videoDetectionPayload = null;
     let demoStartTime = performance.now();
+
+    function switchView(viewName) {
+      document.querySelectorAll('.nav-item[data-view]').forEach((item) => {
+        item.classList.toggle('active', item.dataset.view === viewName);
+      });
+      document.getElementById('dashboard-view').hidden = viewName !== 'dashboard';
+      document.getElementById('rvbench-view').hidden = viewName !== 'rvbench';
+      statusText.textContent = viewName === 'rvbench' ? 'RVBench report view ready' : 'Ready';
+    }
 
     function setLoading(isLoading) {
       runButton.disabled = isLoading;
@@ -1381,6 +2297,123 @@
       }
     }
 
+    function formatBytes(bytes) {
+      if (bytes === null || bytes === undefined) return '--';
+      const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
+      let value = bytes;
+      let unit = 0;
+      while (value >= 1024 && unit < units.length - 1) {
+        value /= 1024;
+        unit += 1;
+      }
+      return value.toFixed(unit >= 3 ? 1 : 0) + ' ' + units[unit];
+    }
+
+    function formatUptime(seconds) {
+      if (seconds === null || seconds === undefined) return '--';
+      const totalMinutes = Math.floor(seconds / 60);
+      const days = Math.floor(totalMinutes / 1440);
+      const hours = Math.floor((totalMinutes % 1440) / 60);
+      const minutes = totalMinutes % 60;
+      return days + 'd ' + hours + 'h ' + minutes + 'm';
+    }
+
+    function renderMetricHistory() {
+      function buildPath(key) {
+        let hasPoint = false;
+        return metricHistory.map(function(sample, index) {
+          const value = sample[key];
+          if (value === null || value === undefined) {
+            hasPoint = false;
+            return '';
+          }
+          const x = 36 + index / Math.max(metricHistory.length - 1, 1) * 589;
+          const y = 160 - Math.max(0, Math.min(100, value)) / 100 * 138;
+          const command = hasPoint ? 'L' : 'M';
+          hasPoint = true;
+          return command + x.toFixed(1) + ' ' + y.toFixed(1);
+        }).join(' ');
+      }
+      document.getElementById('cpu-history').setAttribute('d', buildPath('cpu'));
+      document.getElementById('memory-history').setAttribute('d', buildPath('memory'));
+      document.getElementById('temperature-history').setAttribute('d', buildPath('temperature'));
+    }
+
+    function renderSystemMetrics(payload, requestMs) {
+      const device = payload.device;
+      const usage = payload.usage;
+      const thermal = payload.thermal;
+      const power = payload.power;
+      const cpuModel = device.cpu_model || device.architecture || 'CPU';
+      const memoryTotal = formatBytes(usage.memory_total_bytes);
+      const frequency = device.cpu_frequency_mhz ? ' @ ' + Math.round(device.cpu_frequency_mhz) + ' MHz' : '';
+
+      document.getElementById('top-device-name').textContent = device.hostname;
+      document.getElementById('top-device-platform').textContent = device.architecture + ' Linux';
+      document.getElementById('top-device-cpu').textContent = 'CPU: ' + device.cpu_count + ' cores';
+      document.getElementById('top-device-uptime').textContent = 'Uptime: ' + formatUptime(device.uptime_seconds);
+      document.getElementById('top-device-kernel').textContent = 'Kernel: ' + device.kernel;
+      document.getElementById('sidebar-device-name').textContent = device.hostname;
+      document.getElementById('sidebar-device-platform').textContent = device.architecture + ' · ' + device.os + ' ' + device.kernel;
+      document.getElementById('sidebar-device-resources').textContent = device.cpu_count + ' Cores · ' + memoryTotal + ' RAM';
+      document.getElementById('sidebar-device-runtime').textContent = cpuModel + frequency;
+
+      document.getElementById('health-cpu').textContent = usage.cpu_percent ?? '--';
+      document.getElementById('health-memory').textContent = usage.memory_percent ?? '--';
+      document.getElementById('health-memory-detail').textContent = formatBytes(usage.memory_used_bytes) + ' used';
+      const hottestSensor = thermal.sensors.reduce(function(hottest, sensor) {
+        return !hottest || sensor.celsius > hottest.celsius ? sensor : hottest;
+      }, null);
+      document.getElementById('health-temperature').textContent = thermal.primary_celsius ?? '--';
+      document.getElementById('health-temperature-label').textContent = hottestSensor ? hottestSensor.label : 'Unavailable';
+      document.getElementById('health-power').textContent = power.available ? power.watts : '--';
+      document.getElementById('health-power-unit').textContent = power.available ? 'W' : '';
+      document.getElementById('health-power-label').textContent = power.available ? (power.sensors[0].label || 'Live') : 'No sensor';
+
+      const healthy = (thermal.primary_celsius === null || thermal.primary_celsius < 80)
+        && (usage.memory_percent === null || usage.memory_percent < 90);
+      const hasHealthData = usage.cpu_percent !== null || usage.memory_percent !== null || thermal.available;
+      document.getElementById('health-status').textContent = hasHealthData
+        ? (healthy ? 'Healthy' : 'Attention')
+        : 'Limited';
+
+      metricHistory.push({
+        cpu: usage.cpu_percent,
+        memory: usage.memory_percent,
+        temperature: thermal.primary_celsius,
+      });
+      if (metricHistory.length > 60) metricHistory.shift();
+      renderMetricHistory();
+
+      document.getElementById('rvbench-temperature-reading').textContent = thermal.primary_celsius ?? '--';
+      document.getElementById('rvbench-power-reading').textContent = power.available ? power.watts : 'N/A';
+      document.getElementById('rvbench-power-unit').textContent = power.available ? 'W' : '';
+      document.getElementById('rvbench-power-target').textContent = power.available
+        ? (power.sensors[0].label || 'Live power sensor')
+        : 'Power sensor not exposed';
+      document.getElementById('rvbench-device').textContent = device.hostname;
+      document.getElementById('rvbench-cpu').textContent = cpuModel + ' · ' + device.cpu_count + ' cores' + frequency;
+      document.getElementById('rvbench-memory').textContent = memoryTotal;
+      document.getElementById('rvbench-kernel').textContent = device.os + ' ' + device.kernel + ' (' + device.architecture + ')';
+      statusText.textContent = 'Live K3 telemetry · ' + requestMs.toFixed(0) + ' ms API';
+    }
+
+    async function loadSystemMetrics() {
+      const started = performance.now();
+      try {
+        const response = await fetch('/api/system-metrics', { cache: 'no-store' });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        renderSystemMetrics(await response.json(), performance.now() - started);
+        systemMetricsErrorLogged = false;
+      } catch (error) {
+        document.getElementById('health-status').textContent = 'Offline';
+        if (!systemMetricsErrorLogged) {
+          appendLog('System telemetry unavailable: ' + error.message, 'WARN');
+          systemMetricsErrorLogged = true;
+        }
+      }
+    }
+
     async function runSampleFlow() {
       setLoading(true);
       try {
@@ -1397,10 +2430,24 @@
       }
     }
 
-    runButton.addEventListener('click', runSampleFlow);
+    document.querySelectorAll('.nav-item[data-view]').forEach((item) => {
+      item.addEventListener('click', () => switchView(item.dataset.view));
+      item.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          switchView(item.dataset.view);
+        }
+      });
+    });
+    runButton.addEventListener('click', () => {
+      switchView('rvbench');
+      runSampleFlow();
+    });
     loadVideoDetections().finally(setupVideoSource);
     loadVisionState();
     loadPersonTracking();
+    loadSystemMetrics();
+    window.setInterval(loadSystemMetrics, 2000);
     requestAnimationFrame(animatePersonDemo);
     runSampleFlow();
   </script>

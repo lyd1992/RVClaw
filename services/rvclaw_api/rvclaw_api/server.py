@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 
 from .person_tracking import get_person_tracking_payload
 from .sample_flow import run_sample_flow
+from .system_metrics import get_system_metrics
 from .video_detection import get_video_detection_payload
 from .vision_state import get_vision_state
 
@@ -31,6 +32,9 @@ class RVClawRequestHandler(BaseHTTPRequestHandler):
             return
         if parsed.path == "/api/video-detections":
             self._write_json(get_video_detection_payload())
+            return
+        if parsed.path == "/api/system-metrics":
+            self._write_json(get_system_metrics())
             return
         if parsed.path.startswith("/artifacts/"):
             self._serve_artifact(parsed.path.removeprefix("/artifacts/"))
