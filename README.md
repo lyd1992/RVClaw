@@ -60,6 +60,18 @@ scripts/                      # 项目辅助脚本
 
 后续所有 `M2 -> M3 -> M4 -> M5` 的联调，都优先围绕这些契约对齐。
 
+## 目标检测框部署说明
+
+Studio 页面里的目标检测框不是纯前端效果，它来自后端 YOLOv8n 适配器输出的检测结果。由于模型权重和部分推理工具包体积较大，仓库默认不携带完整运行环境；其他人只克隆代码后可以打开 Studio，但如果没有准备模型和依赖，就只能看到 fallback 状态，不能看到真实目标检测框。
+
+部署到 K3 或其他设备时需要准备：
+
+- Python 推理依赖：`ultralytics`、`opencv-python`
+- YOLOv8n 权重文件：默认放在 `models/yolov8n.pt`
+- 如模型放在其他路径，需要设置环境变量：`RVCLAW_YOLO_MODEL=/path/to/yolov8n.pt`
+
+更多步骤见 `deploy/README.md` 和 `models/README.md`。部署后可访问 `/api/vision-state`，确认返回里的 `model.available=true`；如果是 `false`，说明当前仍处于模型或工具包未就绪状态，Studio 不会显示真实检测框。
+
 ## 开发原则
 
 1. 先对齐契约，再补实现。
