@@ -1,0 +1,19 @@
+{
+  "architecture": "riscv64",
+  "python_abi": "cp314",
+  "ros": {"distribution": "humble", "prefix": "/opt/ros/humble"},
+  "sdk": {"root": "/data/spacemit_robot", "manifest": "deploy/k3/sdk_manifest.xml"},
+  "system_packages": [
+    "alsa-utils", "v4l-utils", "python3-opencv", "python3-colcon-common-extensions",
+    "python3-spacemit-ort", "spacemit-onnxruntime", "opencv-spacemit",
+    "libyaml-cpp-dev", "libeigen3-dev", "libpcap-dev",
+    "ros-humble-navigation2", "ros-humble-nav2-bringup",
+    "ros-humble-slam-toolbox", "ros-humble-robot-localization"
+  ],
+  "native_python_modules": ["ncnn", "onnxruntime", "spacemit_asr", "spacemit_vad"],
+  "sdk_python_paths": [
+    "output/build/cmake/pkgs/components_model_zoo_asr/python",
+    "output/staging/lib/python"
+  ],
+  "runtime_resources": "models/runtime_assets.json"
+}

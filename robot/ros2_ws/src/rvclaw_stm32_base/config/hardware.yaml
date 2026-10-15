@@ -1,0 +1,24 @@
+rvclaw_stm32_hardware:
+  ros__parameters:
+    device: /dev/serial/by-id/usb-WCH.CN_USB_Single_Serial_0002-if00
+    baud: 115200
+    hardware_output_enabled: false
+    control_rate_hz: 20.0
+    command_timeout_s: 0.25
+    max_command_stamp_age_s: 0.10
+    max_future_command_stamp_skew_s: 0.02
+    deadman_timeout_s: 0.15
+    max_linear_x_m_s: 0.20
+    max_angular_z_rad_s: 0.60
+    max_linear_accel_m_s2: 0.20
+    max_angular_accel_rad_s2: 0.60
+    require_feedback_connected: true
+    connection_timeout_s: 0.5
+    min_battery_voltage_v: 9.0
+    odom_frame_id: odom
+    base_frame_id: base_footprint
+    imu_frame_id: imu_link
+    odom_x_scale: 0.981
+    odom_y_scale: 1.0
+    odom_z_scale_positive: 1.0
+    odom_z_scale_negative: 1.0

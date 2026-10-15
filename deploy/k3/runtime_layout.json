@@ -1,0 +1,1100 @@
+{
+  "schema_version": 1,
+  "scripts": [
+    {
+      "profile": "mission",
+      "source": "scripts/robot/nav2_fast_localization.py",
+      "destination": "scripts/nav2_fast_localization.py",
+      "mode": 493
+    },
+    {
+      "profile": "mission",
+      "source": "scripts/robot/nav2_forward_goal_030.py",
+      "destination": "scripts/nav2_forward_goal_030.py",
+      "mode": 493
+    },
+    {
+      "profile": "mission",
+      "source": "scripts/robot/nav2_global_localization_scan.py",
+      "destination": "scripts/nav2_global_localization_scan.py",
+      "mode": 436
+    },
+    {
+      "profile": "mission",
+      "source": "scripts/robot/nav2_heading_spin_left_0350.py",
+      "destination": "scripts/nav2_heading_spin_left_0350.py",
+      "mode": 493
+    },
+    {
+      "profile": "mission",
+      "source": "scripts/robot/nav2_persistent_route.sh",
+      "destination": "scripts/nav2_persistent_route.sh",
+      "mode": 493
+    },
+    {
+      "profile": "mission",
+      "source": "scripts/robot/rvclaw_waypoint_client.py",
+      "destination": "scripts/rvclaw_waypoint_client.py",
+      "mode": 493
+    },
+    {
+      "profile": "mission",
+      "source": "scripts/robot/rvclaw_waypoint_route_client.py",
+      "destination": "scripts/rvclaw_waypoint_route_client.py",
+      "mode": 438
+    },
+    {
+      "profile": "mission",
+      "source": "scripts/robot/static_match_consensus.py",
+      "destination": "scripts/static_match_consensus.py",
+      "mode": 493
+    },
+    {
+      "profile": "mission",
+      "source": "scripts/robot/stm32_control_client.py",
+      "destination": "scripts/stm32_control_client.py",
+      "mode": 493
+    },
+    {
+      "profile": "mission",
+      "source": "scripts/robot/verify_runtime_map.py",
+      "destination": "scripts/verify_runtime_map.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "scripts/robot/nav2_persistent_runtime.sh",
+      "destination": "scripts/nav2_persistent_runtime.sh",
+      "mode": 493
+    },
+    {
+      "profile": "mapping",
+      "source": "scripts/robot/autonomous_mapping_session.sh",
+      "destination": "scripts/autonomous_mapping_session.sh",
+      "mode": 493
+    },
+    {
+      "profile": "mapping",
+      "source": "scripts/robot/m10_serial_probe.py",
+      "destination": "scripts/m10_serial_probe.py",
+      "mode": 493
+    },
+    {
+      "profile": "mapping",
+      "source": "scripts/robot/navigation_stationary_probe.py",
+      "destination": "scripts/navigation_stationary_probe.py",
+      "mode": 493
+    },
+    {
+      "profile": "mapping",
+      "source": "scripts/robot/rvclaw_visualization.sh",
+      "destination": "scripts/rvclaw_visualization.sh",
+      "mode": 493
+    },
+    {
+      "profile": "mapping",
+      "source": "scripts/robot/slam_mapping_session.sh",
+      "destination": "scripts/slam_mapping_session.sh",
+      "mode": 493
+    },
+    {
+      "profile": "base",
+      "source": "scripts/robot/m10_serial_probe.py",
+      "destination": "scripts/m10_serial_probe.py",
+      "mode": 436
+    },
+    {
+      "profile": "base",
+      "source": "robot/profiles/base/scripts/nav2_global_localization_scan.py",
+      "destination": "scripts/nav2_global_localization_scan.py",
+      "mode": 436
+    },
+    {
+      "profile": "base",
+      "source": "robot/profiles/base/scripts/nav2_heading_spin_left_0350.py",
+      "destination": "scripts/nav2_heading_spin_left_0350.py",
+      "mode": 438
+    },
+    {
+      "profile": "base",
+      "source": "scripts/robot/nav2_heading_spin_left_90.py",
+      "destination": "scripts/nav2_heading_spin_left_90.py",
+      "mode": 493
+    },
+    {
+      "profile": "base",
+      "source": "scripts/robot/nav2_heading_spin_left_90.sh",
+      "destination": "scripts/nav2_heading_spin_left_90.sh",
+      "mode": 493
+    },
+    {
+      "profile": "base",
+      "source": "scripts/robot/rvclaw_visualization.sh",
+      "destination": "scripts/rvclaw_visualization.sh",
+      "mode": 493
+    },
+    {
+      "profile": "base",
+      "source": "scripts/robot/static_match_consensus.py",
+      "destination": "scripts/static_match_consensus.py",
+      "mode": 436
+    },
+    {
+      "profile": "base",
+      "source": "scripts/robot/stm32_control_client.py",
+      "destination": "scripts/stm32_control_client.py",
+      "mode": 436
+    }
+  ],
+  "profiles": [
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_through_poses_forward_only.xml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_through_poses_forward_only.xml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_forward_only.xml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_forward_only.xml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_heading_forward_only.xml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_heading_forward_only.xml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_origin_heading.xml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_origin_heading.xml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_position_only.xml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_position_only.xml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/bounded_backup_params.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/bounded_backup_params.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/ekf_odom_only.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/ekf_odom_only.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/heading_gate_params.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/heading_gate_params.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/inspection_route_tasks.example.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/inspection_route_tasks.example.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/inspection_route_tasks.phone-demo.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/inspection_route_tasks.phone-demo.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/mission_catalog.example.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/mission_catalog.example.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/mission_catalog.newmap.example.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/mission_catalog.newmap.example.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/profiles/navigation/overrides/rvclaw_nav2_bringup/config/nav2_params.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/nav2_params.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/nav2_params_dwb_ab.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/nav2_params_dwb_ab.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/physical_measurements.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/physical_measurements.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/slam_toolbox.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/slam_toolbox.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/task_workers.example.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/task_workers.example.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/autonomous_mapping.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/autonomous_mapping.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/global_scan_lidar.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/global_scan_lidar.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/heading_gate.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/heading_gate.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/localization.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/localization.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/mapping.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/mapping.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/mapping_raw_odom.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/mapping_raw_odom.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/profiles/navigation/overrides/rvclaw_nav2_bringup/launch/navigation.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/navigation.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/odom_tf.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/odom_tf.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/profiles/navigation/overrides/rvclaw_nav2_bringup/launch/persistent_navigation.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/persistent_navigation.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/sensor_transforms.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/sensor_transforms.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/state_estimation.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/state_estimation.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/visualization.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/visualization.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/package.xml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/package.xml",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/resource/rvclaw_nav2_bringup",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/resource/rvclaw_nav2_bringup",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/__init__.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/__init__.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/amcl_localization_observer.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/amcl_localization_observer.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/amcl_motion_observer.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/amcl_motion_observer.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/amcl_reposition_observer.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/amcl_reposition_observer.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/bounded_backup_client.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/bounded_backup_client.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/bounded_backup_corridor_filter.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/bounded_backup_corridor_filter.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/bounded_backup_policy.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/bounded_backup_policy.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/calibration_math.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/calibration_math.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/catalog_from_waypoints.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/catalog_from_waypoints.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/profiles/navigation/overrides/rvclaw_nav2_bringup/rvclaw_nav2_bringup/cmd_vel_adapter.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/cmd_vel_adapter.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/dynamic_obstacle_policy.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/dynamic_obstacle_policy.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/fast_start_policy.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/fast_start_policy.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/frontier_exploration_policy.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/frontier_exploration_policy.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/frontier_explorer.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/frontier_explorer.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/profiles/navigation/overrides/rvclaw_nav2_bringup/rvclaw_nav2_bringup/inspection_task_runtime.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/inspection_task_runtime.py",
+      "mode": 438
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/localization_runtime_manager.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/localization_runtime_manager.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/map_acceptance.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/map_acceptance.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/measurement_geometry.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/measurement_geometry.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/mission_contract.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/mission_contract.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/mission_release_check.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/mission_release_check.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/nav_readiness_check.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/nav_readiness_check.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/profiles/navigation/overrides/rvclaw_nav2_bringup/rvclaw_nav2_bringup/navigation_recovery_policy.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/navigation_recovery_policy.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/odom_calibration_recorder.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/odom_calibration_recorder.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/odom_tf_broadcaster.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/odom_tf_broadcaster.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/offline_mission_validator.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/offline_mission_validator.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/readiness_contract.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/readiness_contract.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/profiles/navigation/overrides/rvclaw_nav2_bringup/rvclaw_nav2_bringup/safe_egress_policy.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/safe_egress_policy.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/profiles/navigation/overrides/rvclaw_nav2_bringup/rvclaw_nav2_bringup/scan_map_consistency.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/scan_map_consistency.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/scan_self_filter.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/scan_self_filter.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/scan_trial_policy.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/scan_trial_policy.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/task_worker_contract.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/task_worker_contract.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/voice_command_contract.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/voice_command_contract.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/waypoint_catalog.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/waypoint_catalog.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/waypoint_client.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/waypoint_client.py",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rviz/rvclaw_navigation.rviz",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rviz/rvclaw_navigation.rviz",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/setup.cfg",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/setup.cfg",
+      "mode": 436
+    },
+    {
+      "profile": "navigation",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/setup.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/setup.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_through_poses_forward_only.xml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_through_poses_forward_only.xml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_forward_only.xml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_forward_only.xml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_heading_forward_only.xml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_heading_forward_only.xml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_origin_heading.xml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_origin_heading.xml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_position_only.xml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/behavior_trees/navigate_to_pose_position_only.xml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/bounded_backup_params.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/bounded_backup_params.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/ekf_odom_only.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/ekf_odom_only.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/heading_gate_params.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/heading_gate_params.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/inspection_route_tasks.example.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/inspection_route_tasks.example.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/inspection_route_tasks.phone-demo.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/inspection_route_tasks.phone-demo.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/mission_catalog.example.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/mission_catalog.example.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/mission_catalog.newmap.example.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/mission_catalog.newmap.example.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/nav2_params.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/nav2_params.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/nav2_params_dwb_ab.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/nav2_params_dwb_ab.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/physical_measurements.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/physical_measurements.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/slam_toolbox.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/slam_toolbox.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/config/task_workers.example.yaml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/config/task_workers.example.yaml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/autonomous_mapping.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/autonomous_mapping.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/profiles/mapping/overrides/rvclaw_nav2_bringup/launch/global_scan_lidar.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/global_scan_lidar.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/heading_gate.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/heading_gate.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/localization.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/localization.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/mapping.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/mapping.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/mapping_raw_odom.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/mapping_raw_odom.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/navigation.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/navigation.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/odom_tf.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/odom_tf.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/persistent_navigation.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/persistent_navigation.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/sensor_transforms.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/sensor_transforms.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/state_estimation.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/state_estimation.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/launch/visualization.launch.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/launch/visualization.launch.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/package.xml",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/package.xml",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/resource/rvclaw_nav2_bringup",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/resource/rvclaw_nav2_bringup",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/__init__.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/__init__.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/amcl_localization_observer.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/amcl_localization_observer.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/amcl_motion_observer.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/amcl_motion_observer.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/amcl_reposition_observer.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/amcl_reposition_observer.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/bounded_backup_client.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/bounded_backup_client.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/bounded_backup_corridor_filter.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/bounded_backup_corridor_filter.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/bounded_backup_policy.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/bounded_backup_policy.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/calibration_math.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/calibration_math.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/catalog_from_waypoints.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/catalog_from_waypoints.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/cmd_vel_adapter.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/cmd_vel_adapter.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/dynamic_obstacle_policy.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/dynamic_obstacle_policy.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/fast_start_policy.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/fast_start_policy.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/frontier_exploration_policy.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/frontier_exploration_policy.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/frontier_explorer.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/frontier_explorer.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/profiles/mapping/overrides/rvclaw_nav2_bringup/rvclaw_nav2_bringup/inspection_task_runtime.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/inspection_task_runtime.py",
+      "mode": 438
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/localization_runtime_manager.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/localization_runtime_manager.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/map_acceptance.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/map_acceptance.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/measurement_geometry.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/measurement_geometry.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/mission_contract.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/mission_contract.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/mission_release_check.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/mission_release_check.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/nav_readiness_check.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/nav_readiness_check.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/profiles/mapping/overrides/rvclaw_nav2_bringup/rvclaw_nav2_bringup/navigation_recovery_policy.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/navigation_recovery_policy.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/odom_calibration_recorder.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/odom_calibration_recorder.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/odom_tf_broadcaster.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/odom_tf_broadcaster.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/offline_mission_validator.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/offline_mission_validator.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/readiness_contract.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/readiness_contract.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/profiles/mapping/overrides/rvclaw_nav2_bringup/rvclaw_nav2_bringup/safe_egress_policy.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/safe_egress_policy.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/profiles/mapping/overrides/rvclaw_nav2_bringup/rvclaw_nav2_bringup/scan_map_consistency.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/scan_map_consistency.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/profiles/mapping/overrides/rvclaw_nav2_bringup/rvclaw_nav2_bringup/scan_self_filter.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/scan_self_filter.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/task_worker_contract.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/task_worker_contract.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/voice_command_contract.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/voice_command_contract.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/waypoint_catalog.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/waypoint_catalog.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/waypoint_client.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rvclaw_nav2_bringup/waypoint_client.py",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/rviz/rvclaw_navigation.rviz",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/rviz/rvclaw_navigation.rviz",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/setup.cfg",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/setup.cfg",
+      "mode": 436
+    },
+    {
+      "profile": "mapping",
+      "source": "robot/ros2_ws/src/rvclaw_nav2_bringup/setup.py",
+      "destination": "ros2_ws/src/rvclaw_nav2_bringup/setup.py",
+      "mode": 436
+    }
+  ],
+  "vision": [
+    {
+      "source": "services/rvclaw_api/native/CMakeLists.txt",
+      "destination": "native/CMakeLists.txt",
+      "mode": 436
+    },
+    {
+      "source": "services/rvclaw_api/native/helmet_compliance.h",
+      "destination": "native/helmet_compliance.h",
+      "mode": 436
+    },
+    {
+      "source": "services/rvclaw_api/native/yolov8_mjpeg.cpp",
+      "destination": "native/yolov8_mjpeg.cpp",
+      "mode": 436
+    },
+    {
+      "source": "services/rvclaw_api/rvclaw_api/__init__.py",
+      "destination": "rvclaw_api/__init__.py",
+      "mode": 436
+    },
+    {
+      "source": "services/rvclaw_api/rvclaw_api/meter_config.py",
+      "destination": "rvclaw_api/meter_config.py",
+      "mode": 436
+    },
+    {
+      "source": "services/rvclaw_api/rvclaw_api/meter_reference.py",
+      "destination": "rvclaw_api/meter_reference.py",
+      "mode": 436
+    },
+    {
+      "source": "services/rvclaw_api/rvclaw_api/meter_trial.py",
+      "destination": "rvclaw_api/meter_trial.py",
+      "mode": 436
+    },
+    {
+      "source": "services/rvclaw_api/rvclaw_api/person_tracking.py",
+      "destination": "rvclaw_api/person_tracking.py",
+      "mode": 436
+    },
+    {
+      "source": "services/rvclaw_api/rvclaw_api/pointer_gauge_adapter.py",
+      "destination": "rvclaw_api/pointer_gauge_adapter.py",
+      "mode": 436
+    },
+    {
+      "source": "services/rvclaw_api/rvclaw_api/pointer_reference.py",
+      "destination": "rvclaw_api/pointer_reference.py",
+      "mode": 436
+    },
+    {
+      "source": "services/rvclaw_api/rvclaw_api/rvbench_store.py",
+      "destination": "rvclaw_api/rvbench_store.py",
+      "mode": 436
+    },
+    {
+      "source": "services/rvclaw_api/rvclaw_api/sample_flow.py",
+      "destination": "rvclaw_api/sample_flow.py",
+      "mode": 436
+    },
+    {
+      "source": "services/rvclaw_api/profiles/inspection/rvclaw_api/server.py",
+      "destination": "rvclaw_api/server.py",
+      "mode": 436
+    },
+    {
+      "source": "services/rvclaw_api/rvclaw_api/video_detection.py",
+      "destination": "rvclaw_api/video_detection.py",
+      "mode": 436
+    },
+    {
+      "source": "services/rvclaw_api/rvclaw_api/vision_state.py",
+      "destination": "rvclaw_api/vision_state.py",
+      "mode": 436
+    }
+  ],
+  "contracts": [
+    {
+      "source": "contracts/command_result.schema.json",
+      "destination": "contracts/command_result.schema.json"
+    },
+    {
+      "source": "contracts/device_status.schema.json",
+      "destination": "contracts/device_status.schema.json"
+    },
+    {
+      "source": "contracts/profiles/inspection/inspection_result.schema.json",
+      "destination": "contracts/inspection_result.schema.json"
+    },
+    {
+      "source": "contracts/person_tracking.schema.json",
+      "destination": "contracts/person_tracking.schema.json"
+    },
+    {
+      "source": "contracts/task_state.schema.json",
+      "destination": "contracts/task_state.schema.json"
+    },
+    {
+      "source": "contracts/vision_state.schema.json",
+      "destination": "contracts/vision_state.schema.json"
+    },
+    {
+      "source": "contracts/voice_command.schema.json",
+      "destination": "contracts/voice_command.schema.json"
+    }
+  ],
+  "algorithms": [
+    {
+      "source": "robot/profiles/inspection/overrides/rvclaw_algo/rvclaw_algo/__init__.py",
+      "destination": "rvclaw_algo/__init__.py",
+      "mode": 436
+    },
+    {
+      "source": "robot/ros2_ws/src/rvclaw_algo/rvclaw_algo/ethz_gauge_reader.py",
+      "destination": "rvclaw_algo/ethz_gauge_reader.py",
+      "mode": 436
+    },
+    {
+      "source": "robot/ros2_ws/src/rvclaw_algo/rvclaw_algo/meter_reader.py",
+      "destination": "rvclaw_algo/meter_reader.py",
+      "mode": 436
+    },
+    {
+      "source": "robot/ros2_ws/src/rvclaw_algo/rvclaw_algo/ppocr_onnx.py",
+      "destination": "rvclaw_algo/ppocr_onnx.py",
+      "mode": 436
+    },
+    {
+      "source": "robot/ros2_ws/src/rvclaw_algo/rvclaw_algo/sample_recognizer.py",
+      "destination": "rvclaw_algo/sample_recognizer.py",
+      "mode": 436
+    },
+    {
+      "source": "robot/ros2_ws/src/rvclaw_algo/rvclaw_algo/yolov8n_detector.py",
+      "destination": "rvclaw_algo/yolov8n_detector.py",
+      "mode": 436
+    }
+  ]
+}

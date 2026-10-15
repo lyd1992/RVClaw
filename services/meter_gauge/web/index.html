@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RVClaw 指针仪表盘识别</title>
+<style>
+  :root{
+    --bg:#f5f7fa; --card:#fff; --line:#e3e8ef; --ink:#1f2937; --ink2:#5b6675;
+    --brand:#2563eb; --ok:#0f9d58; --warn:#d97706; --bad:#dc2626; --shadow:0 1px 3px rgba(16,24,40,.08),0 1px 2px rgba(16,24,40,.04);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:22px 18px 56px}
+  header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+  h1{font-size:21px;margin:0;letter-spacing:.2px}
+  .sub{color:var(--ink2);font-size:13px}
+  .grid{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:16px;margin-top:16px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:16px}
+  .card h2{font-size:14px;margin:0 0 12px;color:var(--ink2);font-weight:600;letter-spacing:.3px}
+  #drop{border:2px dashed #c8d2e0;border-radius:10px;padding:26px 16px;text-align:center;
+        color:var(--ink2);cursor:pointer;transition:.15s;background:#fafcff}
+  #drop:hover,#drop.over{border-color:var(--brand);background:#f0f6ff;color:var(--brand)}
+  #drop b{color:var(--ink);display:block;margin-bottom:4px;font-size:15px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  button{font:inherit;border:1px solid var(--line);background:#fff;color:var(--ink);
+         padding:9px 14px;border-radius:9px;cursor:pointer;transition:.15s}
+  button:hover:not(:disabled){border-color:var(--brand);color:var(--brand);background:#f7faff}
+  button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  button.primary:hover:not(:disabled){background:#1d4ed8;color:#fff}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink2);flex:1;min-width:86px}
+  input[type=number],input[type=text]{font:inherit;padding:8px 10px;border:1px solid var(--line);
+        border-radius:8px;width:100%;color:var(--ink);background:#fff}
+  .val{font-size:52px;font-weight:700;line-height:1.05;letter-spacing:-1px;margin:2px 0 2px}
+  .val small{font-size:20px;font-weight:600;color:var(--ink2);margin-left:6px}
+  .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:600}
+  .b-ok{background:#e7f6ee;color:var(--ok)}
+  .b-warn{background:#fdf3e3;color:var(--warn)}
+  .b-bad{background:#fdeaea;color:var(--bad)}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:13.5px;margin-top:14px;
+      padding-top:14px;border-top:1px dashed var(--line)}
+  .kv dt{color:var(--ink2)}
+  .kv dd{margin:0;font-variant-numeric:tabular-nums}
+  .imgs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+  @media(max-width:760px){.imgs{grid-template-columns:1fr}}
+  .imgs figure{margin:0}
+  .imgs img{width:100%;border-radius:10px;border:1px solid var(--line);display:block;background:#fbfcfe}
+  .imgs figcaption{font-size:12.5px;color:var(--ink2);margin-top:6px;text-align:center}
+  .note{font-size:12.5px;color:var(--ink2);margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+  .hint{color:var(--ink2);font-size:13px}
+  #err{display:none;margin-top:12px;padding:10px 12px;border-radius:9px;background:#fdeaea;color:var(--bad);
+       font-size:13.5px;white-space:pre-wrap}
+  .spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.45);
+           border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>RVClaw 指针仪表盘识别</h1>
+    <span class="sub">NanoDet + YOLOv8-Pose · ncnn · K3 板端本地推理 · 不上云</span>
+  </header>
+
+  <div class="grid">
+    <!-- 左：输入 -->
+    <section class="card">
+      <h2>1 · 选择照片</h2>
+      <div id="drop">
+        <b>点击选择，或把照片拖到这里</b>
+        <span class="hint">支持 JPG / PNG；上传后在本机识别，原图不会离开设备</span>
+      </div>
+      <input id="file" type="file" accept="image/*" style="display:none">
+      <div class="row">
+        <button id="useSample" class="primary">使用示例照片</button>
+        <button id="clearBtn">清空</button>
+      </div>
+
+      <h2 style="margin-top:18px">2 · 量程与单位</h2>
+      <div class="row">
+        <label class="f">下限<input id="rmin" type="number" value="0"></label>
+        <label class="f">上限<input id="rmax" type="number" value="100"></label>
+        <label class="f">单位<input id="unit" type="text" value="&deg;C"></label>
+      </div>
+      <div class="note">
+        模型只输出指针相对刻度弧的<b>比例</b>（0–1），量程由这里的配置决定。
+        换一块表 → 改这里即可，不用重训。
+      </div>
+      <div id="err"></div>
+    </section>
+
+    <!-- 右：结果 -->
+    <section class="card">
+      <h2>3 · 识别结果</h2>
+      <div id="statusBadge" class="badge b-warn">等待照片</div>
+      <div class="val" id="value">—</div>
+      <dl class="kv">
+        <dt>指针比例</dt><dd id="ratio">—</dd>
+        <dt>状态</dt><dd id="statusText">—</dd>
+        <dt>推断耗时</dt><dd id="ms">—</dd>
+        <dt>取针方式</dt><dd id="method">—</dd>
+        <dt>图像尺寸</dt><dd id="size">—</dd>
+      </dl>
+      <div class="note" id="reasonBox" style="display:none"></div>
+    </section>
+  </div>
+
+  <div class="imgs">
+    <figure>
+      <img id="imgView" alt="原图">
+      <figcaption id="capView">原图</figcaption>
+    </figure>
+    <figure>
+      <img id="imgAnn" alt="识别标注">
+      <figcaption id="capAnn">表盘裁剪 + 关键点标注（指针端点 / 圆心 / 刻度起止）</figcaption>
+    </figure>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = (id) => document.getElementById(id);
+  const drop = $('drop'), file = $('file');
+  const useSample = $('useSample'), clearBtn = $('clearBtn');
+  const imgView = $('imgView'), imgAnn = $('imgAnn');
+  let busy = false;
+  let sampleB64 = null;
+
+  function setBusy(type, on){
+    busy = on;
+    document.querySelectorAll('button').forEach(b => b.disabled = on);
+    drop.style.pointerEvents = on ? 'none' : 'auto';
+    drop.style.opacity = on ? .6 : 1;
+    file.disabled = on;
+    if (on) {
+      ['rmin','rmax','unit'].forEach(i => $(i).disabled = true);
+      if (type === 'sample') useSample.innerHTML = '<span class="spinner"></span>识别中…';
+      else useSample.textContent = '识别中…';
+    } else {
+      ['rmin','rmax','unit'].forEach(i => $(i).disabled = false);
+      useSample.textContent = '使用示例照片';
+    }
+  }
+  function showErr(msg){ const e = $('err'); e.style.display = 'block'; e.textContent = msg; }
+  function clearErr(){ const e = $('err'); e.style.display = 'none'; e.textContent = ''; }
+
+  // ⚠️ 刻意**不**沿用 studio 那套"缩到长边 1600 + JPEG 0.88"的口径：
+  // 实测该预处理会把 public-01 的 ratio 从 0.26751 漂到 0.26562
+  // （读数 26.75 → 26.56 ℃，即 0.19% 满量程）——像素被重采样后骨架/霍夫结果会变。
+  //
+  // 更进一步（2026-09-18 板端两次实测，结论修正过一次，注意别看错）：
+  //   传 4608×3456 的压力表照片（public-04）：
+  //     * 走 canvas 缩到长边 2560 → ratio = 0.01054
+  //     * 原样送原始字节（仍是 4608×3456）→ ratio = 0.01024
+  //   两者在 0~1.6 MPa 量程上都显示 0.02 MPa ⇒ **"缩小"确实会改 ratio（相对约 3%），
+  //   但"把 0.00 变成 0.02"不是它造成的**（那张表真值就是 0，1% 满量程的偏移来自模型本身的分辨力，
+  //   不是预处理）。public-01 上换 1600px + JPEG 0.88 的口径则实测漂 0.19% 满量程（26.75→26.56 ℃）。
+  //   ⇒ 结论：**缩小/重编码是会伤精度的真实来源，量级随量程放大**；
+  //     本服务跑在板端本地、走局域网，没必要用精度换带宽，
+  //     所以 **≤ MAX_RAW_BYTES 的文件一律原样送字节**（与板端直接读该文件逐位一致），
+  //     只有超过阈值的大图才退化成 canvas 压缩，避免 base64 体积失控。
+  const MAX_SIDE = 2560, JPEG_QUALITY = 0.95, MAX_RAW_BYTES = 8 * 1024 * 1024;
+  function toJpegB64(img){
+    const s = Math.min(1, MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas');
+    c.width  = Math.max(1, Math.round(img.naturalWidth  * s));
+    c.height = Math.max(1, Math.round(img.naturalHeight * s));
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', JPEG_QUALITY).split(',')[1];
+  }
+
+  // 原样转 base64（不重编码）—— 示例照片与普通上传文件都用它，见上面的说明
+  function blobToB64(blob){
+    return new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => resolve(String(fr.result).split(',')[1]);
+      fr.onerror = () => reject(new Error('读取文件失败'));
+      fr.readAsDataURL(blob);
+    });
+  }
+
+  function loadImage(url){
+    return new Promise((resolve, reject) => {
+      const im = new Image();
+      im.onload = () => resolve(im);
+      im.onerror = () => reject(new Error('图片解码失败'));
+      im.src = url;
+    });
+  }
+
+  // 上传文件的两种处理：小图原样送（保精度），大图压到 2560 再送（保带宽）
+  async function fileToB64(f){
+    if (f.size <= MAX_RAW_BYTES){
+      return { b64: await blobToB64(f), preview: URL.createObjectURL(f), recompressed: false };
+    }
+    const url = URL.createObjectURL(f);
+    const im = await loadImage(url);
+    return { b64: toJpegB64(im), preview: url, recompressed: true };
+  }
+
+  // 预览图换了就把旧的 blob URL 释放掉（否则每上传一张就漏一份内存）
+  let previewUrl = null;
+  function setPreview(u){
+    const old = previewUrl;
+    previewUrl = u;
+    imgView.src = u;
+    if (old && old !== u) URL.revokeObjectURL(old);
+  }
+
+  function resetResult(){
+    $('statusBadge').className = 'badge b-warn';
+    $('statusBadge').textContent = '等待照片';
+    $('value').textContent = '—';
+    ['ratio','statusText','ms','method','size'].forEach(i => $(i).textContent = '—');
+    $('reasonBox').style.display = 'none';
+    imgAnn.removeAttribute('src');
+    imgAnn.style.visibility = 'hidden';
+    $('capAnn').textContent = '表盘裁剪 + 关键点标注';
+  }
+
+  async function runRead(b64, filename){
+    clearErr();
+    setBusy(filename === '__sample__' ? 'sample' : 'file', true);
+    const body = {
+      image_b64: b64,
+      range_min: parseFloat($('rmin').value),
+      range_max: parseFloat($('rmax').value),
+      unit: $('unit').value
+    };
+    if (!isFinite(body.range_min) || !isFinite(body.range_max) || body.range_max <= body.range_min){
+      showErr('量程不合法：上限必须大于下限。');
+      setBusy(null, false);
+      return;
+    }
+    const t0 = performance.now();
+    try{
+      const r = await fetch('/api/read', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || ('HTTP ' + r.status));
+
+      const badge = $('statusBadge');
+      const ok = (j.status === 'readable' && typeof j.value === 'number');
+      badge.className = 'badge ' + (ok ? 'b-ok' : 'b-bad');
+      badge.textContent = ok ? '识别成功' : (j.status_zh || j.status);
+
+      $('value').innerHTML = ok
+        ? j.value.toFixed(2) + '<small>' + (j.unit || '') + '</small>'
+        : '<span style="font-size:26px;color:#dc2626">未给出读数</span>';
+
+      $('ratio').textContent  = (typeof j.ratio === 'number') ? j.ratio.toFixed(5) : '—';
+      $('statusText').textContent = (j.status_zh || j.status) + (j.gate_relaxed ? '（已放宽宽高比门控）' : '');
+      $('ms').textContent     = (j.elapsed_ms != null) ? j.elapsed_ms + ' ms（含前处理与渲染）' : '—';
+      $('method').textContent = j.needle_method || '—';
+      $('size').textContent   = j.image_size ? (j.image_size[0] + ' × ' + j.image_size[1]) : '—';
+
+      if (j.reason){
+        $('reasonBox').style.display = 'block';
+        $('reasonBox').textContent = '说明：' + j.reason;
+      }
+      if (j.overview_b64) imgView.src = 'data:image/jpeg;base64,' + j.overview_b64;
+      if (j.annotated_b64){
+        imgAnn.src = 'data:image/jpeg;base64,' + j.annotated_b64;
+        imgAnn.style.visibility = 'visible';
+        $('capAnn').textContent = '表盘裁剪 + 关键点标注' +
+          (j.annotated_original_size ? '（原始 ' + j.annotated_original_size.join('×') + '）' : '');
+      } else {
+        imgAnn.style.visibility = 'hidden';
+        $('capAnn').textContent = '本次未进入表盘裁剪阶段';
+      }
+      $('capView').textContent = '原图 · 红框为检出的表盘' +
+        (j.record_id ? ' · 留档 ' + j.record_id : '');
+      console.log('[meter-gauge] round-trip', (performance.now()-t0).toFixed(0), 'ms', j);
+    }catch(e){
+      showErr('识别失败：' + (e && e.message ? e.message : e));
+      resetResult();
+    }finally{
+      setBusy(null, false);
+    }
+  }
+
+  // ---- 事件（入口统一 busy 门禁，兜住竞争窗口）
+  drop.addEventListener('click', () => { if (!busy) file.click(); });
+  ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => {
+    e.preventDefault(); if (!busy) drop.classList.add('over');
+  }));
+  ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => {
+    e.preventDefault(); drop.classList.remove('over');
+  }));
+  drop.addEventListener('drop', e => {
+    if (busy) return;
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  });
+  file.addEventListener('change', () => {
+    if (busy) return;
+    if (file.files && file.files[0]) handleFile(file.files[0]);
+  });
+
+  async function handleFile(f){
+    clearErr();
+    setBusy('file', true);
+    try{
+      const { b64, preview, recompressed } = await fileToB64(f);
+      setPreview(preview);
+      if (recompressed) console.log('[meter-gauge] 文件 > ' + (MAX_RAW_BYTES / 1048576) +
+                                    'MB，已压缩到长边 ' + MAX_SIDE + ' 后再上传');
+      await runRead(b64, f.name);
+    }catch(e){
+      showErr('无法读取该文件，请换一张 JPG/PNG。' + (e && e.message ? '（' + e.message + '）' : ''));
+      setBusy(null, false);
+    }
+  }
+
+  useSample.addEventListener('click', async () => {
+    if (busy) return;
+    clearErr();
+    try{
+      if (!sampleB64){
+        const r = await fetch('/sample.jpg');
+        if (!r.ok) throw new Error('示例照片不可用（HTTP ' + r.status + '）');
+        const blob = await r.blob();
+        // ⚠️ 示例照片刻意**不走 canvas 重编码**，直接送原始 JPEG 字节。
+        //    原因同上面 150 行：canvas.toDataURL('image/jpeg') 会重采样像素 + 有损压缩，
+        //    实测把 public-01 的 ratio 从 0.267511 漂到 0.2674~0.2677（26.75 → 26.74~26.77 ℃）。
+        //    示例照片是"基准样例"，必须与原始文件逐位一致，否则演示时读数对不上基线。
+        //    （用户自己拖进来的文件仍走 toJpegB64，为的是压住 base64 体积。）
+        sampleB64 = await blobToB64(blob);
+        setPreview(URL.createObjectURL(blob));
+      }
+      await runRead(sampleB64, '__sample__');
+    }catch(e){
+      showErr('示例照片加载失败：' + (e && e.message ? e.message : e));
+      setBusy(null, false);
+    }
+  });
+
+  clearBtn.addEventListener('click', () => {
+    if (busy) return;
+    clearErr();
+    file.value = '';
+    if (previewUrl){ URL.revokeObjectURL(previewUrl); previewUrl = null; }
+    imgView.removeAttribute('src');
+    resetResult();
+  });
+
+  // 健康检查（失败只提示，不挡使用）
+  fetch('/health').then(r => r.json()).then(j => {
+    console.log('[meter-gauge] health', j);
+  }).catch(() => {});
+  resetResult();
+})();
+</script>
+</body>
+</html>

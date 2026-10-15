@@ -1,0 +1,60 @@
+schema_version: 1
+map_id: voice-slam-20261006-110834-66940a96
+map_yaml: map.yaml
+frame_id: map
+
+# O is the mapping start; the current ORIGIN return point can differ from O.
+# +X is the vehicle's initial forward direction;
+# +Y is to its left, and positive yaw is counter-clockwise.
+# These are vehicle-centre observation poses, not locations on obstacles.
+coordinate_convention:
+  x_positive: initial_forward
+  y_positive: initial_left
+  yaw_positive: counter_clockwise
+  pose_reference: base_footprint
+
+waypoints:
+  A:
+    name: A
+    x_m: 2.0
+    y_m: 0.75
+    yaw_deg: 90.0
+    yaw_rad: 1.5707963267948966
+    map_validation: static_grid_candidate
+    field_validation: pending
+  B:
+    name: B
+    x_m: 5.8
+    y_m: 0.45
+    yaw_deg: -90.0
+    yaw_rad: -1.5707963267948966
+    map_validation: static_grid_candidate
+    field_validation: pending
+  C:
+    name: C
+    # Shift +X by 10 cm to better centre the printed dial; preserve turn room.
+    x_m: 9.45
+    y_m: 1.00
+    yaw_deg: 90.0
+    yaw_rad: 1.5707963267948966
+    map_validation: static_grid_candidate
+    field_validation: pending
+  ORIGIN:
+    name: ORIGIN
+    # Operator-selected stationary chassis centre, verified 2026-10-09.
+    # This return waypoint does not redefine the map coordinate frame.
+    x_m: -0.15
+    y_m: 0.67
+    yaw_deg: 0.0
+    yaw_rad: 0.0
+    map_validation: static_grid_candidate
+    field_validation: pending
+
+test_policy:
+  first_run_order: [A, B, C, ORIGIN]
+  initial_goal_tolerance_m: 0.05
+  initial_yaw_tolerance_rad: 0.15
+  require_amcl_converged: true
+  require_fresh_scan: true
+  require_operator_at_main_power: true
+  automatic_reverse: false

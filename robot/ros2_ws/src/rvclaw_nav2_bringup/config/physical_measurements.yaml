@@ -1,0 +1,35 @@
+schema_version: 1
+units: mm
+
+# STEP-derived review values. The footprint includes the later display so the
+# collision envelope does not need to shrink or grow when it is installed.
+footprint:
+  front: 132.75
+  rear: 134.40
+  left: 107.25
+  right: 107.25
+  safety_margin: 20
+
+# Position is measured from base_footprint to the LiDAR rotation axis and
+# scan plane. Angles are in degrees even though length units are millimetres.
+laser:
+  # STEP rotation axis, cross-checked against the M10/M10P 79.3 mm housing.
+  x: 77.25
+  y: 0
+  # STEP housing bottom above ground (80.938 mm) plus the vendor-documented
+  # 30.5 mm optical centreline above the housing bottom.
+  z: 111.44
+  roll_deg: 0
+  pitch_deg: 0
+  # The manual defines zero opposite the cable outlet. Photos show that axis
+  # toward the vehicle front; retain a live single-obstacle check before use.
+  yaw_deg: 0
+
+# Nominal STEP geometry. Effective rolling diameter and odometry scales still
+# require repeated floor calibration.
+chassis:
+  wheel_diameter: 65
+  front_axle_x: 82.30
+  rear_axle_x: -82.30
+  left_wheel_y: 94.155
+  right_wheel_y: -94.155

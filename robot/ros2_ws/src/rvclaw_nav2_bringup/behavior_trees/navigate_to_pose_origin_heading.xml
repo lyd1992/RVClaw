@@ -1,0 +1,41 @@
+<!--
+  ORIGIN-only full-pose NavigateToPose tree. The dedicated goal checker keeps
+  the normal position accuracy while accepting a reviewed 0.25 rad final yaw.
+
+  Replanning is distance-triggered rather than time-triggered. Nav2 Humble
+  resets the stateful goal checker every time FollowPath receives a new path;
+  periodic replanning during an in-place terminal rotation can therefore lose
+  the already-reached XY latch and command an unnecessary reverse correction.
+  A 0.25 m translation threshold preserves replanning on the C->ORIGIN drive,
+  while keeping the checker latched while the robot rotates in place.
+
+  Recovery remains forward-only and contains no Spin or BackUp action.
+-->
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <RecoveryNode number_of_retries="4" name="NavigateRecovery">
+      <PipelineSequence name="NavigateWithDistanceReplanning">
+        <DistanceController distance="0.25" global_frame="map" robot_base_frame="base_footprint">
+          <RecoveryNode number_of_retries="1" name="ComputePathToPose">
+            <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Context" service_name="global_costmap/clear_entirely_global_costmap"/>
+          </RecoveryNode>
+        </DistanceController>
+        <RecoveryNode number_of_retries="1" name="FollowPath">
+          <FollowPath path="{path}" controller_id="FollowPath" goal_checker_id="origin_goal_checker"/>
+          <ClearEntireCostmap name="ClearLocalCostmap-Context" service_name="local_costmap/clear_entirely_local_costmap"/>
+        </RecoveryNode>
+      </PipelineSequence>
+      <ReactiveFallback name="RecoveryFallback">
+        <GoalUpdated/>
+        <RoundRobin name="ForwardOnlyRecoveryActions">
+          <Sequence name="ClearingActions">
+            <ClearEntireCostmap name="ClearLocalCostmap-Subtree" service_name="local_costmap/clear_entirely_local_costmap"/>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Subtree" service_name="global_costmap/clear_entirely_global_costmap"/>
+          </Sequence>
+          <Wait wait_duration="5"/>
+        </RoundRobin>
+      </ReactiveFallback>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>

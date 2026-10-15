@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "meters": [
+    {
+      "meter_id": "PRINT-A",
+      "name": "Inspection A",
+      "display_region": {
+        "x": 0.25066666666666665,
+        "y": 0.4266666666666667,
+        "width": 0.44266666666666665,
+        "height": 0.15733333333333333
+      },
+      "alignment_markers": [
+        null,
+        null
+      ],
+      "decimal_places": 2,
+      "digit_count": 4,
+      "unit": "",
+      "normal_min": null,
+      "normal_max": 50,
+      "max_change": null,
+      "min_confidence": 0.8,
+      "consistency_count": 2,
+      "reference_image": "PRINT-A.png",
+      "updated_at": "2026-10-10T02:14:35Z"
+    },
+    {
+      "meter_id": "PRINT-B",
+      "name": "Inspection B",
+      "display_region": {
+        "x": 0.35196374622356497,
+        "y": 0.23981191222570533,
+        "width": 0.32326283987915405,
+        "height": 0.19435736677115986
+      },
+      "alignment_markers": [
+        null,
+        null
+      ],
+      "decimal_places": 0,
+      "digit_count": 5,
+      "unit": "",
+      "normal_min": null,
+      "normal_max": 99999,
+      "max_change": null,
+      "min_confidence": 0.8,
+      "consistency_count": 2,
+      "reference_image": "PRINT-B.jpg",
+      "updated_at": "2026-10-10T02:14:35Z"
+    },
+    {
+      "meter_id": "PRINT-C",
+      "name": "Inspection C",
+      "display_region": {
+        "x": 0.25729166666666664,
+        "y": 0.1037037037037037,
+        "width": 0.396875,
+        "height": 0.6962962962962963
+      },
+      "alignment_markers": [
+        null,
+        null
+      ],
+      "decimal_places": 2,
+      "digit_count": null,
+      "unit": "°C",
+      "normal_min": 60,
+      "normal_max": null,
+      "max_change": null,
+      "min_confidence": 0.8,
+      "consistency_count": 2,
+      "reference_image": "PRINT-C.jpg",
+      "updated_at": "2026-10-10T02:40:42Z",
+      "pointer_scale": {
+        "center": {
+          "x": 0.46822916666666664,
+          "y": 0.4703703703703704
+        },
+        "start": {
+          "x": 0.3458333333333333,
+          "y": 0.6527777777777778
+        },
+        "end": {
+          "x": 0.571875,
+          "y": 0.6638888888888889
+        },
+        "mutable_region": {
+          "cx": 0.46875,
+          "cy": 0.4703703703703704,
+          "rx": 0.17447916666666666,
+          "ry": 0.3101851851851852
+        },
+        "direction": "clockwise"
+      }
+    }
+  ]
+}

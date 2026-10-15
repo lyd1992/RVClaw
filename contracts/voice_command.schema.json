@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rvclaw.local/contracts/voice_command.schema.json",
+  "title": "RVClaw Voice Command",
+  "type": "object",
+  "required": ["request_id", "source", "intent", "transcript", "confidence", "timestamp", "slots"],
+  "properties": {
+    "request_id": {"type": "string", "minLength": 1},
+    "source": {"const": "voice"},
+    "intent": {"type": "string", "enum": ["query_status", "inspect_meter", "check_ppe", "repeat_last_result", "start_inspection", "pause_inspection", "resume_inspection", "return_home", "stop", "clear_estop", "release_manual_override"]},
+    "transcript": {"type": "string", "minLength": 1},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "slots": {"type": "object"}
+  },
+  "additionalProperties": false
+}

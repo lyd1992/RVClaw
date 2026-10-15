@@ -1,0 +1,63 @@
+schema_version: 2
+vision_api_url: http://127.0.0.1:8017
+result_root: /data/RVClaw/runs/route-inspections
+restore_camera_mode: true
+speech_ack_timeout_s: 22.0
+
+defaults:
+  enabled: true
+  task_id: inspect_meter
+  kind: digital_meter
+  search_offsets_deg: [0, -5, 5]
+  reads_per_heading: 3
+  min_consistent_reads: 2
+  min_confidence: 0.65
+  numeric_tolerance: 0.01
+  timeout_s: 60.0
+  # A single unreadable/failed visual task is reported and counted, but it
+  # must not prevent B/C or the final return to ORIGIN. Navigation and chassis
+  # safety failures remain fail-stop in the route runner.
+  failure_policy: continue
+
+# Demo convention: each target is the map coordinate of the meter, 0.20 m in
+# front of its A/B/C observation pose along the intended route-facing direction:
+# A faces -45 degrees, B faces +60 degrees, and C faces -90 degrees. The route computes the camera-facing
+# yaw with atan2(target_y - waypoint_y, target_x - waypoint_x), so arrival yaw
+# does not need to be repeatable.  Regenerate these coordinates whenever a new
+# map or a new observation pose is accepted.
+points:
+  A:
+    meter_id: PHONE-A
+    kind: digital_meter
+    min_consistent_reads: 1
+    raw_text_pattern: '^[0-9]{2}\.[0-9]{2}$'
+    normal_max: 50
+    normal_max_inclusive: true
+    target: {x_m: 3.141421, y_m: -1.141421}
+  B:
+    meter_id: PHONE-B
+    kind: digital_meter
+    # The live phone image makes this LCD only about ten pixels high. Require
+    # two identical frames so a single plausible five-digit OCR error cannot
+    # be reported as a successful inspection.
+    min_consistent_reads: 2
+    reads_per_heading: 4
+    raw_text_pattern: '^[0-9]{5}$'
+    normal_max: 99999
+    normal_max_inclusive: false
+    target: {x_m: 7.100000, y_m: 1.173205}
+  C:
+    meter_id: PHONE-C
+    kind: pointer_meter
+    calibration:
+      zero_angle_deg: 270
+      sweep_deg: 360
+      min_value: 0
+      max_value: 100
+      direction: clockwise
+      decimal_places: 2
+    normal_min: 60
+    normal_min_inclusive: true
+    numeric_tolerance: 2.0
+    reads_per_heading: 4
+    target: {x_m: 2.000000, y_m: 1.800000}

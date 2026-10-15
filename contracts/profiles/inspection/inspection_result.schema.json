@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RVClaw Inspection Result",
+  "type": "object",
+  "required": ["task_id", "point_id", "category", "is_anomaly", "timestamp"],
+  "definitions": {
+    "bbox": {
+      "type": "object",
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number" }, "y": { "type": "number" },
+        "width": { "type": "number" }, "height": { "type": "number" }
+      }
+    }
+  },
+  "properties": {
+    "task_id": { "type": "string" },
+    "point_id": { "type": "string" },
+    "category": {
+      "type": "string",
+      "enum": ["meter_reading", "indicator_status", "switch_status", "personnel_safety", "restricted_area"]
+    },
+    "meter_type": { "type": ["string", "null"], "enum": ["digital", "pointer", null] },
+    "status": {
+      "type": ["string", "null"],
+      "enum": ["checking", "stable", "unreadable", "out_of_range", "alarm", "unit_mismatch", null]
+    },
+    "value": { "type": ["string", "number", "null"] },
+    "unit": { "type": ["string", "null"] },
+    "raw_text": { "type": ["string", "null"] },
+    "display_value": {
+      "type": ["object", "null"],
+      "properties": {
+        "text": { "type": ["string", "null"] },
+        "value": { "type": ["number", "null"] },
+        "confidence": { "type": ["number", "null"] },
+        "method": { "type": ["string", "null"] },
+        "bbox": { "$ref": "#/definitions/bbox" }
+      }
+    },
+    "text_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "confidence", "bbox"],
+        "properties": {
+          "text": { "type": "string" },
+          "confidence": { "type": "number" },
+          "in_display": { "type": "boolean" },
+          "bbox": { "$ref": "#/definitions/bbox" }
+        }
+      }
+    },
+    "angle_deg": { "type": ["number", "null"] },
+    "confidence": { "type": ["number", "null"] },
+    "is_anomaly": { "type": "boolean" },
+    "anomaly_reason": { "type": ["string", "null"] },
+    "quality": { "type": "object" },
+    "evidence_uri": { "type": ["string", "null"] },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "runtime": {
+      "type": "object",
+      "required": ["target", "backend", "model", "offline"],
+      "properties": {
+        "target": { "type": "string" }, "backend": { "type": "string" },
+        "model": { "type": "string" }, "offline": { "type": "boolean" }
+      }
+    },
+    "detections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "value", "confidence", "bbox"],
+        "properties": {
+          "label": { "type": "string" },
+          "value": { "type": ["string", "number", "null"] },
+          "confidence": { "type": ["number", "null"] },
+          "bbox": { "$ref": "#/definitions/bbox" }
+        }
+      }
+    }
+  }
+}

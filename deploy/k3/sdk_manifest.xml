@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <remote name="model-zoo" fetch="../spacemit-com"/>
+  <remote name="origin" fetch="../spacemit-robotics"/>
+  <remote name="spacemit-com-github" fetch="https://github.com/spacemit-com/"/>
+
+  <default remote="origin" revision="main" sync-j="4"/>
+
+  <project name="agent-tools-mcp" path="components/agent_tools/mcp" revision="4590de4147ebacf08069f56297e888a9c53b0a08" upstream="main" dest-branch="main" groups="agent_tools,default"/>
+  <project name="ai-cubpet" path="application/native/ai-cubpet" revision="d302ee278fa24f7477dec172f9d80ab5af8ea553" upstream="main" dest-branch="main" groups="ai-cubpet,default"/>
+  <project name="ai-gateway" path="components/ai-gateway" remote="model-zoo" revision="a2f761c55a87337372e7394dfffe588169dcd3ab" upstream="main" dest-branch="main" groups="ai-gateway,default"/>
+  <project name="audio" path="components/multimedia/audio" revision="118fb652595081dd4184d9094f5d7cd6247bcc4f" upstream="main" dest-branch="main" groups="default,multimedia"/>
+  <project name="audio_process" path="components/multimedia/audio_process" revision="b7654008ffb67c232510693dd67fa0366552689e" upstream="main" dest-branch="main" groups="default,multimedia"/>
+  <project name="build" revision="8b2ff55a748f8e12d6df272451c7851881b582c2" upstream="main" dest-branch="main" groups="core,default"/>
+  <project name="control_base" path="components/control/base" revision="80ba5074735466b07e47b4f9685c005b4bf3b5fc" upstream="main" dest-branch="main" groups="control,default"/>
+  <project name="control_gimbal" path="components/control/gimbal" revision="c7946b63d66eae776e3e1c697e233cafa1ef41dc" upstream="main" dest-branch="main" groups="control,default"/>
+  <project name="control_grasp" path="components/control/grasp" revision="986f28cb2c01a89ecc96e823faf7d86fb3d36b57" upstream="main" dest-branch="main" groups="control,default"/>
+  <project name="control_manipulator" path="components/control/manipulator" revision="f75268ab2ea23f4078269571b5e0dfdd102e1f52" upstream="main" dest-branch="main" groups="control,default"/>
+  <project name="docs" revision="91ac212359f545cd51cb31d25a5c2b22931e3153" upstream="main" dest-branch="main" groups="default,doc"/>
+  <project name="humanoid_common" path="application/native/humanoid_common" revision="e56e9a32a1331963dad8d89db24453928bb93e2d" upstream="main" dest-branch="main" groups="default,humanoid,humanoid_common"/>
+  <project name="humanoid_qinglong" path="application/native/humanoid_qinglong" revision="bfd0b1036e9bceb9082a3190d232232a244a355e" upstream="main" dest-branch="main" groups="default,humanoid,humanoid_qinglong"/>
+  <project name="humanoid_tiangong" path="application/native/humanoid_tiangong" revision="b84a2c48de58a6a7d7e5c0e91d8b57a4718c6066" upstream="main" dest-branch="main" groups="default,humanoid,humanoid_tiangong"/>
+  <project name="humanoid_unitree_g1" path="application/native/humanoid_unitree_g1" revision="dd930b016a1770a11c1aac4fc2cf3c4f7ee53373" upstream="main" dest-branch="main" groups="default,humanoid,humanoid_unitree_g1"/>
+  <project name="humanoid_unitree_go1" path="application/native/humanoid_unitree_go1" revision="38866c85c2c582557a08ef40a921094e5086b3d3" upstream="main" dest-branch="main" groups="default,humanoid,humanoid_unitree_go1"/>
+  <project name="humanoid_unitree_h1_2" path="application/native/humanoid_unitree_h1_2" revision="ca526ced0bf9529de81174fc084ecbe2276fda0f" upstream="main" dest-branch="main" groups="default,humanoid,humanoid_unitree_h1_2"/>
+  <project name="humanoid_unitree_r1" path="application/native/humanoid_unitree_r1" revision="6f58b931c6e137e43502e2bea33f4b794d63a7c9" upstream="main" dest-branch="main" groups="default,humanoid,humanoid_unitree_r1"/>
+  <project name="lerobot" path="components/thirdparty/lerobot" revision="96c81f6db3d729cb179e714ee210e6d5147fc2b0" upstream="main" dest-branch="main" groups="default,thirdparty" clone-depth="1"/>
+  <project name="lerobot_app" path="application/native/lerobot_app" revision="4123c7f23ff97d30370fa4862eee1f807fad4843" upstream="main" dest-branch="main" groups="default,lerobot_app"/>
+  <project name="linksee" path="application/ros2/linksee" revision="b58cb3ba93baabf60f1c4ffa9275db784cba7a7b" upstream="main" dest-branch="main" groups="default,linksee"/>
+  <project name="mlink_device" path="components/agent_tools/mlink_device" revision="dbc249539c7991e02da249cfbf35e01f42d445d0" upstream="main" dest-branch="main" groups="agent_tools,default"/>
+  <project name="mlink_gateway" path="components/agent_tools/mlink_gateway" revision="8cdb3a92ce8162aebc64eb17a81e1eb947f3804e" upstream="main" dest-branch="main" groups="agent_tools,default"/>
+  <project name="model-zoo-asr" path="components/model_zoo/asr" remote="model-zoo" revision="640d4df787c0778863eab2a5f5e47ddc85b2c8cc" upstream="main" dest-branch="main" groups="default,model_zoo,model_zoo_asr"/>
+  <project name="model-zoo-llm" path="components/model_zoo/llm" remote="model-zoo" revision="01b490fb8f756ecf6689631e1aa17b08198c2694" upstream="main" dest-branch="main" groups="default,model_zoo,model_zoo_llm"/>
+  <project name="model-zoo-tts" path="components/model_zoo/tts" remote="model-zoo" revision="6d67807fa008376a3fa4373df5ecafc9d3fba51f" upstream="main" dest-branch="main" groups="default,model_zoo,model_zoo_tts"/>
+  <project name="model-zoo-vad" path="components/model_zoo/vad" remote="model-zoo" revision="4124a85a8efe8c3047aef5cad621b8c208c4723b" upstream="main" dest-branch="main" groups="default,model_zoo,model_zoo_vad"/>
+  <project name="model-zoo-vision" path="components/model_zoo/vision" remote="model-zoo" revision="8aa8e9fab361d5b51a871431310d93414dc820ec" upstream="main" dest-branch="main" groups="default,model_zoo,model_zoo_vision"/>
+  <project name="model-zoo-vlm" path="components/model_zoo/vlm" remote="model-zoo" revision="20a0fa9353a326f1751340dc469d6929fbd5ba95" upstream="main" dest-branch="main" groups="default,model_zoo,model_zoo_vlm"/>
+  <project name="model_zoo_rl" path="components/model_zoo/rl" remote="model-zoo" revision="4ffc906b554eafd14fd1eca9b85e09fde3bf09bf" upstream="main" dest-branch="main" groups="default,model_zoo,model_zoo_rl"/>
+  <project name="model_zoo_voiceprint" path="components/model_zoo/voiceprint" remote="model-zoo" revision="b54f6fcca5d3ed8ee30535061564640ca26fb7a6" upstream="main" dest-branch="main" groups="default,model_zoo,model_zoo_voiceprint"/>
+  <project name="mpp" path="components/multimedia/mpp" remote="spacemit-com-github" revision="a808f681363f02499b930a2c7bcda7fb01e7717d" upstream="main" dest-branch="main" groups="default,multimedia"/>
+  <project name="omni-agent" path="application/native/omni_agent" revision="febbeccf0892b237561265d286aac184efe85451" upstream="main" dest-branch="main" groups="default,omni_agent"/>
+  <project name="peripherals-imu" path="components/peripherals/imu" revision="148652d4ffd1ba045e24c6e01c155ebd03f8f9ad" upstream="main" dest-branch="main" groups="default,peripherals"/>
+  <project name="peripherals-key" path="components/peripherals/key" revision="f4600713548d6d8b14b0402a6453773e04092840" upstream="main" dest-branch="main" groups="default,peripherals"/>
+  <project name="peripherals-lidar" path="components/peripherals/lidar" revision="5d53ed54e101d06936834064a325603f5599f3b2" upstream="main" dest-branch="main" groups="default,peripherals"/>
+  <project name="peripherals-light-sensor" path="components/peripherals/light_sensor" revision="fc35bfba7ee3028104872132bb931eeb564d717f" upstream="main" dest-branch="main" groups="default,peripherals"/>
+  <project name="peripherals-misc-io" path="components/peripherals/misc_io" revision="16eefba45fd62c986e9bbee91004fe0e536321f4" upstream="main" dest-branch="main" groups="default,peripherals"/>
+  <project name="peripherals-motor" path="components/peripherals/motor" revision="91f766ee12f2aa54e34980bb43ea36d797f789d5" upstream="main" dest-branch="main" groups="default,peripherals"/>
+  <project name="peripherals-nfc" path="components/peripherals/nfc" revision="f2a5c941d0c2f9475b5aa00c29e8e8426193c391" upstream="main" dest-branch="main" groups="default,peripherals"/>
+  <project name="peripherals_5g" path="components/peripherals/5g" revision="2eb2e43ebbd4d2948ca259c0d448172933fca0b8" upstream="main" dest-branch="main" groups="default,peripherals"/>
+  <project name="peripherals_led" path="components/peripherals/led" revision="45b81a11d67b8cb6626cc8621b38b15d19b54ad4" upstream="main" dest-branch="main" groups="default,peripherals"/>
+  <project name="peripherals_pm" path="components/peripherals/pm" revision="ed72d3c08d0fc7907337696696634253deb09d97" upstream="main" dest-branch="main" groups="default,peripherals"/>
+  <project name="peripherals_wifi" path="components/peripherals/wifi" revision="8e7501d21a78ccb26fae7669a338018e0dad4bb9" upstream="main" dest-branch="main" groups="default,peripherals"/>
+  <project name="reachy_mini" path="application/native/reachy_mini" revision="f9521665d6f714b1449b9ea5712f3328ee2c5912" upstream="main" dest-branch="main" groups="default,reachy_mini"/>
+  <project name="rivision" path="application/native/rivision" revision="a6b265d7651a4ce5985658aa4b84ddfa410de4d6" upstream="main" dest-branch="main" groups="default,rivision"/>
+  <project name="ros2_action_recognition" path="middleware/ros2/perception/action_recognition" revision="09eda7ff38e42dce592fc63675942b1fc906b8f1" upstream="main" dest-branch="main" groups="default,ros2,ros2_perception"/>
+  <project name="ros2_arm" path="middleware/ros2/control/arm" revision="935ce718a4333f5c5edb9454dd6b420ddec8acc9" upstream="main" dest-branch="main" groups="default,ros2,ros2_control"/>
+  <project name="ros2_base" path="middleware/ros2/control/base" revision="efa0deb4ca78b592a85f85cbdee2f6b1c74eaa3f" upstream="main" dest-branch="main" groups="default,ros2,ros2_control"/>
+  <project name="ros2_body_pose" path="middleware/ros2/perception/body_pose" revision="755caa26046d21d6120dc06abda7d7077581b850" upstream="main" dest-branch="main" groups="default,ros2,ros2_perception"/>
+  <project name="ros2_cartographer_run" path="middleware/ros2/slam/cartographer_run" revision="f630aa14faf5a33bbf328f6d4a94abe9a040f204" upstream="main" dest-branch="main" groups="default,ros2,ros2_slam"/>
+  <project name="ros2_face_detection" path="middleware/ros2/perception/face_detection" revision="0c6f02049e043912f9e22d2a67e269a370c0b315" upstream="main" dest-branch="main" groups="default,ros2,ros2_perception"/>
+  <project name="ros2_gesture_recognition" path="middleware/ros2/perception/gesture_recognition" revision="f01389868df3a71f020d5ba028a3d7bdce5bf3b6" upstream="main" dest-branch="main" groups="default,ros2,ros2_perception"/>
+  <project name="ros2_gimbal" path="middleware/ros2/control/gimbal" revision="c9cd2b00d2afedd4352425faf7331be70351f651" upstream="main" dest-branch="main" groups="default,ros2,ros2_control"/>
+  <project name="ros2_humman_detetion" path="middleware/ros2/perception/human_detection" revision="b355b3df3324a230ebca7579900a4d7e6f973a19" upstream="main" dest-branch="main" groups="default,ros2,ros2_perception"/>
+  <project name="ros2_instance_seg" path="middleware/ros2/perception/instance_seg" revision="1471a1bca504fdd0bc682b8b454f5cef33fc6ec5" upstream="main" dest-branch="main" groups="default,ros2,ros2_perception"/>
+  <project name="ros2_moveit2" path="middleware/ros2/planning/moveit2" revision="dfe337477054f74e51236124e2bf3501e3f7c25e" upstream="main" dest-branch="main" groups="default,ros2,ros2_planning"/>
+  <project name="ros2_nav2" path="middleware/ros2/planning/nav2" revision="38847bfc177662cee39867dd5457f76dfa2cc6cf" upstream="main" dest-branch="main" groups="default,ros2,ros2_planning"/>
+  <project name="ros2_object_detection" path="middleware/ros2/perception/object_detection" revision="a4567a8ca8c57d7b46e6dc9a192261879bbb84ec" upstream="main" dest-branch="main" groups="default,ros2,ros2_perception"/>
+  <project name="ros2_object_tracking" path="middleware/ros2/perception/object_tracking" revision="9dcf9399c0fa215611a0401bf58b5ea555c17b27" upstream="main" dest-branch="main" groups="default,ros2,ros2_perception"/>
+  <project name="ros2_peripherals" path="middleware/ros2/peripherals" revision="d602c6245a5a06b995f26e0a256359b76d26d369" upstream="main" dest-branch="main" groups="default,ros2,ros2_peripherals"/>
+  <project name="ros2_person_detection" path="middleware/ros2/perception/person_detection" revision="c2b0acd4774ca15a50d703a495523a2d639d3c89" upstream="main" dest-branch="main" groups="default,ros2,ros2_perception"/>
+  <project name="ros2_person_follow" path="middleware/ros2/perception/person_follow" revision="a4262c51dc9bf89efb89b5d1e3ce57a371fccc54" upstream="main" dest-branch="main" groups="default,ros2,ros2_perception"/>
+  <project name="ros2_rtabmap_run" path="middleware/ros2/slam/rtabmap_run" revision="38fcb394c9de5f40152cd941d982433b0ab6f29a" upstream="main" dest-branch="main" groups="default,ros2,ros2_slam"/>
+  <project name="ros2_semantic_seg" path="middleware/ros2/perception/semantic_seg" revision="d4dea50e4d3500475e87614e9c08e313a48f2e93" upstream="main" dest-branch="main" groups="default,ros2,ros2_perception"/>
+  <project name="ros2_slam_toolbox_run" path="middleware/ros2/slam/slam_toolbox_run" revision="f1583e4ba9a7418dab4f2bd1c8bc1cd301b3ed06" upstream="main" dest-branch="main" groups="default,ros2,ros2_slam"/>
+  <project name="ros2_visualization" path="middleware/ros2/tools/visualization" revision="bda55d742aa72b1a768898e0dfb8263c1e66dfa0" upstream="main" dest-branch="main" groups="default,ros2,ros2_tools"/>
+  <project name="ros2_yolo_general" path="middleware/ros2/perception/yolo_general" revision="eb39d53ceb42de7460a7da8bb532bd40265635c8" upstream="main" dest-branch="main" groups="default,ros2,ros2_perception"/>
+  <project name="ros2_yolo_world" path="middleware/ros2/perception/yolo_world" revision="ec5ed3457d9d068110614e7f005a3752bf110a6d" upstream="main" dest-branch="main" groups="default,ros2,ros2_perception"/>
+  <project name="scripts" revision="58b819d7c09741de9a591b0debc6db84ce3bbbe9" upstream="main" dest-branch="main" groups="core,default"/>
+  <project name="simulation_mujoco" path="components/simulation/mujoco" revision="ed790b5f1411cc29a087cf83c33b1de81384d1d6" upstream="main" dest-branch="main" groups="default,simulation"/>
+  <project name="system" path="components/system" revision="ef4f0cd4c98ffa40cb2c0c9dc21f68b0969f25dc" upstream="main" dest-branch="main" groups="core,default"/>
+  <project name="target" revision="90a7a0924ab30fb03308da1f8a3743b7040bcb4a" upstream="main" dest-branch="main" groups="core,default"/>
+  <project name="uav" path="application/ros2/uav" revision="757df96a0ac5a0ef5aa743f41c04cc3f52e0819d" upstream="main" dest-branch="main" groups="default,uav"/>
+</manifest>

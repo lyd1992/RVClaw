@@ -1,0 +1,51 @@
+SpacemiT TTS Component
+Copyright 2026 SpacemiT (Hangzhou) Technology Co. Ltd.
+
+This product includes software developed at
+SpacemiT (Hangzhou) Technology Co. Ltd. (https://www.spacemit.com/).
+
+---------------------------------------------------------------------------
+Third-party Software Notices:
+---------------------------------------------------------------------------
+
+This product contains portions of the following third-party software:
+
+1. Matcha-TTS (https://github.com/shivammehta25/Matcha-TTS)
+   Copyright (c) 2023-2026 Shivam Mehta
+   Licensed under the Apache License 2.0.
+
+2. Kokoro (https://github.com/hexgrad/Kokoro-82M)
+   Copyright (c) 2024-2026 hexgrad
+   Licensed under the Apache License 2.0.
+
+3. Vocos (https://github.com/gemelo-ai/vocos)
+   Copyright (c) 2023-2026 gemelo.ai
+   Licensed under the MIT License.
+
+4. ONNX Runtime (https://github.com/microsoft/onnxruntime)
+   Copyright (c) 2018-2026 Microsoft Corporation
+   Licensed under the MIT License.
+
+5. FFTW3 (http://www.fftw.org/)
+   Copyright (c) 2003-2026 Matteo Frigo and Steven G. Johnson
+   Licensed under the GNU General Public License v2.0.
+
+6. espeak-ng (https://github.com/espeak-ng/espeak-ng)
+   Copyright (c) 2015-2026 eSpeak NG Contributors
+   Licensed under the GNU General Public License v3.0 or later.
+
+7. cppjieba (https://github.com/yanyiwu/cppjieba)
+   Copyright (c) 2014-2026 yanyiwu
+   Licensed under the MIT License.
+
+8. cpp-pinyin (https://github.com/wolfgitpr/cpp-pinyin)
+   Copyright (c) 2024-2026 wolfgitpr
+   Licensed under the Apache License 2.0.
+
+9. libcurl (https://curl.se/)
+   Copyright (c) 1996-2026 Daniel Stenberg
+   Licensed under the MIT License.
+
+10. pybind11 (https://github.com/pybind/pybind11)
+    Copyright (c) 2016-2026 Wenzel Jakob
+    Licensed under the BSD 3-Clause License.

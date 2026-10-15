@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>vad</name>
+  <version>0.1.0</version>
+  <description>Voice activity detection using ONNX Runtime</description>
+  <system_depend check="pkg-config --exists libcurl">libcurl4-openssl-dev</system_depend>
+  <system_depend arch="riscv64">spacemit-onnxruntime</system_depend>
+  <system_depend arch="riscv64">python3-spacemit-ort</system_depend>
+  <system_depend>python3-pip</system_depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>

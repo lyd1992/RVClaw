@@ -1,0 +1,890 @@
+{
+  "schema_version": 1,
+  "assets": [
+    {
+      "path": "models/asr/sensevoice/sensevoice_decoder_model.onnx",
+      "bytes": 377550,
+      "sha256": "ff21a9d021694ae13cedc8fc28a6883cb903db88e50030df9b71dd890b2feed3"
+    },
+    {
+      "path": "models/asr/sensevoice/am.mvn",
+      "bytes": 11203,
+      "sha256": "29b3c740a2c0cfc6b308126d31d7f265fa2be74f3bb095cd2f143ea970896ae5"
+    },
+    {
+      "path": "models/asr/sensevoice/tokens.txt",
+      "bytes": 399355,
+      "sha256": "d92f88b9ece933daf711e145723a76fd3859aa8a8c3771f1cbb7a721ad067193"
+    },
+    {
+      "path": "models/asr/sensevoice/model_quant_optimized.onnx",
+      "bytes": 238347869,
+      "sha256": "0b808be086d8e6a74972b0b04cebaeb0a948d528b2b15d6d42074ae101183c8d"
+    },
+    {
+      "path": "models/vad/silero/silero_vad.onnx",
+      "bytes": 2327524,
+      "sha256": "2623a2953f6ff3d2c1e61740c6cdb7168133479b267dfef114a4a3cc5bdd788f"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/hardhat-finished.wav",
+      "bytes": 497374,
+      "sha256": "62552170c4e8876f481df4e3cd83aa328491d7da61cc07fc8a029642ae06305b"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-runtime-failed.wav",
+      "bytes": 496506,
+      "sha256": "acb58852a2ab33414b4da4253cff119e19cb778f3a1784796e2180ccd645be9e"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/confirm-relocalize-resume-inspection.wav",
+      "bytes": 651342,
+      "sha256": "9f00b8c2be6f83159c4429c5a50472d385f4dd90a563af3900ee287045b4bf45"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-c-unreadable.wav",
+      "bytes": 1009782,
+      "sha256": "4bd9c37ab2342caf2d1170687ae0c2d917589175abc86e6ee54ac62efedf2a0d"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/status-idle.wav",
+      "bytes": 364530,
+      "sha256": "4d8ce958aadc207c2d76bc2edccf6d791196d70fecfff10fc3c07314a753921b"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c0-f2-h1-v0-r1-n0-x0.wav",
+      "bytes": 2482122,
+      "sha256": "5fa1309e88b1ec01bfdf383127aa68c6b8850d592dfab4937f0d69552e214ad8"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/stopped.wav",
+      "bytes": 320114,
+      "sha256": "9e07fe363398fad55a1dd0c79119a05302f9f9c63b53ef40a7da683c2ca54da6"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a1-c0-f1-h1-v0-r0-n0-x0.wav",
+      "bytes": 2139294,
+      "sha256": "7e8c3a0fe27b75598bc4ebbc680ffb8622977474607bbc3d279343eb7e9a6196"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/arrived-a.wav",
+      "bytes": 499654,
+      "sha256": "1a3cff79dd24ee6704bcf81bea87d5f7c5523615c4fba7499a067f8558cb4127"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c2-f1-h0-v1-r0-n2-x0.wav",
+      "bytes": 2084358,
+      "sha256": "3f0e12d4a5c6b26aa0e103035188e85d9d152909b7307280a4ced046bfffec05"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c2-f1-h0-v1-r0-n1-x1.wav",
+      "bytes": 2057946,
+      "sha256": "25f1fefc57da0bcc68b43fb4a09a82e3d2c44d10cacdca6eec56e3c27c468d15"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/mapping-started.wav",
+      "bytes": 892182,
+      "sha256": "880b18cedff831ab2c9f51e5c839b31ecd4714a590fb5d2e1d5287f40331f662"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/left-finished.wav",
+      "bytes": 270838,
+      "sha256": "d5dbbfc1772a14b559305751b0c291211c867393010a96642200f2210ac4bb0a"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-resume-launched.wav",
+      "bytes": 482382,
+      "sha256": "acf8d4ed5436836a63fa9edaf9b320f428005b8a73cdda6ee8bc8e3e2a1ab7a6"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/mapping-not-running.wav",
+      "bytes": 630570,
+      "sha256": "5e4b706172ae37f2c839bf42339dd94f026a3f313e2d53b3392d843d84945003"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c0-f3-h0-v0-r3-n0-x0.wav",
+      "bytes": 2025378,
+      "sha256": "ce90f50364b0107671fef28f81079eda0288068c46b894af6f2abfa1be2cc8d2"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-paused-deadman-timeout.wav",
+      "bytes": 273364,
+      "sha256": "7add45a3751917ff2215fa5204970f559fa42f659d8de34559bb0327cc86e021"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/mapping-not-stationary.wav",
+      "bytes": 1254930,
+      "sha256": "9af9f21fbd94599fb34effbf03a385f37228ac6578fd7ab39237ada29880e2e3"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c0-f3-h0-v1-r2-n0-x0.wav",
+      "bytes": 2467878,
+      "sha256": "241f68ce86ded67b16fd4afebb9b29e267fa650ef1f1fb5b9efaa39945685ea8"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-start-failed-system.wav",
+      "bytes": 2134014,
+      "sha256": "cd5fdfb5ea7bcffc2f57f067f7f1cc7208cf80f17072df80de25a1ab9deb25ac"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/result-ready.wav",
+      "bytes": 451186,
+      "sha256": "b6db34be48850f835b20ea597b01a0333e546a4da32d850e124bf4ea5afdb5ea"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c2-f1-n0-x2.wav",
+      "bytes": 1768938,
+      "sha256": "278940a9274f1ba87ebfdc4975dbc105fd4bc00d65ee5d97c807491c6b1a133d"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-paused-return-position.wav",
+      "bytes": 797202,
+      "sha256": "f25fc3a38352f4130ba69ebf91f884ba09cf38a978d7e386dffc896009d70347"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c1-f2-h2-v0-r0-n1-x0.wav",
+      "bytes": 2069130,
+      "sha256": "c4ecad86a29f66acecf85749b27ff54bd311f397cf4b7ef318eaa7ac01b7669c"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-start-failed-localization.wav",
+      "bytes": 2873994,
+      "sha256": "92abbf12d72c5bf9f034f321ca84fc056a8c64419bc6f89f161cf325672166fb"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c1-f1-h0-v0-r1-n0-x1.wav",
+      "bytes": 1904346,
+      "sha256": "7fd74db76f902a1e4028db1e6f32c506ff6d694c5cb73f66f28e30b1f1a5d83e"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c1-f2-h1-v1-r0-n1-x0.wav",
+      "bytes": 2474994,
+      "sha256": "1782f722e553b6b1e7e93082f90b9fef47e776b0a72b7b1bc88ffd3e4a487c36"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c0-f3-h1-v0-r2-n0-x0.wav",
+      "bytes": 2486178,
+      "sha256": "75367a10f622dbb2be260f31aac59ae3b5a0b4d926e3229528559243aa14fc6d"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-unreadable.wav",
+      "bytes": 390222,
+      "sha256": "e8ca915585a6025f3b08dc67752594372745dde105dfe86fd4d4926c55bd5f1a"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-normal.wav",
+      "bytes": 402510,
+      "sha256": "cc267f148078cb8de3ef8f23df4caef9a60ab4bc5d1b155d419504df30d209fc"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-finished.wav",
+      "bytes": 278222,
+      "sha256": "4a9b16f8e96e9b4b8b24851133a4641603f7b0ab3841c8a7dccacc2c44e21422"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/succeeded.wav",
+      "bytes": 427450,
+      "sha256": "2bb8fa542df324526efff1f67d10157e1756a04bae2d8be33903538e0fd2b1dc"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c0-f3-h3-v0-r0-n0-x0.wav",
+      "bytes": 2153550,
+      "sha256": "b271c3bfb87bbfd14437989b50af6436cff0d372675db7fad34b0d1441b24a3f"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c0-f3-h2-v0-r1-n0-x0.wav",
+      "bytes": 2482122,
+      "sha256": "9ce388d44fd6e2c50a6ecb01c9c436512a5aac7ae2a884faf95852cc677c4669"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-abnormal.wav",
+      "bytes": 402510,
+      "sha256": "54f8cea48ace4e69bf30f5ccc533dfef9d0a010ae2355ca872d547d65d6f49cd"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c2-f1-h1-v0-r0-n2-x0.wav",
+      "bytes": 2080314,
+      "sha256": "ee7763d3f422bf0c608b5e26e673a031f60579868a3235e3e8500e7e4ddf0983"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-b-unreadable.wav",
+      "bytes": 999822,
+      "sha256": "f5296ea8a585638e71c397e77a41d6f5820b0369681bc5cbbd71aa52b0a75fce"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c1-f1-h1-v0-r0-n1-x0.wav",
+      "bytes": 2047746,
+      "sha256": "bb92f555bf68f16137731dc37a823142023bd9c774462cef46cfff5b85e8a841"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c2-f0-n1-x1.wav",
+      "bytes": 1731226,
+      "sha256": "8e81d2607718bda618594042d6b10134038d2d6446d9c7538518ccbb2e887aac"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-recovery-succeeded.wav",
+      "bytes": 543822,
+      "sha256": "caaf44bdf742a0e9e355600e8659e05cf0c2489f1880725072f667fb764f4004"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-launched.wav",
+      "bytes": 434218,
+      "sha256": "4eb6f11cac76e6022c11fe33dcfa8b2569c07a780b9e242ea8bed5893e017681"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-paused-safety.wav",
+      "bytes": 2168910,
+      "sha256": "f581bc9ced748093b9e9550c3740bcd7ab93ef9f1c0b343f9bdcbae2817ca18e"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/arrived-c.wav",
+      "bytes": 499486,
+      "sha256": "b8a2dd8fa012255df340bb5ac3b9131413353f467a6e921e94e28dbead08d9cb"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/failed.wav",
+      "bytes": 387946,
+      "sha256": "d4bfb94127d83968a335fbbcc727810ede55b7a981450ee67338d5e465362c9a"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-paused-localization.wav",
+      "bytes": 2224206,
+      "sha256": "be47f95c891220aed58160e3b213994bb2e3d08706b1d5ac3c9ebe1ef49bc222"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/status-hardhat.wav",
+      "bytes": 499506,
+      "sha256": "9d217f0e877c19f64c1b9b24b47c7200a2fa5129e8d7b2b9e7671f9de0927958"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-paused-heading.wav",
+      "bytes": 184808,
+      "sha256": "942b6a8c759a34c30271dcbb6cb6a19881dfbb8774c3fe40358cb3fdfeb4db61"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c2-f1-n2-x0.wav",
+      "bytes": 1744818,
+      "sha256": "73287c222e88817580b2956c49b1c52270fc359f139989e58b6e72a2dea6a2e7"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-paused-lidar.wav",
+      "bytes": 1873998,
+      "sha256": "7215043e6255ee746918d4fac96a54af8f9c2c78c63113e9cc338844601b3548"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-paused-command-timeout.wav",
+      "bytes": 296548,
+      "sha256": "449f5a14c3ff5749777ccbddab273f2fe4c54f4e0268b5eb1cb8196a553afd4c"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-a-normal.wav",
+      "bytes": 885666,
+      "sha256": "dcd07bf92b26e561c4c5e5be8b26ae5c420f19dbebced811c5b09689982b0acc"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/hardhat-started.wav",
+      "bytes": 419274,
+      "sha256": "9242ccff68ef71e2524eb7d7c76ec64f9b19c0f5c69c60867a2ecc03752a6aa0"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/status-detection.wav",
+      "bytes": 490622,
+      "sha256": "4deee6148ec3b083aae3c2b03c1e7e8ddc736d627efc86f8179be40af1f53e09"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-start-failed-lidar.wav",
+      "bytes": 1960866,
+      "sha256": "74624dea3f76efa3fccaebbaf600647e5e4aca72502b55b8df9febf4a07758de"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/status-inspection.wav",
+      "bytes": 499854,
+      "sha256": "60e390d18433e93a7428ac2748ce0f9ad87ae3026075168c979c40503cd4879f"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-relocalize-resume-launched.wav",
+      "bytes": 697422,
+      "sha256": "ed34856789585488470917f63636d78f37f69e402e0f8cee4822987b2a0c88cc"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c0-f3-n0-x0.wav",
+      "bytes": 1772446,
+      "sha256": "5f4a88b49a4339a5d6801297ca746a6b45f2bad81137049f46583c51a0535dd0"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c1-f2-h0-v0-r2-n0-x1.wav",
+      "bytes": 1937886,
+      "sha256": "c5067140e1dff7ffa19282ff021aa00b4710b610d033b5c122df64594ee14381"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c3-f0-h0-v0-r0-n0-x3.wav",
+      "bytes": 1633758,
+      "sha256": "8fbec4adbbe002722132e02f5e7cf6a70b0a687043691837789678a329431e70"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c2-f1-h0-v0-r1-n2-x0.wav",
+      "bytes": 1977582,
+      "sha256": "499cdfacf5c333a8fbd75994112301ef8671f549f1cfcac20e766cfa77f88b46"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/mapping-cancelled.wav",
+      "bytes": 676530,
+      "sha256": "0e0b5f8bc75aa8d694230590c2d2a14b85b326d18e7289b26be2c036234328fc"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a1-c1-f0-h0-v0-r0-n1-x0.wav",
+      "bytes": 1619514,
+      "sha256": "98d18aa119b9def90e78ba7bd26ff76f988aa512b74167b56cb0337e23fb4466"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c1-f2-n1-x0.wav",
+      "bytes": 1734734,
+      "sha256": "941d1af831be3cd48c0805b665d404245197e72e94df848840007605ed9bef54"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c3-f0-h0-v0-r0-n1-x2.wav",
+      "bytes": 1678494,
+      "sha256": "7e07e8215ecbfec58cb117ec9d57aff29e30fd9ffb25b57d9b9f5d88c7078095"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c1-f1-h1-v0-r0-n0-x1.wav",
+      "bytes": 2021322,
+      "sha256": "48fcd1779bd70ab3f8bac3223a2fe63cfd01b2bf5ca3316c105e0b4940b84dca"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-a-runtime-failed.wav",
+      "bytes": 1074906,
+      "sha256": "3c260064c22a7f338e83e0a88deb584662490a407df90f1f71ff6fd6c2f02bfa"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c1-f2-h0-v2-r0-n0-x1.wav",
+      "bytes": 2047746,
+      "sha256": "7d226e63bacfc89d2b7bb624b2b2396cbd114c7d6fc7e1914767a72baebf89ec"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c1-f2-h1-v0-r1-n1-x0.wav",
+      "bytes": 2358018,
+      "sha256": "62fa346b4d62112f42b52c6705b58986447304c3a88912bf501dbe3200c57af4"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a1-c1-f0-h0-v0-r0-n0-x1.wav",
+      "bytes": 1575762,
+      "sha256": "ec51989cd934e0447938d5e02a48d19f236293b9793c3bb708571a39a4a4696d"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-paused-low-battery.wav",
+      "bytes": 1818702,
+      "sha256": "d55ed774aa7a2387243420c0676ea264a6614634e5637b5aacb8906f7f148eab"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a1-c0-f1-n0-x0.wav",
+      "bytes": 1748326,
+      "sha256": "daed4b363fcdd2ed32c5cb63d70e45f6f9eeff3503f1387ef3965436bd135f2b"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c2-f0-n2-x0.wav",
+      "bytes": 1748326,
+      "sha256": "3d4746352f6a08b394cfb6c1ace63f158847960b23f7d620365bd7d8b2073048"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c1-f1-n0-x1.wav",
+      "bytes": 1714122,
+      "sha256": "ea6b226161ad8917a25af6973bd1dd8998cf869c437b4a65c8763c27ba6e01e4"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c0-f3-h0-v3-r0-n0-x0.wav",
+      "bytes": 2139294,
+      "sha256": "191cecf949bc706b2b6cc7db57d29d553c5272d81b4f75becf18d58b4ff999c6"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c1-f2-h0-v0-r2-n1-x0.wav",
+      "bytes": 1940958,
+      "sha256": "448380f0b745011217012d76a1391d6458c9e02e01585e586339020a7809bd83"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c3-f0-n3-x0.wav",
+      "bytes": 1786478,
+      "sha256": "5ca6009b88457bbdfdf80f1e27afc087f8a3581ab8bf73aeffdafdc0359b01fd"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-start-failed-chassis.wav",
+      "bytes": 1996506,
+      "sha256": "b2b738eec166ae674f13da8a6a163b81cf4ea1374185874b51eff54d009698e2"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-heading-failed.wav",
+      "bytes": 885666,
+      "sha256": "863759f09850cba5fea33c98a088ab60f1688e8bd5b14753588b64aaa3460b89"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-lidar-recovery-started.wav",
+      "bytes": 826446,
+      "sha256": "8e677964a7c39294bca41afd7f060f7fc59e99f1fe5127b419fc21497973d948"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-a-heading-failed.wav",
+      "bytes": 1496634,
+      "sha256": "e969e0cc70bbbf62875a6b083dc02896e3cee755af6ee0654ddf6007f0126c66"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a1-c1-f0-n0-x1.wav",
+      "bytes": 1734734,
+      "sha256": "dddd1896b3a6c75fe8614043b5169a6f3851bb143b0044106b3ea1149768555d"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c0-f3-h1-v2-r0-n0-x0.wav",
+      "bytes": 2596038,
+      "sha256": "6a806231fb9ee888b7dfc244af308f54f99c06ca3cebb02695637aa52c1d83a9"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c0-f2-h0-v2-r0-n0-x0.wav",
+      "bytes": 2160678,
+      "sha256": "7251888276e4e42d3f8e3662603132bd7fe1700f62ccd14f0701ddd45dbc4850"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-paused-system.wav",
+      "bytes": 1806414,
+      "sha256": "4f656a2d7a35689cd329713c306feb1d06075016e4dd2e9733ae83c083698279"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c2-f1-h1-v0-r0-n1-x1.wav",
+      "bytes": 2080314,
+      "sha256": "9c11476a5334b71a35584c1fbd4cb7d82f7cbf3daf8dc5218510ff9a185c6106"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c2-f0-n0-x2.wav",
+      "bytes": 1775954,
+      "sha256": "ca429ceacfa3131df02c6cedd0abd44b6ec4766b548a3d845299de26b4065bd4"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c2-f1-h0-v1-r0-n0-x2.wav",
+      "bytes": 2062002,
+      "sha256": "c64364b6bf6e6015a66c5b7eabb370d96600764c323aad758d9663cd261df6fb"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c2-f1-n1-x1.wav",
+      "bytes": 1738242,
+      "sha256": "b89e1473bee4285a22306296dedbb1c6850c6f93bbe6aead40271d302206d8ea"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c3-f0-n0-x3.wav",
+      "bytes": 1803578,
+      "sha256": "cf62de7196a05df5c3a6754a3e75cff640ef1b12354f0905532374cc0ec4bd63"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/mapping-saving.wav",
+      "bytes": 741654,
+      "sha256": "69f58a091270e2bc48da93aa37a1c0cece059f3e3cfd9ecdfbee442ca30712e6"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/mapping-save-failed.wav",
+      "bytes": 404970,
+      "sha256": "b0d4a3e484e5fed74a7f973a86cc5b8b2408e9c488f8437bcd6f4175b931870f"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a1-c0-f1-h0-v0-r1-n0-x0.wav",
+      "bytes": 1985694,
+      "sha256": "56e9fa5e7d9e13d5ea9037ce6630c32328c19d7dc55be73ea2dcbe044c3d15bf"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/confirm-resume-inspection.wav",
+      "bytes": 430158,
+      "sha256": "107e5e753e08e5545197743bd2f335dff91f0d8f0f59ad14bdc75d610b0d737c"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c1-f1-h0-v0-r1-n1-x0.wav",
+      "bytes": 1926714,
+      "sha256": "a429d82d2028abd488a86354b8a12c03c824078e6670f8279e8ba42595ac0b0d"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c1-f2-h2-v0-r0-n0-x1.wav",
+      "bytes": 2050818,
+      "sha256": "90de19eebe76c661195e16db026938a01fe58c21f544d67d4cb05ebaca8e7a6a"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-prompts.json",
+      "bytes": 15849,
+      "sha256": "c1cb25deb59b4c81f38f9616f3bc42a4131b837c0becab3aa608044e49fcc59e"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-a-unreadable.wav",
+      "bytes": 990246,
+      "sha256": "d85247bd1415d6138cea215a8939fb0d7d3a1adc8011e881df1dee38e117f824"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-started.wav",
+      "bytes": 332854,
+      "sha256": "02eb0eb52eccb05e53c7f779d335bff32edec0501cd1693e4b0db49c684f19e7"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c0-f2-h1-v1-r0-n0-x0.wav",
+      "bytes": 2584854,
+      "sha256": "e0820fe96623e3c57c6a4d622a5fe37289529fb5693d6192c071e51f92380e8d"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-paused-chassis.wav",
+      "bytes": 1873998,
+      "sha256": "336ef7b71634570726b3c116ef6f571ccf715869c33d5d322012f4ff6e59ac17"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c1-f2-h0-v1-r1-n1-x0.wav",
+      "bytes": 2336634,
+      "sha256": "3804241c1df58df2e4a669fa9c2906a053c9ac75e7cb94a04662a512b382565d"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-c-normal.wav",
+      "bytes": 908286,
+      "sha256": "514b8829a5d0126277597213b0bd6c0bb013e1aab1118f4f99689e55a976bdca"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/please-repeat.wav",
+      "bytes": 499522,
+      "sha256": "0fe5bef8134b5c4cdaf8b67342b241d10c8d7ece494f8fafb065f0963bb0f2f4"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/accepted.wav",
+      "bytes": 298782,
+      "sha256": "dad4b69bcd2d25c326c0c7abebb0164f0a38d40455f4482ff1d9a7f991cf0372"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c1-f2-n0-x1.wav",
+      "bytes": 1744818,
+      "sha256": "3aa1a5657bf053fab961da95c11e35abcd236b199c56e38ec05012c15f87feaa"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-b-abnormal.wav",
+      "bytes": 888738,
+      "sha256": "9a5582c156fc4ca1249978071d78425e7d249fbdb30c3fd3d9855f78754b149d"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c0-f2-h0-v1-r1-n0-x0.wav",
+      "bytes": 2467878,
+      "sha256": "196b1c010928b10e96aeb7cb0f38aa7349f16c9feba58907ad07337208157d40"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c3-f0-h0-v0-r0-n2-x1.wav",
+      "bytes": 1678494,
+      "sha256": "194983703e6959a65c711ee3d1cc333fbf1dee79bd4cf90d3a14a532f618d416"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c1-f2-h0-v1-r1-n0-x1.wav",
+      "bytes": 2332578,
+      "sha256": "040e058707348f75f081625afecdd7fa1decb85b1d79484f0294970de30600bf"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c1-f1-h0-v1-r0-n0-x1.wav",
+      "bytes": 2021322,
+      "sha256": "2cfc82b4e6cf55a67d1baaefa9619e6749cb39603df021e918fdbd68b509c5d4"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a1-c0-f1-h0-v1-r0-n0-x0.wav",
+      "bytes": 2120982,
+      "sha256": "c544e5a58bf576f77da5fa4bb565c81128291099aad9c0e9ae6696f32bc17442"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-b-normal.wav",
+      "bytes": 895254,
+      "sha256": "f33b4a7729c92b57635fe6094391238287e364b7055e204b9beb1d94a945d345"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c1-f1-h0-v1-r0-n1-x0.wav",
+      "bytes": 2036562,
+      "sha256": "d989515117233c3aecc809e215e765680b5191ff462889c501ad507705dd2a06"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c0-f2-h2-v0-r0-n0-x0.wav",
+      "bytes": 2156622,
+      "sha256": "52cf27ec3f275b1031689cb173adceff15a086c48c49da454ca6d6c852a07ad9"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c0-f3-h0-v2-r1-n0-x0.wav",
+      "bytes": 2471922,
+      "sha256": "b14a90bb91e3aa0b6571dd57707a3e317cc7f7a49cf2336f68154fcdcdbd79a7"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-b-runtime-failed.wav",
+      "bytes": 1081422,
+      "sha256": "fa9547d3eed152d7dccb604669762add54a3873df1cbbf0c641c007b49b653c1"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/status-mapping.wav",
+      "bytes": 427938,
+      "sha256": "44e580c59cfe888e4f7a1e934fa02b7a28425a5fdf379f48d74243e0c73cbef8"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c2-f1-h1-v0-r0-n0-x2.wav",
+      "bytes": 2073186,
+      "sha256": "e43fcd198860982495147fe78d4b861ebd97a4ce927853ee06eb9fd3bc975654"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c0-f3-h1-v1-r1-n0-x0.wav",
+      "bytes": 2880870,
+      "sha256": "0b230cb0cfd2472ba21b6dfbed8c9114b3ab79815fbabcb8475b501c116f156a"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c0-f3-h2-v1-r0-n0-x0.wav",
+      "bytes": 2584854,
+      "sha256": "497a44abd8ef5076650135515c0683c77de5dfe23145c0936099ccc5a6b93f33"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c1-f2-h1-v1-r0-n0-x1.wav",
+      "bytes": 2467878,
+      "sha256": "61e5d2c38b9e37b9a2eddcd65368f05ceebaca8a086a66a78eb69f538f11263c"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c0-f2-h0-v0-r2-n0-x0.wav",
+      "bytes": 2021322,
+      "sha256": "a8ca8c303ba8e55cdf0f680cee42d4f5b3304ff41b52d937c46a088dea7561d8"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/arrived-b.wav",
+      "bytes": 498894,
+      "sha256": "1390f2cddee34f757a2044ffd2de95b50608aff0af72eb5fc722bd993c401629"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/status-left.wav",
+      "bytes": 499706,
+      "sha256": "040bc6acee79f5ee7951894097e7e91bc6d1aa87f93f7edc28fa67dbf5ffdf34"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c2-f0-h0-v0-r0-n0-x2.wav",
+      "bytes": 1644942,
+      "sha256": "ef4606bad526746ec69bcadd9a32edc0cc2a8da92bd448be437d932afdbf6cac"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-obstacle-recovery-started.wav",
+      "bytes": 909390,
+      "sha256": "12ecb6f1a53d025e17b072d1b0ee2cd7fddfcea411aa11f3692c3407d28a51bd"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-c-runtime-failed.wav",
+      "bytes": 1091370,
+      "sha256": "0d18b7b0aba8204558e751a1fa72e4645e5e2bf2d8aa3af668ae812413c36c02"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c3-f0-n1-x2.wav",
+      "bytes": 1789550,
+      "sha256": "836387944cefb93759c4f4863f79649b87af4d1f012d0814562bdce60c724569"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-finished.wav",
+      "bytes": 451090,
+      "sha256": "67be70e4a32a0e4e3e5c282e33e595f3e3d1942b2eb670fd1ad50796b6e34631"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-start-failed-obstacle.wav",
+      "bytes": 1754802,
+      "sha256": "40a18498c7e6038f6e17ccdbd27bbb3c943adafa3be2e55b96c7938dc3d4c861"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-a-abnormal.wav",
+      "bytes": 875718,
+      "sha256": "231aa8ff80fa4dfe08bc62a26904f629984f5428330c40acc95957d83ac2a6a3"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c2-f0-h0-v0-r0-n1-x1.wav",
+      "bytes": 1644942,
+      "sha256": "a94ceb663726453c973c8533ef41d82a969028b053e2533208d45ed2f093d5b8"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-c-abnormal.wav",
+      "bytes": 895254,
+      "sha256": "79acf9dc0661935ab3880e429e6588b398502626540f7a54e7df5364b7b390a2"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-paused-obstacle.wav",
+      "bytes": 1843278,
+      "sha256": "55fb5036be3453922ccd5d16c014c77a49a885047b2be3d84ea315d1cc3b9e0b"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c1-f2-h1-v0-r1-n0-x1.wav",
+      "bytes": 2350890,
+      "sha256": "bad895bf3d495736d7d8433b508a3997f092b51df0e8e5391fe0b7c49370e02b"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c1-f1-n1-x0.wav",
+      "bytes": 1707106,
+      "sha256": "9d085191c99dfba3839d25f55423ad6599300fc828121a4f0d46a329a116062f"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-started.wav",
+      "bytes": 263522,
+      "sha256": "c48af583edf40bbaced22474d14405919c25db4799ca638dc67aadb4c0412672"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/navigation-localization-recovery-started.wav",
+      "bytes": 678990,
+      "sha256": "350300b2669037f2b3391ee6859c77c4498d78ef024c05cf7c913c3ba03b0a2c"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c2-f1-h0-v0-r1-n0-x2.wav",
+      "bytes": 1959270,
+      "sha256": "893eb9a9cc90b2557df962407fc7ecf33266fadbccf6875cb6b081e378d7bd52"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/confirm-inspection.wav",
+      "bytes": 430490,
+      "sha256": "fb46a31dbe0e482decb37c914e3611d581ada42c0dac75d3e2c4cf010a85d2c1"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/mapping-already-running.wav",
+      "bytes": 813666,
+      "sha256": "e74c357cf1e2238f68c3f877cd406ec5e0f20d2f8416036d2e055818f243a3b6"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a1-c1-f0-n1-x0.wav",
+      "bytes": 1724210,
+      "sha256": "cb0a37848242c00c32fb6d36903ae7f27599daf0a41e655b65fdbb3e0b46d8ba"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-b-heading-failed.wav",
+      "bytes": 1490118,
+      "sha256": "725a54e3d7eca16ca210c36a2dc90a075fd8f13963ba2192c5e18386de397e7c"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/meter-c-heading-failed.wav",
+      "bytes": 1493562,
+      "sha256": "736d9d5966321961ffc3cd1c217c3858b020abd010622f1127acff2315b28c62"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/mapping-saved.wav",
+      "bytes": 395382,
+      "sha256": "db15551524e8eee1f3713f851f85d1e95ba5b01dc836e1e047fa36522a8d845c"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c3-f0-n2-x1.wav",
+      "bytes": 1768938,
+      "sha256": "bc75dc285fbd1e94d45a1b86695c8c1b5d882b249ae540f16247021b41155248"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/status-meter.wav",
+      "bytes": 499470,
+      "sha256": "1b853115872caef1464032e4a7be3d6495d341f2d4432435ec51fd2cca3fadee"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c1-f2-h0-v2-r0-n1-x0.wav",
+      "bytes": 2047746,
+      "sha256": "c2656f20d8601435218612b6b332394d2a700cdd3cdeefe0733c48f88caa0b6f"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c0-f2-n0-x0.wav",
+      "bytes": 1748326,
+      "sha256": "655d0cdeb14c32c9d628ad32064f37674642e400dac1b365400186db3d90623d"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c3-f0-h0-v0-r0-n3-x0.wav",
+      "bytes": 1667310,
+      "sha256": "64906b07a3f21732e7263d6f7351fd0cfc9c39eb5513e333d0f2e1a7b5efa095"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a3-c2-f1-h0-v0-r1-n1-x1.wav",
+      "bytes": 1967382,
+      "sha256": "e456c673442ab1925961a7c931be4723c57149356760073eb032facf76f16509"
+    },
+    {
+      "path": "services/rvclaw_voice/prompts/inspection-summary-a2-c2-f0-h0-v0-r0-n2-x0.wav",
+      "bytes": 1652070,
+      "sha256": "251528270a0161e33a42137c89e5a6afb795843cbb748d6152e428cac96a9b0f"
+    },
+    {
+      "path": "services/meter_gauge/models/yolov8s-pose-opt.param",
+      "bytes": 38921,
+      "sha256": "7560942807921ef8b64218fa890ed03e5ad0a94faee9d1a03a827499be304428"
+    },
+    {
+      "path": "services/meter_gauge/models/nanodet.bin",
+      "bytes": 4623216,
+      "sha256": "94ea186b0e31426338083bd4da27913ecafffca36d3898c2ecc84e51d0b85307"
+    },
+    {
+      "path": "services/meter_gauge/models/nanodet.param",
+      "bytes": 68277,
+      "sha256": "00f7a2a4fd387bed8e3565e44039099bb909bb94b47a89a5d8467a2425114ac4"
+    },
+    {
+      "path": "services/meter_gauge/models/yolov8s-pose-opt.bin",
+      "bytes": 22847564,
+      "sha256": "2420ca7920f9fa5c5f17cfc4912ee2927e2034d34c35ec6494d96ea5b7fafe7a"
+    },
+    {
+      "path": "runtime/k3/pylib/ncnn/ncnn.cpython-314-riscv64-linux-gnu.so",
+      "bytes": 2406512,
+      "sha256": "41b6e49bd7365ea5cbfd1da29f4c2b84867ca4c4ea02f53faec4953f876da385"
+    },
+    {
+      "path": "runtime/k3/pylib/ncnn/__init__.py",
+      "bytes": 118,
+      "sha256": "ef90c76a49b37e74b0cd89f1da9502e764ee6b24a8da44860f4af894dc5838fe"
+    }
+  ],
+  "directory_assets": [
+    "runtime/k3/base/deps/sysroot"
+  ],
+  "external_resources": {
+    "vision_model_cache": {
+      "root": "~/.cache/models/vision",
+      "assets": [
+        {
+          "path": "analog_gauge_reader/segmentation_model.onnx",
+          "bytes": 13288042,
+          "sha256": "98edfaa34b016ccb071e95c9981b92391392eb99432f6677ab65358f7089cd61"
+        },
+        {
+          "path": "analog_gauge_reader/key_point_model.onnx",
+          "bytes": 88415632,
+          "sha256": "65670b88c3b5625018604266ba4c4f94ea72b4e868fc9a6e13e67c5a8f17bc58"
+        },
+        {
+          "path": "analog_gauge_reader/gauge_detection_model.onnx",
+          "bytes": 12265723,
+          "sha256": "2d4d2118f7bb498b5bfcdbcd5beacade999156699672930363a0742e985ba7aa"
+        },
+        {
+          "path": "yolov8/yolov8n_no_dfl.q.onnx",
+          "bytes": 3367042,
+          "sha256": "56fdce64c5e9d93d965b7fde95e58e5e75aa2b97fc8bd192a4cd2ff5aff63b5d"
+        },
+        {
+          "path": "ppocr/PP-OCRv5_mobile_rec.onnx",
+          "bytes": 16537720,
+          "sha256": "dc7de8ee31d9246783cf346f3b207b4cb871e11824b1cfab2ff20aa1f1f8e67b"
+        },
+        {
+          "path": "ppocr/PP-OCRv5_mobile_det.onnx",
+          "bytes": 4767934,
+          "sha256": "d4aa24d408cd70b8b9f66cc758e20f397fc31a9c69d8477cf8887fc53bd5fceb"
+        },
+        {
+          "path": "ppe/keremberke_yolov8n/best_fp16.onnx",
+          "bytes": 6160941,
+          "sha256": "59a4de82aaa6630426b04196bcb24bd8f7be3171d2291fe9586906fd5d7d63ff"
+        },
+        {
+          "path": "ppe/safetyvision_yolov8n/best.onnx",
+          "bytes": 1900544,
+          "sha256": "3b16b2aee96aae65cf1d22de1ffc26459a77d947d95a23bc81c6ad943982fd3a"
+        },
+        {
+          "path": "ppe/safetyvision_yolov8n/best_fp16.onnx",
+          "bytes": 6114716,
+          "sha256": "352dd12427891610de6e51ef110682f2c7fee5b51204cc4432c65169d38567a6"
+        },
+        {
+          "path": "ppe/rvclaw_hardhat_yolov8n/best_fp16.onnx",
+          "bytes": 6160192,
+          "sha256": "10956fccfafba6744c3642e00d0746ea9d320d8cab0e923c3a86066333aaf34a"
+        }
+      ]
+    },
+    "sdk": {
+      "root": "/data/spacemit_robot",
+      "manifest": "deploy/k3/sdk_manifest.xml"
+    },
+    "opencv": {
+      "root": "/opt/opencv-spacemit"
+    },
+    "ros": {
+      "root": "/opt/ros/humble"
+    }
+  }
+}

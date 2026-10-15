@@ -1,0 +1,33 @@
+# Scene classification labels for SigLIP2 zero-shot demo.
+# One label per line. Lines starting with '#' are ignored.
+
+a photo of a beach
+a photo of a mountain
+a photo of a forest
+a photo of a city street
+a photo of a highway
+a photo of an airport
+a photo of a railway station
+a photo of a supermarket
+a photo of a restaurant
+a photo of an office
+a photo of a hospital
+a photo of a classroom
+a photo of a living room
+a photo of a kitchen
+a photo of a bedroom
+a photo of a bathroom
+a photo of a swimming pool
+a photo of a park
+a photo of a sports stadium
+a photo of a concert hall
+a photo of a museum
+a photo of a library
+a photo of a factory
+a photo of a farm
+a photo of a desert
+a photo of a snow field
+a photo of a river
+a photo of an ocean
+a photo of a sky with clouds
+a photo of a sunset

@@ -1,0 +1,23 @@
+# Path-only switch; original policies and units are retained.
+[Unit]
+Description=RVClaw persistent navigation runtime (STM32, lidar, localization, Nav2)
+After=default.target
+StartLimitIntervalSec=600
+StartLimitBurst=3
+RequiresMountsFor=@ROBOT_ROOT@ /data/spacemit_robot /data/RVClaw
+[Service]
+Type=simple
+KillMode=control-group
+EnvironmentFile=@ROBOT_ROOT@/runtime/k3/environment/rvclaw-nav2-persistent.service.env
+WorkingDirectory=@ROBOT_ROOT@/runtime/k3/navigation
+ExecStart=/bin/bash @ROBOT_ROOT@/runtime/k3/navigation/scripts/nav2_persistent_runtime.sh --run
+ExecStartPre=/bin/sleep 20
+Restart=on-failure
+RestartSec=30
+TimeoutStartSec=300
+TimeoutStopSec=30
+KillSignal=SIGINT
+SuccessExitStatus=SIGINT 130
+
+[Install]
+WantedBy=default.target

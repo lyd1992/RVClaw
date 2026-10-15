@@ -1,0 +1,16 @@
+[Unit]
+Description=RVClaw camera and inspection API
+After=network-online.target
+RequiresMountsFor=@ROBOT_ROOT@ /data/spacemit_robot /data/RVClaw
+
+[Service]
+Type=simple
+WorkingDirectory=@ROBOT_ROOT@
+ExecStart=/bin/bash @ROBOT_ROOT@/deploy/k3/run_camera_api.sh --host 127.0.0.1 --port 8017
+KillMode=control-group
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=90
+
+[Install]
+WantedBy=default.target

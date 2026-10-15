@@ -1,0 +1,35 @@
+SpacemiT ASR Component
+Copyright 2026 SpacemiT (Hangzhou) Technology Co. Ltd.
+
+This product includes software developed at
+SpacemiT (Hangzhou) Technology Co. Ltd. (https://www.spacemit.com/).
+
+---------------------------------------------------------------------------
+Third-party Software Notices:
+---------------------------------------------------------------------------
+
+This product contains portions of the following third-party software:
+
+1. SenseVoice (https://github.com/FunAudioLLM/SenseVoice)
+   Copyright (c) 2024-2026 Alibaba DAMO Academy
+   Licensed under the Apache License 2.0.
+
+2. ONNX Runtime (https://github.com/microsoft/onnxruntime)
+   Copyright (c) 2018-2026 Microsoft Corporation
+   Licensed under the MIT License.
+
+3. libsndfile (https://github.com/libsndfile/libsndfile)
+   Copyright (c) 1999-2026 Erik de Castro Lopo
+   Licensed under the GNU Lesser General Public License v2.1.
+
+4. FFTW3 (http://www.fftw.org/)
+   Copyright (c) 2003-2026 Matteo Frigo and Steven G. Johnson
+   Licensed under the GNU General Public License v2.0.
+
+5. libcurl (https://curl.se/)
+   Copyright (c) 1996-2026 Daniel Stenberg
+   Licensed under the MIT License.
+
+6. pybind11 (https://github.com/pybind/pybind11)
+   Copyright (c) 2016-2026 Wenzel Jakob
+   Licensed under the BSD 3-Clause License.

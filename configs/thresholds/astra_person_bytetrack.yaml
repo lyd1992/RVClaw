@@ -1,0 +1,16 @@
+# Astra stage-one person detection and stable ID assignment.
+model_path: ~/.cache/models/vision/yolov8/yolov8n_no_dfl.q.onnx
+test_video: ~/.cache/assets/video/003_palace.mp4
+image_size: [640, 640]
+label_file_path: assets/labels/coco.txt
+class: deploy.bytetrack.ByteTrackTracker
+default_params:
+  conf_threshold: 0.40
+  iou_threshold: 0.45
+  track_buffer: 30
+  frame_rate: 30
+  # The EP reserves cores when the session is created. Keep four available for
+  # the resident hard-hat session; inference calls are still serialized.
+  num_threads: 4
+  providers:
+    - SpaceMITExecutionProvider

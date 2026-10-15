@@ -1,0 +1,15 @@
+# SafetyVision YOLOv8n PPE model. The ONNX path is supplied by the API service
+# so model weights stay in ~/.cache instead of the source tree.
+model_path: ~/.cache/models/vision/ppe/safetyvision_yolov8n/best_fp16.onnx
+test_image: ~/.cache/assets/image/006_test.jpg
+label_file_path: /data/RVClaw/configs/thresholds/helmet_labels.txt
+image_size: [640, 640]
+class: deploy.yolov8.YOLOv8Detector
+default_params:
+  conf_threshold: 0.10
+  iou_threshold: 0.45
+  # Astra mode runs this as its only detector and gives it all K3 compute
+  # threads for each frame.
+  num_threads: 4
+  providers:
+    - SpaceMITExecutionProvider

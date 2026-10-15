@@ -1,0 +1,55 @@
+schema_version: 1
+map_id: voice-slam-20261006-110834-66940a96
+map_yaml: map.yaml
+frame_id: map
+
+locations:
+  ORIGIN:
+    x_m: -0.15
+    y_m: 0.67
+    yaw_deg: 0.0
+    arrival_position_tolerance_m: 0.20
+    arrival_yaw_tolerance_deg: 15.0
+    aliases: [原点, 起点]
+  A:
+    x_m: 2.0
+    y_m: 0.75
+    yaw_deg: 90.0
+    arrival_position_tolerance_m: 0.20
+    arrival_yaw_tolerance_deg: 15.0
+    aliases: [A点, A位置]
+  B:
+    x_m: 5.8
+    y_m: 0.45
+    yaw_deg: -90.0
+    arrival_position_tolerance_m: 0.20
+    arrival_yaw_tolerance_deg: 15.0
+    aliases: [B点, B位置]
+  C:
+    x_m: 9.45
+    y_m: 1.00
+    yaw_deg: 90.0
+    arrival_position_tolerance_m: 0.20
+    arrival_yaw_tolerance_deg: 15.0
+    aliases: [C点, C位置]
+
+tasks:
+  inspect_meter:
+    kind: inspection
+    aliases: [检查仪表, 检查电表, 读仪表]
+    timeout_s: 60.0
+    max_attempts: 2
+    failure_policy: continue
+
+missions:
+  inspection_route:
+    - location: A
+      task: inspect_meter
+    - location: B
+      task: inspect_meter
+    - location: C
+      task: inspect_meter
+    - location: ORIGIN
+
+mission_aliases:
+  inspection_route: [巡检路线, 完整巡检, 依次巡检ABC并返回原点]

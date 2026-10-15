@@ -1,0 +1,61 @@
+schema_version: 1
+map_id: slam-20260904-164645
+map_yaml: maps/slam-20260904-164645/map.yaml
+frame_id: map
+
+locations:
+  ORIGIN:
+    x_m: 0.0
+    y_m: 0.0
+    yaw_deg: 0.0
+    arrival_position_tolerance_m: 0.20
+    arrival_yaw_tolerance_deg: 15.0
+    aliases: [原点, 起点]
+  A:
+    x_m: 2.0
+    y_m: 0.0
+    yaw_deg: 0.0
+    arrival_position_tolerance_m: 0.20
+    arrival_yaw_tolerance_deg: 15.0
+    aliases: [A点, A位置]
+  B:
+    x_m: 2.0
+    y_m: -1.0
+    yaw_deg: 0.0
+    arrival_position_tolerance_m: 0.20
+    arrival_yaw_tolerance_deg: 15.0
+    aliases: [B点, B位置]
+  C:
+    x_m: 1.0
+    y_m: -0.75
+    yaw_deg: 0.0
+    arrival_position_tolerance_m: 0.20
+    arrival_yaw_tolerance_deg: 15.0
+    aliases: [C点, C位置]
+
+tasks:
+  inspect_meter:
+    kind: inspection
+    aliases: [检查仪表, 检查电表, 读仪表]
+    timeout_s: 45.0
+    max_attempts: 2
+    failure_policy: abort
+  inspect_scene:
+    kind: inspection
+    aliases: [检查现场, 巡检, 观察环境]
+    timeout_s: 60.0
+    max_attempts: 1
+    failure_policy: abort
+
+missions:
+  inspection_route:
+    - location: A
+      task: inspect_meter
+    - location: B
+      task: inspect_scene
+    - location: C
+      task: inspect_scene
+    - location: ORIGIN
+
+mission_aliases:
+  inspection_route: [巡检路线, 完整巡检, 依次巡检ABC并返回原点]

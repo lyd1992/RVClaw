@@ -1,0 +1,12 @@
+rvclaw_safety_supervisor:
+  ros__parameters:
+    control_rate_hz: 20.0
+    command_timeout_s: 0.25
+    max_command_stamp_age_s: 0.10
+    max_future_command_stamp_skew_s: 0.02
+    deadman_timeout_s: 0.15
+    max_linear_x_m_s: 0.10
+    max_angular_z_rad_s: 0.30
+    max_linear_accel_m_s2: 0.20
+    max_angular_accel_rad_s2: 0.60
+    require_feedback_connected: false

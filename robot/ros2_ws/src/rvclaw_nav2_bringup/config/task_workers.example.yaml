@@ -1,0 +1,22 @@
+schema_version: 1
+
+# Replace these placeholders with the exact interface supplied by the
+# speech/vision owner. Keep enabled=false until the real endpoint is tested.
+bindings:
+  inspect_meter:
+    transport: ros2_service
+    endpoint: /rvclaw/tasks/inspect_meter
+    interface_type: TODO/srv/InspectMeter
+    readiness_endpoint: /rvclaw/tasks/inspect_meter/ready
+    timeout_s: 40.0
+    enabled: false
+    may_publish_motion: false
+
+  inspect_scene:
+    transport: ros2_service
+    endpoint: /rvclaw/tasks/inspect_scene
+    interface_type: TODO/srv/InspectScene
+    readiness_endpoint: /rvclaw/tasks/inspect_scene/ready
+    timeout_s: 55.0
+    enabled: false
+    may_publish_motion: false

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>asr</name>
+  <version>1.0.2</version>
+  <description>Speech-to-text inference using ONNX Runtime</description>
+  <depend>audio</depend>
+  <system_depend check="pkg-config --exists sndfile">libsndfile1-dev</system_depend>
+  <system_depend check="pkg-config --exists libcurl">libcurl4-openssl-dev</system_depend>
+  <system_depend check="pkg-config --exists fftw3f">libfftw3-dev</system_depend>
+  <system_depend arch="riscv64">spacemit-onnxruntime</system_depend>
+  <system_depend arch="riscv64">python3-spacemit-ort</system_depend>
+  <system_depend arch="riscv64">llama.cpp-tools-spacemit</system_depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>

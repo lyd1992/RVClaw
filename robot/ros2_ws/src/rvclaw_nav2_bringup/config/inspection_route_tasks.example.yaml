@@ -1,0 +1,37 @@
+schema_version: 1
+
+# The Studio service owns the Astra camera.  This integration only calls its
+# JSON API; it never opens /dev/video* itself.
+vision_api_url: http://127.0.0.1:8017
+result_root: /data/RVClaw/runs/route-inspections
+restore_camera_mode: true
+speech_ack_timeout_s: 12.0
+
+defaults:
+  task_id: inspect_meter
+  kind: digital_meter
+  search_offsets_deg: [0, -10, 10, -20, 20]
+  reads_per_heading: 3
+  min_consistent_reads: 2
+  min_confidence: 0.65
+  numeric_tolerance: 0.01
+  timeout_s: 45.0
+  failure_policy: continue
+
+# Keep every point disabled until its reference image, display ROI and two
+# alignment markers have been saved in RVClaw Studio.  A point may define a
+# fixed inspection_yaw_deg, or a target map coordinate from which the yaw is
+# calculated.  The latter is preferred for a permanently installed meter.
+points:
+  A:
+    enabled: false
+    meter_id: PHONE-DEMO-A
+    inspection_yaw_deg: 0.0
+  B:
+    enabled: false
+    meter_id: PHONE-DEMO-B
+    inspection_yaw_deg: 90.0
+  C:
+    enabled: false
+    meter_id: PHONE-DEMO-C
+    inspection_yaw_deg: 180.0

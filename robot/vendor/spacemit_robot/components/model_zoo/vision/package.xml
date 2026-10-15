@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>vision</name>
+  <version>0.1.0</version>
+  <description>Computer vision model deployment (detection, classification, segmentation, tracking) using ONNX Runtime and OpenCV</description>
+  <system_depend arch="riscv64">opencv-spacemit</system_depend>
+  <system_depend>libyaml-cpp-dev</system_depend>
+  <system_depend arch="riscv64">python3-spacemit-ort</system_depend>
+  <system_depend>libeigen3-dev</system_depend>
+  <system_depend arch="riscv64">spacemit-onnxruntime</system_depend>
+
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>

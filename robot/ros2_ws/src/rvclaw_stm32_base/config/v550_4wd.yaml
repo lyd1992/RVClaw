@@ -1,0 +1,13 @@
+rvclaw_stm32_telemetry:
+  ros__parameters:
+    device: /dev/serial/by-id/usb-WCH.CN_USB_Single_Serial_0002-if00
+    baud: 115200
+    odom_frame_id: odom
+    base_frame_id: base_footprint
+    imu_frame_id: imu_link
+    connection_timeout_s: 0.5
+    reconnect_interval_s: 1.0
+    odom_x_scale: 0.981
+    odom_y_scale: 1.0
+    odom_z_scale_positive: 1.0
+    odom_z_scale_negative: 1.0

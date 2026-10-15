@@ -1,0 +1,14 @@
+"scenes/inspection/map.yaml" -text
+"scenes/inspection/map.pgm" -text
+"scenes/inspection/waypoints.yaml" -text
+"scenes/inspection/mission_catalog.yaml" -text
+"scenes/inspection/inspection_route_tasks.yaml" -text
+"device/meter/meters.json" -text
+"device/vision/ppocr_meter_rec.yaml" -text
+"device/vision/ppocr_meter_upload.yaml" -text
+"thresholds/astra_person_bytetrack.yaml" -text
+"thresholds/general_yolov8.yaml" -text
+"thresholds/hardhat_labels.txt" -text
+"thresholds/hardhat_yolov8.yaml" -text
+"thresholds/helmet_labels.txt" -text
+"thresholds/helmet_yolov8.yaml" -text

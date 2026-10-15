@@ -1,0 +1,22 @@
+# Path-only switch; original policies and units are retained.
+[Unit]
+Description=RVClaw vendor M2 wake and local command adapter
+After=default.target
+StartLimitIntervalSec=0
+RequiresMountsFor=@ROBOT_ROOT@ /data/spacemit_robot /data/RVClaw
+[Service]
+Type=simple
+KillMode=control-group
+EnvironmentFile=@ROBOT_ROOT@/runtime/k3/environment/rvclaw-vendor-command.service.env
+WorkingDirectory=@ROBOT_ROOT@/services/rvclaw_voice
+ExecStart=/usr/bin/python3 @ROBOT_ROOT@/services/rvclaw_voice/vendor_m2_command_adapter.py --port-device /dev/rvclaw-m260c-control --capture-device hw:CARD=XFMDPV0018,DEV=0 --baud 115200 --prompt-dir @ROBOT_ROOT@/services/rvclaw_voice/prompts --asr-model-dir @ROBOT_ROOT@/models/asr/sensevoice --vad-model-dir @ROBOT_ROOT@/models/vad/silero --no-aiui-required --silence-seconds 2.0 --no-speech-seconds 6.0 --maximum-seconds 12.0
+ExecStartPre=-/usr/bin/amixer -q -M -c Device sset PCM 60% unmute
+ExecStartPre=-/usr/bin/amixer -q sset Master 60% unmute
+ExecStopPost=@ROBOT_ROOT@/deploy/k3/env/tcm_release_if_leaked.sh stoppost
+Restart=always
+RestartSec=2
+TimeoutStartSec=90
+TimeoutStopSec=90
+
+[Install]
+WantedBy=default.target

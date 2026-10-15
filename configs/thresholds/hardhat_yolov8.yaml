@@ -1,0 +1,15 @@
+# RVClaw stage-two hard-hat detector. Astra sends a 2x2 mosaic of tracked
+# person head regions so all visible people share one model invocation.
+model_path: ~/.cache/models/vision/ppe/rvclaw_hardhat_yolov8n/best_fp16.onnx
+test_image: ~/.cache/assets/image/006_test.jpg
+label_file_path: /data/RVClaw/configs/thresholds/hardhat_labels.txt
+image_size: [640, 640]
+class: deploy.yolov8.YOLOv8Detector
+default_params:
+  conf_threshold: 0.25
+  iou_threshold: 0.45
+  # The other four K3 cores are reserved by the resident ByteTrack session.
+  # Calls remain serialized so the two sessions do not contend at runtime.
+  num_threads: 4
+  providers:
+    - SpaceMITExecutionProvider

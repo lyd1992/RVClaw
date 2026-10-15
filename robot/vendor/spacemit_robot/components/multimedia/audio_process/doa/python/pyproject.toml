@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=42", "pybind11>=2.10"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spacemit_audio_process"
+version = "1.0.0"
+description = "Sound source localization (GCC-PHAT)"
+requires-python = ">=3.8"
+
+[tool.setuptools.packages.find]
+where = ["."]

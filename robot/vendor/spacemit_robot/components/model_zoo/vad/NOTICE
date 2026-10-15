@@ -1,0 +1,23 @@
+SpacemiT VAD Component
+Copyright 2026 SpacemiT (Hangzhou) Technology Co. Ltd.
+
+This product includes software developed at
+SpacemiT (Hangzhou) Technology Co. Ltd. (https://www.spacemit.com/).
+
+---------------------------------------------------------------------------
+Third-party Software Notices:
+---------------------------------------------------------------------------
+
+This product contains portions of the following third-party software:
+
+1. Silero VAD (https://github.com/snakers4/silero-vad)
+   Copyright (c) 2020-2026 Silero Team
+   Licensed under the MIT License.
+
+2. ONNX Runtime (https://github.com/microsoft/onnxruntime)
+   Copyright (c) 2018-2026 Microsoft Corporation
+   Licensed under the MIT License.
+
+3. pybind11 (https://github.com/pybind/pybind11)
+   Copyright (c) 2016-2026 Wenzel Jakob
+   Licensed under the BSD 3-Clause License.

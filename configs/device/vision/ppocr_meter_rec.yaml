@@ -1,0 +1,15 @@
+# Fixed digital-display recognition for RVClaw.
+# The display region is already configured at installation time. DBNet text
+# detection is skipped so joined LCD and seven-segment digits go directly to
+# the PP-OCRv5 recognition model.
+model_path: ~/.cache/models/vision/ppocr/PP-OCRv5_mobile_det.onnx
+class: deploy.ppocr.PPOCRDetector
+default_params:
+  rec_model_path: ~/.cache/models/vision/ppocr/PP-OCRv5_mobile_rec.onnx
+  dict_path: /data/spacemit_robot/components/model_zoo/vision/assets/labels/ppocr_keys.txt
+  rec_only: true
+  rec_img_h: 48
+  rec_img_w_max: 320
+  num_threads: 4
+  providers:
+    - CPUExecutionProvider

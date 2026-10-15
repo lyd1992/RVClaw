@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>audio_process</name>
+  <version>0.1.0</version>
+  <description>Audio processing algorithms: sound source localization (GCC-PHAT)</description>
+  <system_depend check="pkg-config --exists fftw3f">libfftw3-dev</system_depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>

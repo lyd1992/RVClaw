@@ -1,0 +1,23 @@
+SpacemiT Audio Component
+Copyright 2026 SpacemiT (Hangzhou) Technology Co. Ltd.
+
+This product includes software developed at
+SpacemiT (Hangzhou) Technology Co. Ltd. (https://www.spacemit.com/).
+
+---------------------------------------------------------------------------
+Third-party Software Notices:
+---------------------------------------------------------------------------
+
+This product contains portions of the following third-party software:
+
+1. PortAudio (http://www.portaudio.com/)
+   Copyright (c) 1999-2026 Ross Bencina and Phil Burk
+   Licensed under the MIT License.
+
+2. libsamplerate (https://github.com/libsndfile/libsamplerate)
+   Copyright (c) 2002-2026 Erik de Castro Lopo
+   Licensed under the BSD 2-Clause License.
+
+3. pybind11 (https://github.com/pybind/pybind11)
+   Copyright (c) 2016-2026 Wenzel Jakob
+   Licensed under the BSD 3-Clause License.

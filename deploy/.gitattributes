@@ -1,0 +1,8 @@
+"k3/sdk_manifest.xml" -text
+"k3/udev/99-rvclaw-m10.rules" -text
+"k3/udev/99-rvclaw-m260c.rules" -text
+"k3/udev/wheeltec_mic.rules" -text
+"k3/env/m10_env.sh" -text
+"k3/env/tcm_release_if_leaked.sh" -text
+"k3/mapping_entry.sh" -text
+"k3/build_workspaces.sh" -text

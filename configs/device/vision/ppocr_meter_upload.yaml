@@ -1,0 +1,24 @@
+# Arbitrary-image digital-display recognition for RVClaw uploads.
+#
+# The camera pipeline receives a display crop that was calibrated at
+# installation time, so it disables DBNet and feeds the whole crop straight to
+# the recognizer (see ppocr_meter_rec.yaml).  An uploaded photo has no known
+# display region, so this profile keeps text detection enabled: DBNet locates
+# candidate text boxes over the whole image and the recognizer runs per box.
+model_path: ~/.cache/models/vision/ppocr/PP-OCRv5_mobile_det.onnx
+class: deploy.ppocr.PPOCRDetector
+default_params:
+  rec_model_path: ~/.cache/models/vision/ppocr/PP-OCRv5_mobile_rec.onnx
+  dict_path: /data/spacemit_robot/components/model_zoo/vision/assets/labels/ppocr_keys.txt
+  rec_only: false
+  # Keep more detail than the camera profile: uploaded photos are often wider
+  # than 960px and the reading may occupy only a small part of the frame.
+  det_limit_side_len: 1280
+  det_db_thresh: 0.3
+  det_db_box_thresh: 0.45
+  det_db_unclip_ratio: 2.0
+  rec_img_h: 48
+  rec_img_w_max: 320
+  num_threads: 4
+  providers:
+    - CPUExecutionProvider

@@ -1,0 +1,13 @@
+# RVClaw C70 general detector.
+model_path: ~/.cache/models/vision/yolov8/yolov8n_no_dfl.q.onnx
+test_image: ~/.cache/assets/image/006_test.jpg
+label_file_path: assets/labels/coco.txt
+image_size: [640, 640]
+class: deploy.yolov8.YOLOv8Detector
+default_params:
+  conf_threshold: 0.4
+  iou_threshold: 0.45
+  # The active camera owns all K3 inference threads; modes never run together.
+  num_threads: 8
+  providers:
+    - SpaceMITExecutionProvider

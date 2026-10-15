@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rvclaw.local/contracts/command_result.schema.json",
+  "title": "RVClaw Voice Command Result",
+  "type": "object",
+  "required": ["request_id", "accepted", "status", "reason", "timestamp"],
+  "properties": {
+    "request_id": {"type": "string"},
+    "accepted": {"type": "boolean"},
+    "status": {"type": "string", "enum": ["accepted", "rejected", "confirmation_required", "error"]},
+    "reason": {"type": "string"},
+    "intent": {"type": ["string", "null"]},
+    "task_id": {"type": ["string", "null"]},
+    "state": {"type": ["string", "null"]},
+    "response_text": {"type": ["string", "null"]},
+    "replayed": {"type": "boolean"},
+    "timestamp": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": true
+}

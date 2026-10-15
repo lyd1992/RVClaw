@@ -1,0 +1,19 @@
+# Path-only switch; original policies and units are retained.
+[Unit]
+Description=RVClaw meter gauge reader (NanoDet + YOLOv8-Pose, ncnn, port 8018)
+After=network-online.target
+StartLimitIntervalSec=0
+RequiresMountsFor=@ROBOT_ROOT@ /data/spacemit_robot /data/RVClaw
+[Service]
+Type=simple
+KillMode=control-group
+EnvironmentFile=@ROBOT_ROOT@/runtime/k3/environment/rvclaw-meter-gauge.service.env
+WorkingDirectory=@ROBOT_ROOT@/services/meter_gauge
+ExecStart=/usr/bin/python3 @ROBOT_ROOT@/services/meter_gauge/run_server.py --host 0.0.0.0 --port 8018
+Restart=on-failure
+RestartSec=3
+TimeoutStartSec=90
+TimeoutStopSec=90
+
+[Install]
+WantedBy=default.target

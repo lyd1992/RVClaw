@@ -1,0 +1,1 @@
+SUBSYSTEM=="tty", KERNEL=="ttyACM*", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="55d4", ATTRS{serial}=="0001", GROUP:="dialout", MODE:="0660", SYMLINK+="wheeltec_lidar"

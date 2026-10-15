@@ -1,0 +1,209 @@
+Panels:
+  - Class: rviz_common/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /Static Map1
+        - /M10P Scan1
+        - /Footprint1
+        - /Goal Pose1
+        - /Global Costmap1
+        - /Local Costmap1
+        - /TF1
+      Splitter Ratio: 0.5
+    Tree Height: 720
+  - Class: rviz_common/Selection
+    Name: Selection
+  - Class: rviz_common/Tool Properties
+    Expanded:
+      - /Interact1
+      - /Select1
+      - /Focus Camera1
+      - /Measure1
+    Name: Tool Properties
+    Splitter Ratio: 0.588235
+  - Class: rviz_common/Views
+    Expanded:
+      - /Current View1
+    Name: Views
+    Splitter Ratio: 0.5
+  - Class: rviz_common/Time
+    Experimental: false
+    Name: Time
+    SyncSource: M10P Scan
+    SyncSourceTopic: /scan
+Preferences:
+  PromptSaveOnExit: true
+Toolbars:
+  toolButtonStyle: 2
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Alpha: 0.7
+      Class: rviz_default_plugins/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Static Map
+      Topic:
+        Depth: 5
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /map
+      Update Topic: false
+      Use Timestamp: false
+    - Class: rviz_default_plugins/LaserScan
+      Enabled: true
+      Name: M10P Scan
+      Style: Points
+      Size (Pixels): 3
+      Size (m): 0.025
+      Topic:
+        Depth: 10
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Best Effort
+        Value: /scan
+      Use Fixed Frame: true
+      Use rainbow: false
+      Color: 255; 40; 40
+      Decay Time: 0
+    - Class: rviz_default_plugins/Map
+      Alpha: 0.35
+      Color Scheme: costmap
+      Draw Behind: false
+      Enabled: true
+      Name: Global Costmap
+      Topic:
+        Depth: 5
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /global_costmap/costmap
+      Update Topic: false
+      Use Timestamp: false
+    - Class: rviz_default_plugins/Map
+      Alpha: 0.45
+      Color Scheme: costmap
+      Draw Behind: false
+      Enabled: true
+      Name: Local Costmap
+      Topic:
+        Depth: 5
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /local_costmap/costmap
+      Update Topic: false
+      Use Timestamp: false
+    - Class: rviz_default_plugins/Polygon
+      Color: 30; 180; 255
+      Enabled: true
+      Filled: true
+      Fill Color: 30; 180; 255
+      Fill Alpha: 0.12
+      Line Style: Lines
+      Line Width: 0.04
+      Name: Footprint
+      Topic: /local_costmap/published_footprint
+    - Class: rviz_default_plugins/Pose
+      Color: 255; 255; 255
+      Enabled: true
+      Head Length: 0.20
+      Head Radius: 0.08
+      Name: Goal Pose
+      Shaft Length: 0.30
+      Shaft Radius: 0.03
+      Topic: /goal_pose
+    - Class: rviz_default_plugins/Path
+      Color: 40; 220; 40
+      Enabled: true
+      Line Style: Lines
+      Line Width: 0.03
+      Name: Global Plan
+      Topic: /plan
+    - Class: rviz_default_plugins/Path
+      Color: 255; 170; 0
+      Enabled: true
+      Line Style: Lines
+      Line Width: 0.03
+      Name: Local Plan
+      Topic: /local_plan
+    - Class: rviz_default_plugins/Odometry
+      Angle Tolerance: 0.1
+      Color: 255; 255; 0
+      Enabled: true
+      Keep: 100
+      Name: Odometry
+      Position Tolerance: 0.1
+      Shape: Arrow
+      Topic: /odom
+    - Class: rviz_default_plugins/PoseWithCovariance
+      Covariance:
+        Orientation:
+          Alpha: 0.3
+          Color: 255; 255; 127
+          Head Length: 0.3
+          Head Radius: 0.1
+          Shaft Length: 0.5
+          Shaft Radius: 0.03
+          Value: true
+        Position:
+          Alpha: 0.3
+          Color: 255; 255; 127
+          Scale: 0.1
+          Value: true
+        Value: true
+      Enabled: true
+      Name: AMCL Pose
+      Topic: /amcl_pose
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Frame Timeout: 15
+      Marker Scale: 0.25
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: false
+      Update Interval: 0
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: map
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/Interact
+      Hide Inactive Objects: true
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/FocusCamera
+    - Class: rviz_default_plugins/Measure
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/TopDownOrtho
+      Angle: 0
+      Enable Stereo Rendering: false
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.01
+      Scale: 20
+      Target Frame: <Fixed Frame>
+      X: 0
+      Y: 0
+  Window Geometry:
+    Displays:
+      collapsed: false
+    Height: 900
+    Hide Left Dock: false
+    Hide Right Dock: false
+    QMainWindow State: 000000ff00000000fd0000000400000000000001900000034fc0200000008fb000000100044006900730070006c006100790073010000003d0000034d000000c900fffffffb000000140054006f006f006c002000500072006f0070006500720074006900650073010000038f0000011c000000c900fffffffb0000000c005600690065007700730101000002b9000000e9000000c900fffffffb0000000800540069006d006501000003a80000006e000000c900ffffff00000001000001000000034cfc0200000001fb000000100044006900730070006c0061007900730200000000000001890000016500fffffffb000000140054006f006f006c002000500072006f007000650072007400690065007301000000410000011c0000011c00fffffffb0000000c00560069006500770073000100000041000000e90000011c00fffffffb0000000800540069006d006501000000410000006e0000011c00ffffff00000001000001000000034c00000004000000040000000800000008fc0000000100000002
+    Width: 1440
+    X: 40
+    Y: 40

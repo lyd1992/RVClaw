@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>audio</name>
+  <version>0.1.0</version>
+  <description>Audio capture, playback and file I/O (PortAudio, libsndfile)</description>
+  <system_depend check="pkg-config --exists portaudio-2.0">portaudio19-dev</system_depend>
+  <system_depend check="pkg-config --exists alsa">libasound2-dev</system_depend>
+  <system_depend check="pkg-config --exists sndfile">libsndfile1-dev</system_depend>
+  <system_depend check="pkg-config --exists samplerate">libsamplerate0-dev</system_depend>
+  <system_depend check="command -v arecord">alsa-utils</system_depend>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>
